@@ -1,26 +1,44 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const ResultsSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
+        ref: "Student",
         required: true,
     },
+
     courseId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
+        ref: "Course",
         required: true,
     },
-    grade: {
-        type: String,
-        required: true,
-    },
+
     semester: {
         type: String,
         required: true,
     },
+
+    internalMarks: Number,
+    externalMarks: Number,
+    practicalMarks: Number,
+
+    totalMarks: Number,
+
+    grade: {
+        type: String,
+    },
+
+    status: {
+        type: String,
+        enum: ["draft", "published"],
+        default: "draft",
+    },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Teacher",
+    }
+
 }, { timestamps: true });
 
-const Results = mongoose.model('Results', ResultsSchema);
-
-export default Results;
+export default mongoose.model("Results", ResultsSchema);
