@@ -15,7 +15,6 @@ const ResultsSchema = new mongoose.Schema({
 
     semester: {
         type: String,
-        required: true,
     },
 
     internalMarks: Number,

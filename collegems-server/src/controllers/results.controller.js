@@ -21,26 +21,24 @@ export const getResults = async (req, res) => {
 
 export const createResult = async (req, res) => {
     try {
-        const { studentId, courseCode, marks, grade } = req.body;
+        const { studentId, courseId, marks, grade } = req.body;
 
-        // 1️⃣ Find student using studentId
-        const student = await Student.findOne({ studentId });
+        // ✅ find using Mongo _id
+        const student = await Student.findById(studentId);
 
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
         }
 
-        // 2️⃣ Find course using code
-        const course = await Course.findOne({ code: courseCode });
+        const course = await Course.findById(courseId);
 
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
 
-        // 3️⃣ Save result using Mongo IDs
         const result = await Results.create({
-            studentId: student._id,
-            courseId: course._id,
+            studentId,
+            courseId,
             marks,
             grade,
         });
