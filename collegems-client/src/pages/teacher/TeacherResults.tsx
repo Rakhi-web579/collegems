@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   User,
   BookOpen,
-  Award,
   Hash,
   Save,
   Loader2,
@@ -633,7 +632,7 @@ export default function TeacherResult() {
             </div>
 
             {/* Students List */}
-            <div className="overflow-y-auto max-h-[600px]">
+            <div className="overflow-y-auto max-h-150">
               {loading ? (
                 <div className="text-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
