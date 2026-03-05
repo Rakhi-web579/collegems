@@ -22,6 +22,7 @@ import {
   Settings,
   GraduationCap,
   CalendarDays,
+  Percent,
 } from "lucide-react";
 import HodCourses from "../../components/Courses";
 import TeacherAssignments from "./Assignment";
@@ -33,6 +34,7 @@ import Salary from "./Salary";
 import Syllabus from "../../components/Syllabus";
 import MyAttendance from "./MyAttendance";
 import OrganizeEvents from "../../components/OrganizeEvents";
+import TeacherResults from "./TeacherResults";
 
 export default function TeacherDashboard() {
   const [data, setData] = useState<any>(null);
@@ -121,6 +123,7 @@ export default function TeacherDashboard() {
     { id: "salary", label: "Salary", icon: Coins },
     { id: "classes", label: "Classes", icon: Book },
     { id: "syllabus", label: "Syllabus", icon: FileText },
+    { id: "results", label: "Results", icon: Percent },
     { id: "students", label: "Students", icon: Users },
     { id: "events", label: "Organize Events", icon: CalendarDays },
   ];
@@ -231,10 +234,9 @@ export default function TeacherDashboard() {
                     className={`
                       w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
                       transition-colors relative
-                      ${
-                        isActive
-                          ? "bg-blue-50 text-blue-700"
-                          : "text-gray-700 hover:bg-gray-100"
+                      ${isActive
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-700 hover:bg-gray-100"
                       }
                     `}
                   >
@@ -448,11 +450,10 @@ export default function TeacherDashboard() {
                               {classItem.course}
                             </h3>
                             <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                classItem.status === "upcoming"
+                              className={`px-2 py-1 rounded text-xs font-medium ${classItem.status === "upcoming"
                                   ? "bg-blue-50 text-blue-700"
                                   : "bg-gray-100 text-gray-600"
-                              }`}
+                                }`}
                             >
                               {classItem.status}
                             </span>
@@ -524,6 +525,7 @@ export default function TeacherDashboard() {
           {activeTab === "salary" && <Salary />}
           {activeTab === "classes" && <Classes />}
           {activeTab === "syllabus" && <Syllabus />}
+          {activeTab === "results" && <TeacherResults />}
           {activeTab === "students" && <Students />}
           {activeTab === "events" && <OrganizeEvents />}
         </main>
