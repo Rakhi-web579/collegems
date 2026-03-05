@@ -18,6 +18,7 @@ import {
   Moon,
   Sun,
   CalendarDays,
+  AwardIcon,
 } from "lucide-react";
 import api from "../../api/axios";
 import Attendance from "./Attendance";
@@ -26,6 +27,7 @@ import Assignment from "./Assignment";
 import Courses from "./Courses";
 import ExamSchedule from "./ExamSchedule";
 import Events from "../../components/Events";
+import StudentResults from "./StudentResults";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -65,6 +67,7 @@ export default function StudentDashboard() {
     { id: "courses", label: "Courses", icon: BookOpen },
     { id: "examschedule", label: "Exam Schedule", icon: Calendar },
     { id: "events", label: "Events", icon: CalendarDays },
+    { id: "results", label: "Results", icon: AwardIcon }
   ];
 
   if (loading) {
@@ -187,10 +190,9 @@ export default function StudentDashboard() {
                     className={`
                       w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
                       transition-colors relative
-                      ${
-                        isActive
-                          ? "bg-blue-50 text-blue-700"
-                          : "text-gray-700 hover:bg-gray-100"
+                      ${isActive
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-700 hover:bg-gray-100"
                       }
                     `}
                   >
@@ -509,6 +511,7 @@ export default function StudentDashboard() {
               {activeTab === "courses" && <Courses />}
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "events" && <Events />}
+              {activeTab === "results" && <StudentResults />}
             </div>
           )}
 

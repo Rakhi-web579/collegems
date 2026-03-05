@@ -10,6 +10,7 @@ import ExamSchedule from "./pages/students/ExamSchedule";
 import Courses from "./pages/students/Courses";
 import Teachers from "./components/Teachers";
 import Events from "./components/Events";
+import StudentResults from "./pages/students/StudentResults";
 
 export default function App() {
   return (
@@ -20,11 +21,11 @@ export default function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/examschedule" element={<ExamSchedule />} />
-        <Route path="/results" element={<div>Results Page</div>} />
-        <Route path="/events" element={<Events/>} />
+        <Route path="/results" element={<StudentResults />} />
+        <Route path="/events" element={<Events />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/timetable" element={<div>Timetable Page</div>} />
-        <Route path="/faculty" element={<Teachers/>} />
+        <Route path="/faculty" element={<Teachers />} />
         <Route
           path="/student/dashboard"
           element={
