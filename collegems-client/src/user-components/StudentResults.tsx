@@ -13,7 +13,7 @@ import {
   Eye,
   Printer,
 } from "lucide-react";
-import axios from "../../api/axios";
+import axios from "../api/axios";
 
 interface Course {
   _id: string;

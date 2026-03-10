@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../../api/axios";
+import api from "../api/axios";
 import {
   PieChart,
   Pie,
@@ -20,15 +20,12 @@ import {
   RadialBar,
 } from "recharts";
 import {
-  Calendar,
   Filter,
   RefreshCw,
   CheckCircle,
   XCircle,
   Clock,
-  BookOpen,
   TrendingUp,
-  Users,
   Download,
   ChevronDown,
   Activity,

@@ -13,7 +13,7 @@ import {
   Save,
   AlertCircle,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 export default function TeacherAssignments({ courseId }: { courseId: string }) {
   const [open, setOpen] = useState(false);

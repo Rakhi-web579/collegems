@@ -8,7 +8,6 @@ import {
   Calendar,
   Award,
   Download,
-  RefreshCw,
   Filter,
   ChevronDown,
   Upload,
@@ -16,7 +15,7 @@ import {
   FolderOpen,
   FileCheck,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 export default function Assignment() {
   const [assignments, setAssignments] = useState<any[]>([]);

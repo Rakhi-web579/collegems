@@ -5,7 +5,6 @@ import {
   Filter,
   ChevronDown,
   X,
-  Bookmark,
   Users,
   Calendar,
   Clock,
@@ -18,7 +17,7 @@ import {
   List,
   Download,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface Course {
   id: string;
@@ -321,7 +320,7 @@ const Courses: React.FC = () => {
               className="group bg-white rounded-xl border border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all overflow-hidden"
             >
               {/* Course Header */}
-              <div className="relative p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+              <div className="relative p-5 bg-linear-to-br from-gray-50 to-white border-b border-gray-100">
                 <div className="flex items-start gap-3">
                   <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
                     <span className="text-white font-bold text-lg">

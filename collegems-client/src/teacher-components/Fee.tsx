@@ -13,7 +13,7 @@ import {
   Clock,
   Wallet,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface Student {
   _id: string;

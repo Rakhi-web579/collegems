@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  DollarSign,
   TrendingUp,
   Calendar,
   Clock,
@@ -19,7 +18,7 @@ import {
   Landmark,
   ReceiptText,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface Salary {
   _id: string;

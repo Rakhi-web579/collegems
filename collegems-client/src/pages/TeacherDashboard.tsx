@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../../api/axios";
-import TeacherAttendance from "./Attendance";
+import api from "../api/axios";
 import {
   Users,
   BarChart3,
@@ -24,17 +23,19 @@ import {
   CalendarDays,
   Percent,
 } from "lucide-react";
-import HodCourses from "../../components/Courses";
-import TeacherAssignments from "./Assignment";
-import Students from "../../components/Students";
-import ExamSchedule from "../../components/ExamSchedule";
-import Classes from "../../components/Classes";
-import TeacherFee from "./Teacherfee";
-import Salary from "./Salary";
-import Syllabus from "../../components/Syllabus";
-import MyAttendance from "./MyAttendance";
-import OrganizeEvents from "../../components/EventsManage";
-import TeacherResults from "./TeacherResults";
+import HodCourses from "../teacher-components/Courses";
+import TeacherAssignments from "../teacher-components/Assignment";
+import Students from "../common-components-management/Students";
+import ExamSchedule from "../teacher-components/ExamSchedule";
+import Classes from "../teacher-components/Classes";
+import TeacherFee from "../teacher-components/Fee";
+import Salary from "../teacher-components/Salary";
+import Syllabus from "../teacher-components/Syllabus";
+import MyAttendance from "../teacher-components/MyAttendance";
+import OrganizeEvents from "../teacher-components/EventsManage";
+import TeacherResults from "../teacher-components/TeacherResults";
+import TeacherAttendance from "../teacher-components/MyAttendance";
+
 
 export default function TeacherDashboard() {
   const [data, setData] = useState<any>(null);
@@ -451,8 +452,8 @@ export default function TeacherDashboard() {
                             </h3>
                             <span
                               className={`px-2 py-1 rounded text-xs font-medium ${classItem.status === "upcoming"
-                                  ? "bg-blue-50 text-blue-700"
-                                  : "bg-gray-100 text-gray-600"
+                                ? "bg-blue-50 text-blue-700"
+                                : "bg-gray-100 text-gray-600"
                                 }`}
                             >
                               {classItem.status}

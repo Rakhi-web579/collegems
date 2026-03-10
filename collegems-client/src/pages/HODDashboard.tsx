@@ -21,17 +21,10 @@ import {
   Home,
   CalendarDays,
 } from "lucide-react";
-import api from "../../api/axios";
-import HodCourses from "../../components/Courses";
-import Students from "../../components/Students";
-import Teachers from "../../components/Teachers";
-import ExamSchedule from "../../components/ExamSchedule";
-import Classes from "../../components/Classes";
-import Hodfee from "./Hodfee";
-import HODSalary from "./HODSalary";
-import Syllabus from "../../components/Syllabus";
-import HODTeacherAttendance from "./HodTeacherAttendance";
-import EventsManage from "../../components/EventsManage";
+import api from "../api/axios";
+import Students from "../common-components-management/Students";
+import HODSalary from "../hod-components/Salary";
+import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 
 type TabType =
   | "overview"
@@ -198,10 +191,9 @@ export default function HODDashboard() {
                     className={`
                       w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium
                       transition-colors relative
-                      ${
-                        isActive
-                          ? "bg-blue-50 text-blue-700"
-                          : "text-gray-700 hover:bg-gray-100"
+                      ${isActive
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-700 hover:bg-gray-100"
                       }
                     `}
                   >
@@ -421,16 +413,9 @@ export default function HODDashboard() {
             </div>
           )}
 
-          {activeTab === "teachers" && <Teachers />}
           {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
           {activeTab === "students" && <Students />}
-          {activeTab === "fees" && <Hodfee />}
           {activeTab === "salary" && <HODSalary />}
-          {activeTab === "syllabus" && <Syllabus />}
-          {activeTab === "courses" && <HodCourses />}
-          {activeTab === "examSchedule" && <ExamSchedule />}
-          {activeTab === "classes" && <Classes />}
-          {activeTab === "classes" && <EventsManage />}
         </main>
       </div>
     </div>

@@ -13,7 +13,7 @@ import {
   Building2,
   GraduationCap,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface ExamSchedule {
   _id: string;

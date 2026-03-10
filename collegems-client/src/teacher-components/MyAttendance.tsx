@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Calendar,
   CheckCircle,
-  XCircle,
   AlertCircle,
   Save,
   Loader2,
@@ -11,10 +10,8 @@ import {
   UserCheck,
   UserX,
   UserMinus,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface AttendanceRecord {
   _id: string;

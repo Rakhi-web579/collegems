@@ -20,7 +20,7 @@ import {
   Wallet,
   PieChart,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface Teacher {
   _id: string;
@@ -42,7 +42,7 @@ interface Salary {
   lastPayment?: string;
 }
 
-export default function HODSalary() {
+export default function Salary() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [salaries, setSalaries] = useState<Salary[]>([]);
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
@@ -391,33 +391,30 @@ export default function HODSalary() {
       <div className="bg-white rounded-xl border border-gray-200 p-1 inline-flex">
         <button
           onClick={() => setActiveTab("set")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-            activeTab === "set"
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "set"
               ? "bg-blue-600 text-white"
               : "text-gray-600 hover:text-gray-900"
-          }`}
+            }`}
         >
           <UserPlus className="w-4 h-4" />
           Set Salary
         </button>
         <button
           onClick={() => setActiveTab("pay")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-            activeTab === "pay"
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "pay"
               ? "bg-blue-600 text-white"
               : "text-gray-600 hover:text-gray-900"
-          }`}
+            }`}
         >
           <CreditCard className="w-4 h-4" />
           Pay Salary
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-            activeTab === "history"
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === "history"
               ? "bg-blue-600 text-white"
               : "text-gray-600 hover:text-gray-900"
-          }`}
+            }`}
         >
           <Clock className="w-4 h-4" />
           Payment History
@@ -532,11 +529,10 @@ export default function HODSalary() {
                   return (
                     <div
                       key={teacher._id}
-                      className={`px-4 py-3 border-b border-gray-100 flex items-center hover:bg-gray-50 transition-colors ${
-                        selectedTeachers.includes(teacher._id)
+                      className={`px-4 py-3 border-b border-gray-100 flex items-center hover:bg-gray-50 transition-colors ${selectedTeachers.includes(teacher._id)
                           ? "bg-blue-50"
                           : ""
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center w-8 mr-4">
                         <input
@@ -564,18 +560,16 @@ export default function HODSalary() {
                       <div className="w-24">
                         {teacherSalary ? (
                           <span
-                            className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                              teacherSalary.status === "paid"
+                            className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${teacherSalary.status === "paid"
                                 ? "bg-green-50 text-green-700"
                                 : "bg-amber-50 text-amber-700"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                                teacherSalary.status === "paid"
+                              className={`w-1.5 h-1.5 rounded-full mr-1.5 ${teacherSalary.status === "paid"
                                   ? "bg-green-500"
                                   : "bg-amber-500"
-                              }`}
+                                }`}
                             ></span>
                             {teacherSalary.status}
                           </span>
@@ -737,21 +731,19 @@ export default function HODSalary() {
                   <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
                     <button
                       onClick={() => setBulkPaymentMode(false)}
-                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                        !bulkPaymentMode
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${!bulkPaymentMode
                           ? "bg-white text-gray-900 shadow-sm"
                           : "text-gray-600 hover:text-gray-900"
-                      }`}
+                        }`}
                     >
                       Single
                     </button>
                     <button
                       onClick={() => setBulkPaymentMode(true)}
-                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                        bulkPaymentMode
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${bulkPaymentMode
                           ? "bg-white text-gray-900 shadow-sm"
                           : "text-gray-600 hover:text-gray-900"
-                      }`}
+                        }`}
                     >
                       Bulk
                     </button>
@@ -950,13 +942,12 @@ export default function HODSalary() {
             {/* Message Display */}
             {message && (
               <div
-                className={`mt-4 p-3 rounded-lg flex items-start gap-2 ${
-                  message.type === "success"
+                className={`mt-4 p-3 rounded-lg flex items-start gap-2 ${message.type === "success"
                     ? "bg-green-50 text-green-800"
                     : message.type === "error"
                       ? "bg-red-50 text-red-800"
                       : "bg-blue-50 text-blue-800"
-                }`}
+                  }`}
               >
                 {message.type === "success" ? (
                   <CheckCircle size={18} className="shrink-0 mt-0.5" />
@@ -1035,16 +1026,14 @@ export default function HODSalary() {
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                        s.status === "paid"
+                      className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${s.status === "paid"
                           ? "bg-green-50 text-green-700"
                           : "bg-amber-50 text-amber-700"
-                      }`}
+                        }`}
                     >
                       <span
-                        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                          s.status === "paid" ? "bg-green-500" : "bg-amber-500"
-                        }`}
+                        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${s.status === "paid" ? "bg-green-500" : "bg-amber-500"
+                          }`}
                       ></span>
                       {s.status}
                     </span>

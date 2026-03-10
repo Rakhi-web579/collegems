@@ -1,16 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import RoleRoute from "./components/RoleRoute";
-import StudentDashboard from "./pages/students/StudentDashboard";
-import TeacherDashboard from "./pages/teacher/TeacherDashboard";
-import HodDashboard from "./pages/hod/HODDashboard";
+import RoleRoute from "./routes/RoleRoute";
+import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
-import ExamSchedule from "./pages/students/ExamSchedule";
-import Courses from "./pages/students/Courses";
-import Teachers from "./components/Teachers";
-import Events from "./pages/students/EventsStudent";
-import StudentResults from "./pages/students/StudentResults";
+import ExamSchedule from "./user-components/ExamSchedule";
+import Courses from "./user-components/Courses";
+import Teachers from "./hod-components/Teachers";
+import Events from "./user-components/EventsStudent";
+import StudentResults from "./user-components/StudentResults";
 
 export default function App() {
   return (

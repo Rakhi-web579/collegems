@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Download,
   BarChart3,
-  PieChart,
   TrendingUp,
   CalendarDays,
   UserCheck,
@@ -18,7 +17,7 @@ import {
   Filter,
   RefreshCw,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface TeacherAttendance {
   _id: string;

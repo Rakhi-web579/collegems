@@ -20,14 +20,14 @@ import {
   CalendarDays,
   AwardIcon,
 } from "lucide-react";
-import api from "../../api/axios";
-import Attendance from "./Attendance";
-import Fees from "./Fee";
-import Assignment from "./Assignment";
-import Courses from "./Courses";
-import ExamSchedule from "./ExamSchedule";
-import StudentResults from "./StudentResults";
-import EventsStudent from "./EventsStudent";
+import api from "../api/axios";
+import Attendance from "../user-components/Attendance";
+import Fees from "../user-components/Fee";
+import Assignment from "../user-components/Assignment";
+import Courses from "../user-components/Courses";
+import ExamSchedule from "../user-components/ExamSchedule";
+import StudentResults from "../user-components/StudentResults";
+import EventsStudent from "../user-components/EventsStudent";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -512,7 +512,7 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
-              
+
             </div>
           )}
 

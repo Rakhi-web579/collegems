@@ -16,8 +16,8 @@ import {
   Landmark,
   Receipt,
   Shield,
-  ArrowLeft,
 } from "lucide-react";
+import api from "../api/axios";
 
 interface Installment {
   amount: number;
