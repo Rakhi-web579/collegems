@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const WorkshopSchema = new mongoose.Schema(
+const EventsSchema = new mongoose.Schema(
     {
         title: {
             type: String,
@@ -21,7 +21,7 @@ const WorkshopSchema = new mongoose.Schema(
 
         category: {
             type: String,
-            enum: ["Workshop", "Seminar", "Webinar", "Alumni Talk"],
+            enum: ["Workshop", "Seminar", "Webinar", "Alumni Talk", "Hackathon"],
             required: true,
         },
 
@@ -113,6 +113,6 @@ const WorkshopSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const Workshop = mongoose.model("Workshop", WorkshopSchema);
+const Event = mongoose.model("Event", EventsSchema);
 
-export default Workshop;
+export default Event;

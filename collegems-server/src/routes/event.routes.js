@@ -1,23 +1,22 @@
 import express from "express";
 import {
-  createEvent,
-  deleteEvent,
-  getAllEvents,
-  getEventById,
-  updateEvent,
-} from "../controllers/event.controller.js";
+    createEvent,
+    getAllEvents,
+    getEventById,
+    updateEvent,
+    deleteEvent,
+} from "../controllers/events.controller.js";
+
 
 const router = express.Router();
 
-// Create a new event
-router.post("/", createEvent);
-// Get all events
+// PUBLIC ROUTES
 router.get("/", getAllEvents);
-// Get a specific event by ID
 router.get("/:id", getEventById);
-// Update an event by ID
+
+// ADMIN ROUTES
+router.post("/create", createEvent);
 router.put("/:id", updateEvent);
-// Delete an event by ID
 router.delete("/:id", deleteEvent);
 
 export default router;
