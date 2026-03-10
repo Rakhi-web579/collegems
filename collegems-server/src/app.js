@@ -19,6 +19,7 @@ import resultsRoutes from "./routes/results.routes.js";
 // Admin / HOD
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
+import workshopRoutes from "./routes/workshop.routes.js";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api/assignment", assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
 app.use("/api/events", eventRoute);
 app.use("/api/results", resultsRoutes);
+app.use("/api/workshops", workshopRoutes);
 
 app.use("/api/courses", courseRoutes);
 app.use("/api/classes", classRoutes);
