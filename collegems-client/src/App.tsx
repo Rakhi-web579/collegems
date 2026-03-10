@@ -9,8 +9,8 @@ import MainDashboard from "./pages/MainDashboard";
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
 import Teachers from "./hod-components/Teachers";
-import Events from "./user-components/EventsStudent";
 import StudentResults from "./user-components/StudentResults";
+import EventsStudent from "./user-components/EventsStudent";
 
 export default function App() {
   return (
@@ -22,7 +22,7 @@ export default function App() {
 
         <Route path="/examschedule" element={<ExamSchedule />} />
         <Route path="/results" element={<StudentResults />} />
-        <Route path="/events" element={<Events />} />
+        <Route path="/events" element={<EventsStudent />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/timetable" element={<div>Timetable Page</div>} />
         <Route path="/faculty" element={<Teachers />} />

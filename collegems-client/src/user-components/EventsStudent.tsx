@@ -25,7 +25,7 @@ import {
   Loader2,
 } from 'lucide-react';
 
-interface Workshop {
+interface Event {
     _id: string;
     title: string;
     shortDescription: string;
@@ -52,46 +52,46 @@ interface Workshop {
 }
 
 export default function EventsStudent() {
-    const [workshops, setWorkshops] = useState<Workshop[]>([]);
-    const [filteredWorkshops, setFilteredWorkshops] = useState<Workshop[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
+    const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [selectedMode, setSelectedMode] = useState<string>("all");
     const [showFilters, setShowFilters] = useState<boolean>(false);
-    const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
+    const [selectedevent, setSelectedevent] = useState<Event | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
 
     // Get unique categories
-    const categories = ["all", ...new Set(workshops.map(w => w.category))];
+    const categories = ["all", ...new Set(events.map(w => w.category))];
     const modes = ["all", "online", "offline", "hybrid"];
 
     useEffect(() => {
-        fetchWorkshops();
+        fetchEvents();
     }, []);
 
     useEffect(() => {
-        filterWorkshops();
-    }, [searchTerm, selectedCategory, selectedMode, workshops]);
+        filterEvents();
+    }, [searchTerm, selectedCategory, selectedMode, events]);
 
-    const fetchWorkshops = async () => {
+    const fetchEvents = async () => {
         try {
             setLoading(true);
             const res = await axios.get("/events");
-            setWorkshops(res.data.data);
-            setFilteredWorkshops(res.data.data);
+            setEvents(res.data.data);
+            setFilteredEvents(res.data.data);
             setError(null);
         } catch (err) {
             console.error(err);
-            setError("Failed to load workshops. Please try again.");
+            setError("Failed to load events. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
-    const filterWorkshops = () => {
-        let filtered = workshops;
+    const filterEvents = () => {
+        let filtered = events;
 
         if (searchTerm) {
             filtered = filtered.filter(w =>
@@ -110,7 +110,7 @@ export default function EventsStudent() {
             filtered = filtered.filter(w => w.mode === selectedMode);
         }
 
-        setFilteredWorkshops(filtered);
+        setFilteredEvents(filtered);
     };
 
     const clearFilters = () => {
@@ -119,14 +119,14 @@ export default function EventsStudent() {
         setSelectedMode("all");
     };
 
-    const handleViewDetails = (workshop: Workshop) => {
-        setSelectedWorkshop(workshop);
+    const handleViewDetails = (event: Event) => {
+        setSelectedevent(event);
         setShowModal(true);
     };
 
     const closeModal = () => {
         setShowModal(false);
-        setSelectedWorkshop(null);
+        setSelectedevent(null);
     };
 
     const formatDate = (dateString: string) => {
@@ -161,7 +161,7 @@ export default function EventsStudent() {
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto" />
-                    <p className="mt-4 text-gray-600">Loading workshops...</p>
+                    <p className="mt-4 text-gray-600">Loading events...</p>
                 </div>
             </div>
         );
@@ -175,11 +175,11 @@ export default function EventsStudent() {
                         <AlertCircle className="w-8 h-8 text-rose-600" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Unable to load workshops
+                        Unable to load events
                     </h3>
                     <p className="text-gray-600 mb-6">{error}</p>
                     <button
-                        onClick={fetchWorkshops}
+                        onClick={fetchEvents}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         <Loader2 className="w-4 h-4" />
@@ -194,8 +194,8 @@ export default function EventsStudent() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Workshops & Events</h1>
-                <p className="text-gray-500 mt-1">Discover and join upcoming workshops, seminars, and webinars</p>
+                <h1 className="text-2xl font-bold text-gray-900">Events & Events</h1>
+                <p className="text-gray-500 mt-1">Discover and join upcoming events, seminars, and webinars</p>
             </div>
 
             {/* Search and Filter Bar */}
@@ -310,7 +310,7 @@ export default function EventsStudent() {
             {/* Results Stats */}
             <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-500">
-                    Showing <span className="font-medium text-gray-700">{filteredWorkshops.length}</span> workshops
+                    Showing <span className="font-medium text-gray-700">{filteredEvents.length}</span> events
                 </p>
                 <button className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2">
                     <Download className="w-4 h-4" />
@@ -318,11 +318,11 @@ export default function EventsStudent() {
                 </button>
             </div>
 
-            {/* Workshops Grid */}
-            {filteredWorkshops.length === 0 ? (
+            {/* events Grid */}
+            {filteredEvents.length === 0 ? (
                 <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
                     <CalendarDays className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No workshops found</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No events found</h3>
                     <p className="text-gray-500 mb-6">Try adjusting your search or filters</p>
                     <button
                         onClick={clearFilters}
@@ -333,34 +333,34 @@ export default function EventsStudent() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredWorkshops.map((workshop) => (
+                    {filteredEvents.map((event) => (
                         <div
-                            key={workshop._id}
+                            key={event._id}
                             className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
                         >
                             {/* Image Container */}
                             <div className="relative h-48 overflow-hidden bg-gray-100">
                                 <img
-                                    src={workshop.coverImage || 'https://via.placeholder.com/800x400?text=Workshop'}
-                                    alt={workshop.title}
+                                    src={event.coverImage || 'https://via.placeholder.com/800x400?text=event'}
+                                    alt={event.title}
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=Workshop';
+                                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=event';
                                     }}
                                 />
 
                                 {/* Category Badge */}
                                 <div className="absolute top-3 left-3">
                                     <span className="px-2 py-1 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-medium rounded-lg border border-gray-200">
-                                        {workshop.category}
+                                        {event.category}
                                     </span>
                                 </div>
 
                                 {/* Mode Badge */}
                                 <div className="absolute top-3 right-3">
-                                    <span className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 border ${getModeColor(workshop.mode)}`}>
-                                        {getModeIcon(workshop.mode)}
-                                        {workshop.mode.charAt(0).toUpperCase() + workshop.mode.slice(1)}
+                                    <span className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 border ${getModeColor(event.mode)}`}>
+                                        {getModeIcon(event.mode)}
+                                        {event.mode?.charAt(0).toUpperCase() + event.mode?.slice(1)}
                                     </span>
                                 </div>
                             </div>
@@ -368,37 +368,37 @@ export default function EventsStudent() {
                             {/* Content */}
                             <div className="p-5">
                                 <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">
-                                    {workshop.title}
+                                    {event.title}
                                 </h3>
 
                                 <p className="text-sm text-gray-500 mb-4 line-clamp-2">
-                                    {workshop.shortDescription}
+                                    {event.shortDescription}
                                 </p>
 
                                 {/* Speaker & Organization */}
                                 <div className="space-y-2 mb-4">
                                     <div className="flex items-center gap-2 text-sm">
                                         <User className="w-4 h-4 text-gray-400" />
-                                        <span className="text-gray-600">{workshop.speaker}</span>
+                                        <span className="text-gray-600">{event.speaker}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm">
                                         <Building className="w-4 h-4 text-gray-400" />
-                                        <span className="text-gray-600">{workshop.organization}</span>
+                                        <span className="text-gray-600">{event.organization}</span>
                                     </div>
                                 </div>
 
                                 {/* Date & Time */}
                                 <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                                     <Calendar className="w-4 h-4 text-gray-400" />
-                                    <span>{formatDate(workshop.date)}</span>
+                                    <span>{formatDate(event.date)}</span>
                                     <Clock className="w-4 h-4 text-gray-400 ml-2" />
-                                    <span>{workshop.startTime}</span>
+                                    <span>{event.startTime}</span>
                                 </div>
 
                                 {/* Tags */}
-                                {workshop.tags && (
+                                {event.tags && (
                                     <div className="flex flex-wrap gap-2 mb-4">
-                                        {workshop.tags.split(',').map((tag, index) => (
+                                        {event.tags.split(',').map((tag, index) => (
                                             <span
                                                 key={index}
                                                 className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg flex items-center gap-1"
@@ -413,16 +413,16 @@ export default function EventsStudent() {
                                 {/* Action Buttons */}
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => handleViewDetails(workshop)}
+                                        onClick={() => handleViewDetails(event)}
                                         className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                                     >
                                         Details
                                         <ChevronRight className="w-4 h-4" />
                                     </button>
 
-                                    {workshop.mode !== 'offline' && workshop.meetingLink && (
+                                    {event.mode !== 'offline' && event.meetingLink && (
                                         <a
-                                            href={workshop.meetingLink}
+                                            href={event.meetingLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
@@ -437,15 +437,15 @@ export default function EventsStudent() {
                 </div>
             )}
 
-            {/* Workshop Details Modal */}
-            {showModal && selectedWorkshop && (
+            {/* event Details Modal */}
+            {showModal && selectedevent && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
                         {/* Modal Header */}
                         <div className="relative h-56 bg-gray-100">
                             <img
-                                src={selectedWorkshop.coverImage || 'https://via.placeholder.com/1200x400?text=Workshop'}
-                                alt={selectedWorkshop.title}
+                                src={selectedevent.coverImage || 'https://via.placeholder.com/1200x400?text=event'}
+                                alt={selectedevent.title}
                                 className="w-full h-full object-cover"
                             />
                             <button
@@ -458,36 +458,36 @@ export default function EventsStudent() {
                             {/* Badges */}
                             <div className="absolute bottom-4 left-4 flex gap-2">
                                 <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-700 text-sm font-medium rounded-lg border border-gray-200">
-                                    {selectedWorkshop.category}
+                                    {selectedevent.category}
                                 </span>
-                                <span className={`px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-1 border ${getModeColor(selectedWorkshop.mode)}`}>
-                                    {getModeIcon(selectedWorkshop.mode)}
-                                    {selectedWorkshop.mode.charAt(0).toUpperCase() + selectedWorkshop.mode.slice(1)}
+                                <span className={`px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-1 border ${getModeColor(selectedevent.mode)}`}>
+                                    {getModeIcon(selectedevent.mode)}
+                                    {selectedevent.mode.charAt(0).toUpperCase() + selectedevent.mode.slice(1)}
                                 </span>
                             </div>
                         </div>
 
                         {/* Modal Content */}
                         <div className="p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">{selectedWorkshop.title}</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">{selectedevent.title}</h2>
 
                             {/* Key Info Grid */}
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <User className="w-4 h-4 text-gray-400" />
-                                    <span className="font-medium">Speaker:</span> {selectedWorkshop.speaker}
+                                    <span className="font-medium">Speaker:</span> {selectedevent.speaker}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Building className="w-4 h-4 text-gray-400" />
-                                    <span className="font-medium">Organization:</span> {selectedWorkshop.organization}
+                                    <span className="font-medium">Organization:</span> {selectedevent.organization}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Calendar className="w-4 h-4 text-gray-400" />
-                                    <span className="font-medium">Date:</span> {formatDate(selectedWorkshop.date)}
+                                    <span className="font-medium">Date:</span> {formatDate(selectedevent.date)}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Clock className="w-4 h-4 text-gray-400" />
-                                    <span className="font-medium">Time:</span> {selectedWorkshop.startTime} - {selectedWorkshop.endTime}
+                                    <span className="font-medium">Time:</span> {selectedevent.startTime} - {selectedevent.endTime}
                                 </div>
                             </div>
 
@@ -496,38 +496,38 @@ export default function EventsStudent() {
                                 <div>
                                     <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                         <Info className="w-4 h-4 text-gray-400" />
-                                        About this Workshop
+                                        About this event
                                     </h3>
-                                    <p className="text-sm text-gray-600 leading-relaxed">{selectedWorkshop.description}</p>
+                                    <p className="text-sm text-gray-600 leading-relaxed">{selectedevent.description}</p>
                                 </div>
 
-                                {selectedWorkshop.prerequisites && (
+                                {selectedevent.prerequisites && (
                                     <div>
                                         <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                             <BookOpen className="w-4 h-4 text-gray-400" />
                                             Prerequisites
                                         </h3>
-                                        <p className="text-sm text-gray-600">{selectedWorkshop.prerequisites}</p>
+                                        <p className="text-sm text-gray-600">{selectedevent.prerequisites}</p>
                                     </div>
                                 )}
 
-                                {selectedWorkshop.targetAudience && (
+                                {selectedevent.targetAudience && (
                                     <div>
                                         <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                             <Users className="w-4 h-4 text-gray-400" />
                                             Target Audience
                                         </h3>
-                                        <p className="text-sm text-gray-600">{selectedWorkshop.targetAudience}</p>
+                                        <p className="text-sm text-gray-600">{selectedevent.targetAudience}</p>
                                     </div>
                                 )}
 
-                                {selectedWorkshop.mode !== 'online' && selectedWorkshop.venue && (
+                                {selectedevent.mode !== 'online' && selectedevent.venue && (
                                     <div>
                                         <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                             <MapPin className="w-4 h-4 text-gray-400" />
                                             Venue
                                         </h3>
-                                        <p className="text-sm text-gray-600">{selectedWorkshop.venue}</p>
+                                        <p className="text-sm text-gray-600">{selectedevent.venue}</p>
                                     </div>
                                 )}
 
@@ -540,30 +540,30 @@ export default function EventsStudent() {
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                             <User className="w-4 h-4 text-gray-400" />
-                                            {selectedWorkshop.contactName}
+                                            {selectedevent.contactName}
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                             <Mail className="w-4 h-4 text-gray-400" />
-                                            {selectedWorkshop.contactEmail}
+                                            {selectedevent.contactEmail}
                                         </div>
-                                        {selectedWorkshop.contactPhone && (
+                                        {selectedevent.contactPhone && (
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                                 <Phone className="w-4 h-4 text-gray-400" />
-                                                {selectedWorkshop.contactPhone}
+                                                {selectedevent.contactPhone}
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
-                                {selectedWorkshop.registrationRequired && (
+                                {selectedevent.registrationRequired && (
                                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                                         <div className="flex items-start gap-3">
                                             <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
                                             <div>
                                                 <p className="font-medium text-amber-800">Registration Required</p>
-                                                {selectedWorkshop.maxParticipants && (
+                                                {selectedevent.maxParticipants && (
                                                     <p className="text-sm text-amber-600 mt-1">
-                                                        Maximum participants: {selectedWorkshop.maxParticipants}
+                                                        Maximum participants: {selectedevent.maxParticipants}
                                                     </p>
                                                 )}
                                             </div>
@@ -580,15 +580,15 @@ export default function EventsStudent() {
                                 >
                                     Close
                                 </button>
-                                {selectedWorkshop.mode !== 'offline' && selectedWorkshop.meetingLink && (
+                                {selectedevent.mode !== 'offline' && selectedevent.meetingLink && (
                                     <a
-                                        href={selectedWorkshop.meetingLink}
+                                        href={selectedevent.meetingLink}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
                                     >
                                         <Video className="w-4 h-4" />
-                                        Join Workshop
+                                        Join event
                                     </a>
                                 )}
                             </div>
