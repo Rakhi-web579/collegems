@@ -26,8 +26,8 @@ import Fees from "./Fee";
 import Assignment from "./Assignment";
 import Courses from "./Courses";
 import ExamSchedule from "./ExamSchedule";
-import Events from "../../components/Events";
 import StudentResults from "./StudentResults";
+import EventsStudent from "./EventsStudent";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -510,8 +510,9 @@ export default function StudentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "courses" && <Courses />}
               {activeTab === "examschedule" && <ExamSchedule />}
-              {activeTab === "events" && <Events />}
+              {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
+              
             </div>
           )}
 

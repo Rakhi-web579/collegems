@@ -9,7 +9,7 @@ import MainDashboard from "./pages/MainDashboard";
 import ExamSchedule from "./pages/students/ExamSchedule";
 import Courses from "./pages/students/Courses";
 import Teachers from "./components/Teachers";
-import Events from "./components/Events";
+import Events from "./pages/students/EventsStudent";
 import StudentResults from "./pages/students/StudentResults";
 
 export default function App() {

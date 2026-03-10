@@ -33,7 +33,7 @@ import TeacherFee from "./Teacherfee";
 import Salary from "./Salary";
 import Syllabus from "../../components/Syllabus";
 import MyAttendance from "./MyAttendance";
-import OrganizeEvents from "../../components/OrganizeEvents";
+import OrganizeEvents from "../../components/EventsManage";
 import TeacherResults from "./TeacherResults";
 
 export default function TeacherDashboard() {

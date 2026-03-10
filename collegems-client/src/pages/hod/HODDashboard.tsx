@@ -31,7 +31,7 @@ import Hodfee from "./Hodfee";
 import HODSalary from "./HODSalary";
 import Syllabus from "../../components/Syllabus";
 import HODTeacherAttendance from "./HodTeacherAttendance";
-import OrganizeEvents from "../../components/OrganizeEvents";
+import EventsManage from "../../components/EventsManage";
 
 type TabType =
   | "overview"
@@ -430,7 +430,7 @@ export default function HODDashboard() {
           {activeTab === "courses" && <HodCourses />}
           {activeTab === "examSchedule" && <ExamSchedule />}
           {activeTab === "classes" && <Classes />}
-          {activeTab === "classes" && <OrganizeEvents />}
+          {activeTab === "classes" && <EventsManage />}
         </main>
       </div>
     </div>
