@@ -78,7 +78,24 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 - Smart Notice Targeting  
 
 ---
+## Application workflow
+``` mermaid
+flowchart LR
+    User[Student / Teacher / Admin] --> Frontend[React Frontend]
 
+    Frontend --> Auth[Authentication Service]
+    Auth --> API[Express API Server]
+
+    API --> DB[(MongoDB Database)]
+    API --> AI[AI Prediction Engine]
+    API --> Notify[Notification Service]
+
+    AI --> DB
+    Notify --> Frontend
+
+    DB --> Dashboard[Analytics & Reports]
+    Dashboard --> Frontend
+```
 ---
 
 ## Additional Features
@@ -89,6 +106,21 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 - Deployment Ready Setup  
 
 ---
+
+``` mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as Backend API
+    participant D as Database
+
+    U->>F: Perform Action
+    F->>B: API Request (JWT)
+    B->>D: Fetch/Update Data
+    D-->>B: Response
+    B-->>F: Processed Data
+    F-->>U: UI Update
+```
 
 ## Project Purpose
 - College Academic Project  
