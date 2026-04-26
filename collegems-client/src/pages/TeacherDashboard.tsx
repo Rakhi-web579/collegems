@@ -34,7 +34,7 @@ import Syllabus from "../teacher-components/Syllabus";
 import MyAttendance from "../teacher-components/MyAttendance";
 import OrganizeEvents from "../teacher-components/EventsManage";
 import TeacherResults from "../teacher-components/TeacherResults";
-import TeacherAttendance from "../teacher-components/MyAttendance";
+import StudentAttendance from "../teacher-components/Attendance";
 
 
 export default function TeacherDashboard() {
@@ -520,7 +520,7 @@ export default function TeacherDashboard() {
               courseId={courses[0]?._id || "default-course-id"}
             />
           )}
-          {activeTab === "attendance" && <TeacherAttendance />}
+          {activeTab === "attendance" && <StudentAttendance />}
           {activeTab === "examschedules" && <ExamSchedule />}
           {activeTab === "fees" && <TeacherFee />}
           {activeTab === "salary" && <Salary />}
