@@ -14,15 +14,15 @@ import {
   UserX,
   RefreshCw,
 } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
-interface Attendance {
-  studentId: string;
-  student?: string;
-  status: "present" | "absent";
-  studentName: string;
-  studentEmail: string;
-}
+// interface Attendance {
+//   studentId: string;
+//   student?: string;
+//   status: "present" | "absent";
+//   studentName: string;
+//   studentEmail: string;
+// }
 
 export default function TeacherAttendance() {
   const [students, setStudents] = useState<any[]>([]);
