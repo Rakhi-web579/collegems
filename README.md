@@ -22,6 +22,19 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 
 ---
 
+## Local Setup
+
+1. Create a server `.env` file from `collegems-server/.env.example` and set your MongoDB connection string, JWT secret, and port.
+2. Create a client `.env` file in `collegems-client/` with:
+   - `VITE_BACKEND_URL=http://localhost:5000/api`
+3. Install dependencies and run each app:
+   - `cd collegems-server && npm install`
+   - `cd collegems-client && npm install`
+   - `cd collegems-server && npm start`
+   - `cd collegems-client && npm run dev`
+
+---
+
 ## Core Features
 
 ### Authentication & Security
