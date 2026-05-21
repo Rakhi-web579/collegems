@@ -46,7 +46,7 @@ export default function HODSalary() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedYear] = useState("2024");
 
   const fetchSalary = async () => {
     try {

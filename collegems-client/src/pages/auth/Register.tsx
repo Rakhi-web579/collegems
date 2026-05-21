@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Users,
   Shield,
-  BookOpen,
   Building2,
   Hash,
   ChevronRight,

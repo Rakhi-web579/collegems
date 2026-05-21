@@ -486,12 +486,21 @@ export default function TeacherAttendance() {
             </button>
 
             <button
+              onClick={exportAttendance}
+              className="flex-1 md:flex-none px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
+
+            <button
               onClick={() => {
                 setDate(new Date().toISOString().split("T")[0]);
                 setSubject("");
               }}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
             >
+              <RefreshCw className="w-4 h-4" />
               Reset
             </button>
           </div>

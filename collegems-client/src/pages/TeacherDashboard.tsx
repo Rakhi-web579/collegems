@@ -44,7 +44,7 @@ export default function TeacherDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([
+  const [notifications] = useState<any[]>([
     {
       id: 1,
       type: "assignment",
