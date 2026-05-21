@@ -8,12 +8,14 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 ## Tech Stack
 
 ### Frontend
+
 - React
 - Tailwind CSS
 - RxJS
 - Chart.js
 
 ### Backend
+
 - Express.js
 - MongoDB
 - Mongoose
@@ -38,12 +40,14 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 ## Core Features
 
 ### Authentication & Security
+
 - JWT-based Authentication
 - Role-based Access Control
 - Email Verification
 - Password Reset
 
 ### Student Module
+
 - Profile Management  
 - Course Enrollment  
 - Attendance View  
@@ -54,6 +58,7 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 - Notifications  
 
 ### Teacher Module
+
 - Course & Subject Management  
 - Attendance Marking  
 - Assignment Creation & Evaluation  
@@ -61,6 +66,7 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 - Student Performance Tracking  
 
 ### Admin / HOD Module
+
 - User Management  
 - Role & Permission Control  
 - Department & Course Management  
@@ -69,29 +75,35 @@ This project is designed for **academic use**, **real-world learning**, and **fu
 - Audit Logs  
 
 ### Fees & Accounts
+
 - Fee Structure Management  
 - Installments & Late Fines  
 - Payment Status Tracking  
 - Fee Receipt Generation (PDF)
 
 ### Dashboards & Reports
+
 - Role-based Dashboards  
 - Attendance & Performance Analytics  
 - Fee Collection Reports  
 - Export Reports (PDF / Excel)
 
 ### Real-Time Features
+
 - Live Announcements  
 - Real-time Notifications  
 
 ### AI / Smart Features
+
 - Attendance Prediction  
 - Student Performance Prediction  
 - At-risk Student Detection  
 - Smart Notice Targeting  
 
 ---
+
 ## Application workflow
+
 ``` mermaid
 flowchart LR
     User[Student / Teacher / Admin] --> Frontend[React Frontend]
@@ -109,9 +121,11 @@ flowchart LR
     DB --> Dashboard[Analytics & Reports]
     Dashboard --> Frontend
 ```
+
 ---
 
 ## Additional Features
+
 - API Documentation using Swagger  
 - Role Guards & Interceptors  
 - Centralized Error Handling  
@@ -136,6 +150,7 @@ sequenceDiagram
 ```
 
 ## Project Purpose
+
 - College Academic Project  
 - Full Stack Learning (Angular + NestJS)  
 - Real-world ERP System Simulation  
@@ -143,6 +158,7 @@ sequenceDiagram
 ---
 
 ## Future Enhancements
+
 - Mobile App Integration  
 - Advanced AI Analytics  
 - Payment Gateway Integration  
@@ -151,6 +167,7 @@ sequenceDiagram
 ---
 
 ## Author
+
 **Anchal Singh**  
 Aspiring Full Stack Developer  
 
