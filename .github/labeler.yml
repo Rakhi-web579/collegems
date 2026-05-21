@@ -1,12 +1,12 @@
 frontend:
   - changed-files:
       - any-glob-to-any-file:
-          - 'client/**/*'
+          - 'collegems-client/**/*'
 
 backend:
   - changed-files:
       - any-glob-to-any-file:
-          - 'server/**/*'
+          - 'collegems-server/**/*'
 
 documentation:
   - changed-files:
