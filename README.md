@@ -174,3 +174,26 @@ Aspiring Full Stack Developer
 ---
 
 ⭐ If you find this project useful, feel free to star the repository!
+
+---
+
+## Deploy on Render
+
+To deploy this repository on Render (or similar services) from the repository root:
+
+- Build command (Render):
+
+```bash
+npm run build
+```
+
+- Start command (Render service):
+
+```bash
+npm start
+```
+
+Notes:
+- The repo includes a root `package.json` that runs the client build (`collegems-client`) and delegates the server start to `collegems-server`.
+- Ensure you set the server environment variable `MONGO_URI` in Render's dashboard (do NOT commit secrets to the repo).
+- For the client, set `VITE_BACKEND_URL` in the client environment if your backend is deployed to a different URL.
