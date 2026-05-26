@@ -37,10 +37,21 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await api.post("/auth/register", { ...form, role });
-      alert("Registration successful! Please login with your credentials.");
-      navigate("/login");
+      const res = await api.post("/auth/register", { ...form, role });
+
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("userData", JSON.stringify(res.data.user));
+
       setForm({});
+
+      const routes: Record<string, string> = {
+        student: "/student/dashboard",
+        teacher: "/teacher/dashboard",
+        hod: "/hod/dashboard",
+      };
+
+      navigate(routes[res.data.user.role] || "/");
     } catch (err: any) {
       alert(err.response?.data?.message || "Registration failed");
     } finally {

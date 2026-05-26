@@ -78,8 +78,11 @@ export const register = async (req, res) => {
     // Create user
     const user = await User.create(userData);
 
+    const token = generateToken(user);
+
     res.status(201).json({
       message: "Registered successfully",
+      token,
       user: { id: user._id, name: user.name, role: user.role },
     });
   } catch (err) {
