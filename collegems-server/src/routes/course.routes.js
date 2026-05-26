@@ -13,6 +13,7 @@ router.post(
   async (req, res) => {
     try {
       const { name, code, department, semester } = req.body;
+      const teacher = req.body.teacher || req.user.id;
 
       if (!name || !code || !department || !semester) {
         return res.status(400).json({
@@ -32,6 +33,7 @@ router.post(
         code,
         department,
         semester,
+        teacher,
       });
 
       res.status(201).json(course);
