@@ -10,20 +10,20 @@ on:
 permissions:
   issues: write
   pull-requests: write
-  contents: read
 
 jobs:
   welcome:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/first-interaction@v2
+      - name: Welcome First Time Contributors
+        uses: actions/first-interaction@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
           issue-message: |
             👋 Thanks for opening your first issue!
-            Please make sure to follow the contribution guidelines.
+            Please follow the contribution guidelines.
 
           pr-message: |
             🎉 Thank you for your first pull request!
