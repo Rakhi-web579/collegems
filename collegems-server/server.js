@@ -13,6 +13,11 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 
+if (!process.env.JWT_SECRET) {
+  console.error("Missing JWT_SECRET in .env. Please set a JWT secret.");
+  process.exit(1);
+}
+
 connectDB();
 
 app.listen(PORT, () => {
