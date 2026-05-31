@@ -11,7 +11,9 @@ router.get(
   protect,
   allowRoles("teacher", "hod"),
   async (req, res) => {
-    const students = await User.find({ role: "student" }).select("name email");
+    const students = await User.find({ role: "student" }).select(
+      "name email role studentId course semester",
+    );
 
     res.json(students);
   },
