@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   CalendarCheck,
@@ -30,11 +31,19 @@ import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
 
 export default function StudentDashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -212,11 +221,20 @@ export default function StudentDashboard() {
           {/* Sidebar Footer */}
           <div className="p-4 border-t border-gray-200">
             <div className="space-y-2">
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setSidebarOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
                 <Settings className="w-4 h-4 text-gray-500" />
                 Settings
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
                 <LogOut className="w-4 h-4 text-gray-500" />
                 Sign Out
               </button>
@@ -512,6 +530,11 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
+              {activeTab === "settings" && (
+                <div className="text-sm text-gray-600">
+                  Settings are not available yet for student accounts.
+                </div>
+              )}
 
             </div>
           )}

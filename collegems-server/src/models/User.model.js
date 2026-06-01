@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["student", "teacher", "hod"], required: true },
+  phone: { type: String },
 
   // Student-specific fields
   studentId: { type: String },
@@ -32,6 +33,19 @@ const userSchema = new mongoose.Schema({
 
   // HOD-specific
   departmentCode: { type: String },
+
+  settings: {
+    preferences: {
+      language: { type: String, default: "en" },
+      timezone: { type: String, default: "UTC" },
+      digestFrequency: { type: String, default: "weekly" },
+    },
+    notifications: {
+      email: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false },
+      inApp: { type: Boolean, default: true },
+    },
+  },
 });
 
 export default mongoose.model("User", userSchema);
