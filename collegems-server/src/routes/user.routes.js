@@ -12,14 +12,24 @@ import {
 
 const router = express.Router();
 
-router.get("/me", protect, allowRoles("teacher"), getMe);
-router.put("/me", protect, allowRoles("teacher"), updateMe);
-router.put("/me/password", protect, allowRoles("teacher"), updatePassword);
-router.get("/me/preferences", protect, allowRoles("teacher"), getPreferences);
+router.get("/me", protect, allowRoles("teacher", "hod"), getMe);
+router.put("/me", protect, allowRoles("teacher", "hod"), updateMe);
+router.put(
+  "/me/password",
+  protect,
+  allowRoles("teacher", "hod"),
+  updatePassword,
+);
+router.get(
+  "/me/preferences",
+  protect,
+  allowRoles("teacher", "hod"),
+  getPreferences,
+);
 router.put(
   "/me/preferences",
   protect,
-  allowRoles("teacher"),
+  allowRoles("teacher", "hod"),
   updatePreferences,
 );
 
