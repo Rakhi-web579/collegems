@@ -301,8 +301,8 @@ If you find this project helpful or educational, please consider giving it a **s
 
 ## 👤 Author
 
-*   **Anchal Singh** - *Aspiring Full Stack Developer*
-    *   [GitHub](https://github.com/anchalsingh-dev)
+*   **Anchal Singh** - *Full Stack Developer*
+    *   [GitHub](https://github.com/imanchalsingh)
 
 ---
 
