@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import {
   Users,
@@ -35,9 +36,11 @@ import MyAttendance from "../teacher-components/MyAttendance";
 import OrganizeEvents from "../teacher-components/EventsManage";
 import TeacherResults from "../teacher-components/TeacherResults";
 import StudentAttendance from "../teacher-components/Attendance";
+import TeacherSettings from "../teacher-components/Settings";
 
 
 export default function TeacherDashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [courses, setCourses] = useState<{ _id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +67,13 @@ export default function TeacherDashboard() {
       time: "2 days ago",
     },
   ]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -128,6 +138,11 @@ export default function TeacherDashboard() {
     { id: "students", label: "Students", icon: Users },
     { id: "events", label: "Organize Events", icon: CalendarDays },
   ];
+
+  const activeTabLabel =
+    activeTab === "settings"
+      ? "Settings"
+      : navigationItems.find((item) => item.id === activeTab)?.label;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -257,11 +272,20 @@ export default function TeacherDashboard() {
           {/* Sidebar Footer */}
           <div className="p-4 border-t border-gray-200">
             <div className="space-y-2">
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setSidebarOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
                 <Settings className="w-4 h-4 text-gray-500" />
                 Settings
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
                 <LogOut className="w-4 h-4 text-gray-500" />
                 Sign Out
               </button>
@@ -317,7 +341,7 @@ export default function TeacherDashboard() {
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              {navigationItems.find((item) => item.id === activeTab)?.label}
+              {activeTabLabel}
             </h1>
             <p className="text-gray-500 mt-1">
               {activeTab === "overview"
@@ -529,6 +553,7 @@ export default function TeacherDashboard() {
           {activeTab === "results" && <TeacherResults />}
           {activeTab === "students" && <Students />}
           {activeTab === "events" && <OrganizeEvents />}
+          {activeTab === "settings" && <TeacherSettings />}
         </main>
       </div>
     </div>
