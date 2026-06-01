@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   Users,
@@ -50,14 +51,43 @@ interface Data {
   totalClassess: number;
 }
 
+interface ProfileData {
+  name: string;
+  email: string;
+  phone?: string;
+  department?: string;
+  departmentCode?: string;
+  role: string;
+  avatarUrl?: string;
+}
+
 export default function HODDashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileRefreshing, setProfileRefreshing] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState<Date | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchProfileData();
+
+    const refreshProfile = () => {
+      fetchProfileData(true);
+    };
+
+    const profileInterval = window.setInterval(refreshProfile, 15000);
+    window.addEventListener("focus", refreshProfile);
+
+    return () => {
+      window.clearInterval(profileInterval);
+      window.removeEventListener("focus", refreshProfile);
+    };
   }, []);
 
   const fetchDashboardData = async () => {
@@ -71,6 +101,65 @@ export default function HODDashboard() {
       setLoading(false);
     }
   };
+
+  const fetchProfileData = async (silent = false) => {
+    try {
+      if (silent) {
+        setProfileRefreshing(true);
+      } else {
+        setProfileLoading(true);
+      }
+
+      const res = await api.get("/users/me");
+      const user = res.data;
+
+      if (user?.role !== "hod") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userData");
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      setProfile({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        department: user.department || "",
+        departmentCode: user.departmentCode || "",
+        role: user.role || "hod",
+        avatarUrl: user.avatarUrl || user.profilePicture || user.photo,
+      });
+      setProfileError(null);
+      setProfileUpdatedAt(new Date());
+    } catch (error: any) {
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userData");
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      setProfileError(
+        error?.response?.data?.message || "Unable to load HOD profile.",
+      );
+    } finally {
+      setProfileLoading(false);
+      setProfileRefreshing(false);
+    }
+  };
+
+  const profileDisplayDepartment =
+    profile?.department || profile?.departmentCode || "Not set";
+  const profileInitials = profile?.name
+    ?.split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("")
+    .slice(0, 2);
 
   const navigationItems = [
     { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
@@ -164,7 +253,9 @@ export default function HODDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">HOD Portal</h2>
-                <p className="text-sm text-gray-500 mt-1">Computer Science</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {profileLoading ? "Loading department..." : profileDisplayDepartment}
+                </p>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -257,9 +348,19 @@ export default function HODDashboard() {
                   <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
                 </button>
                 <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg">
-                  <UserCircle className="w-5 h-5 text-gray-600" />
+                  {profile?.avatarUrl ? (
+                    <img
+                      src={profile.avatarUrl}
+                      alt={profile.name || "HOD profile"}
+                      className="w-5 h-5 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                      {profileInitials || <UserCircle className="w-4 h-4" />}
+                    </div>
+                  )}
                   <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                    Dr. Smith
+                    {profile?.name || (profileLoading ? "Loading..." : "HOD")}
                   </span>
                 </button>
                 <button
@@ -283,7 +384,7 @@ export default function HODDashboard() {
             </h1>
             <p className="text-gray-500 mt-1">
               {activeTab === "overview"
-                ? "Welcome back, Dr. Smith. Here's what's happening with your department today."
+                ? `Welcome back${profile?.name ? `, ${profile.name}` : ""}. Here's what's happening with your department today.`
                 : `Manage your department's ${activeTab.toLowerCase()}`}
             </p>
           </div>
@@ -291,6 +392,90 @@ export default function HODDashboard() {
           {/* Content Area */}
           {activeTab === "overview" && (
             <div className="space-y-8">
+              <section className="bg-white rounded-xl border border-gray-200 p-6">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center overflow-hidden shrink-0">
+                      {profile?.avatarUrl ? (
+                        <img
+                          src={profile.avatarUrl}
+                          alt={profile.name || "HOD profile"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-lg font-semibold text-blue-700">
+                          {profileInitials || "H"}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                          {profile?.name || "HOD Profile"}
+                        </h2>
+                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                          {profile?.role?.toUpperCase() || "HOD"}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {profile?.department ? profile.department : "Department not assigned"}
+                        {profile?.departmentCode ? ` • ${profile.departmentCode}` : ""}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-3 max-w-2xl">
+                        {profile?.email || "No email available"}
+                        {profile?.phone ? ` • ${profile.phone}` : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:min-w-[320px]">
+                    <div className="rounded-lg bg-gray-50 border border-gray-200 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-500">
+                        Designation
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-gray-900">
+                        Head of Department
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-gray-50 border border-gray-200 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-500">
+                        Last sync
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-gray-900">
+                        {profileRefreshing
+                          ? "Refreshing..."
+                          : profileUpdatedAt
+                            ? profileUpdatedAt.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Waiting for data"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {profileError && (
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    {profileError}
+                  </div>
+                )}
+
+                {profileLoading && !profile && (
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 animate-pulse">
+                    <div className="h-16 rounded-lg bg-gray-100" />
+                    <div className="h-16 rounded-lg bg-gray-100" />
+                    <div className="h-16 rounded-lg bg-gray-100" />
+                  </div>
+                )}
+
+                {!profileLoading && !profileError && !profile && (
+                  <div className="mt-4 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-sm text-gray-500">
+                    No HOD profile data is available for this account.
+                  </div>
+                )}
+              </section>
+
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {statsCards?.map((card, index) => {
