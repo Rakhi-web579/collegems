@@ -11,7 +11,7 @@ import Courses from "./user-components/Courses";
 import Teachers from "./hod-components/Teachers";
 import StudentResults from "./user-components/StudentResults";
 import EventsStudent from "./user-components/EventsStudent";
-
+import QuickAccessAll from "./pages/QuickAccessAll";
 export default function App() {
   return (
     <BrowserRouter>
@@ -26,6 +26,7 @@ export default function App() {
         <Route path="/courses" element={<Courses />} />
         <Route path="/timetable" element={<div>Timetable Page</div>} />
         <Route path="/faculty" element={<Teachers />} />
+          <Route path="/quickaccess" element={<QuickAccessAll />} />
         <Route
           path="/student/dashboard"
           element={
