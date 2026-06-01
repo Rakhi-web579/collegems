@@ -255,7 +255,7 @@ export default function MainDashboard() {
               <Home className="w-5 h-5 text-gray-500" />
               Quick Access
             </h2>
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+            <button  onClick={() => navigate("/quickaccess")}className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
               View All
               <ChevronRight className="w-4 h-4" />
             </button>
