@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   LayoutGrid,
   CalendarCheck,
@@ -560,9 +560,9 @@ export default function StudentDashboard() {
                 <a href="#" className="hover:text-gray-900">
                   Help
                 </a>
-                <a href="#" className="hover:text-gray-900">
+                <Link to="/privacy" className="hover:text-gray-900">
                   Privacy
-                </a>
+                </Link>
                 <a href="#" className="hover:text-gray-900">
                   Terms
                 </a>

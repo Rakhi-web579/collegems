@@ -13,6 +13,7 @@ import Teachers from "./hod-components/Teachers";
 import StudentResults from "./user-components/StudentResults";
 import EventsStudent from "./user-components/EventsStudent";
 import QuickAccessAll from "./pages/QuickAccessAll";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 export default function App() {
   return (
     <BrowserRouter>
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/" element={<MainDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         <Route path="/examschedule" element={<ExamSchedule />} />
         <Route path="/results" element={<StudentResults />} />

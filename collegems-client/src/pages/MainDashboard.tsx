@@ -15,7 +15,7 @@ import {
   AlertCircle,
   School,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 
 export default function MainDashboard() {
@@ -409,12 +409,12 @@ export default function MainDashboard() {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-6">
-              <a
-                href="#"
+              <Link
+                to="/privacy"
                 className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
               >
                 Privacy
-              </a>
+              </Link>
               <a
                 href="#"
                 className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
