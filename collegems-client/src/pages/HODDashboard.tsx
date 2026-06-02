@@ -27,6 +27,7 @@ import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import Teachers from "../hod-components/Teachers";
 
 type TabType =
   | "overview"

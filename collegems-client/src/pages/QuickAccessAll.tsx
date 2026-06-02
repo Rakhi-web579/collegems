@@ -10,7 +10,6 @@ import {
   ArrowLeft,
   Search,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 
 const allItems = [
