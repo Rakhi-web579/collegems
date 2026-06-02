@@ -94,8 +94,13 @@ export default function EventsManage() {
         setError(null);
         setSuccess(false);
 
+        const payload = {
+            ...form,
+            maxParticipants: (!form.registrationRequired || form.maxParticipants === "") ? null : Number(form.maxParticipants),
+        };
+
         try {
-            await axios.post("/events/create", form);
+            await axios.post("/events/create", payload);
             setSuccess(true);
 
             setTimeout(() => {
