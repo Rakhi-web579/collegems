@@ -21,7 +21,7 @@ const EventsSchema = new mongoose.Schema(
 
         category: {
             type: String,
-            enum: ["Workshop", "Seminar", "Webinar", "Alumni Talk", "Hackathon"],
+            enum: ["Workshop", "Seminar", "Webinar", "Alumni Talk", "Hackathon", "Training", "Conference", "Guest Lecture"],
             required: true,
         },
 
@@ -108,6 +108,26 @@ const EventsSchema = new mongoose.Schema(
             type: String,
             enum: ["upcoming", "ongoing", "completed"],
             default: "upcoming",
+        },
+
+        contactPhone: {
+            type: String,
+            trim: true,
+        },
+
+        prerequisites: {
+            type: String,
+            trim: true,
+        },
+
+        targetAudience: {
+            type: String,
+            trim: true,
+        },
+
+        tags: {
+            type: String,
+            trim: true,
         },
     },
     { timestamps: true }
