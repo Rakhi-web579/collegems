@@ -45,6 +45,9 @@ export default function HodCourses() {
   const [description, setDescription] = useState("");
   const [maxStudents, setMaxStudents] = useState("");
 
+  const currentUser = JSON.parse(localStorage.getItem("userData") || "null");
+  const teacherId = currentUser?.id || currentUser?._id || "";
+
   // Departments and semesters
   const departments = [
     "Computer Science",
@@ -126,6 +129,7 @@ export default function HodCourses() {
         code,
         department,
         semester: Number(semester),
+        teacher: teacherId,
         credits: credits ? Number(credits) : 3,
         description,
         maxStudents: maxStudents ? Number(maxStudents) : 60,
