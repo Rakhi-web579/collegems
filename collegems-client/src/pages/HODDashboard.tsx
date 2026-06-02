@@ -601,6 +601,7 @@ export default function HODDashboard() {
             </div>
           )}
 
+          {activeTab === "teachers" && <Teachers />}
           {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
           {activeTab === "students" && <Students />}
           {activeTab === "salary" && <HODSalary />}

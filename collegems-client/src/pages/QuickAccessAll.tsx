@@ -116,10 +116,10 @@ export default function QuickAccessAll() {
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
+              Back 
             </button>
-            <span className="text-gray-300">|</span>
-            <span className="text-sm text-gray-400">Quick Access</span>
+            
+            
           </div>
         </div>
       </div>

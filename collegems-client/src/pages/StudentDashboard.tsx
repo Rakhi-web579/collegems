@@ -50,6 +50,11 @@ export default function StudentDashboard() {
     fetchDashboardData();
   }, []);
 
+  const student = data?.user;
+  const studentProgram = student?.course
+    ? `${student.course}${student.semester ? ` - Sem ${student.semester}` : ""}`
+    : "Course not set";
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -144,7 +149,7 @@ export default function StudentDashboard() {
                   Student Portal
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  {data.user?.department || "Computer Science"}
+                  {studentProgram}
                 </p>
               </div>
               <button
@@ -159,14 +164,14 @@ export default function StudentDashboard() {
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                  {data.user?.name?.charAt(0) || "S"}
+                  {student?.name?.charAt(0) || "S"}
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">
-                    {data.user?.name || "Student"}
+                    {student?.name || "Student"}
                   </p>
                   <p className="text-xs text-gray-600">
-                    ID: {data.user?.studentId || "STU001"}
+                    ID: {student?.studentId || "Not set"}
                   </p>
                 </div>
               </div>
@@ -174,12 +179,14 @@ export default function StudentDashboard() {
                 <div>
                   <span className="text-gray-500">Semester</span>
                   <p className="font-medium text-gray-900">
-                    {data.currentSemester || "5th"}
+                    {student?.semester || "Not set"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Section</span>
-                  <p className="font-medium text-gray-900">A</p>
+                  <span className="text-gray-500">Course</span>
+                  <p className="font-medium text-gray-900">
+                    {student?.course || "Not set"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -287,14 +294,14 @@ export default function StudentDashboard() {
                 </button>
                 <div className="flex items-center gap-2 px-3 py-2">
                   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                    {data.user?.name?.charAt(0) || "S"}
+                    {student?.name?.charAt(0) || "S"}
                   </div>
                   <div className="hidden sm:block text-left">
                     <p className="text-sm font-medium text-gray-900">
-                      {data.user?.name || "Student"}
+                      {student?.name || "Student"}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {data.user?.email || "student@college.edu"}
+                      {student?.email || "Not set"}
                     </p>
                   </div>
                 </div>
@@ -310,7 +317,7 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  {getGreeting()}, {data.user?.name?.split(" ")[0] || "Student"}
+                  {getGreeting()}, {student?.name?.split(" ")[0] || "Student"}
                   !
                 </h1>
                 <p className="text-gray-500 mt-1">

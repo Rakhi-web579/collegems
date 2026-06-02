@@ -3,9 +3,29 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const COLLEGE_DOMAIN = "@college.edu";
+const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$.{53}$/;
+
+const normalizeEmail = (email) => email?.trim().toLowerCase();
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const isBcryptHash = (password) =>
+  typeof password === "string" && BCRYPT_HASH_PATTERN.test(password);
+
+const verifyPassword = async (plainPassword, storedPassword) => {
+  if (typeof storedPassword !== "string" || !storedPassword) {
+    return false;
+  }
+
+  if (!isBcryptHash(storedPassword)) {
+    return plainPassword === storedPassword;
+  }
+
+  return bcrypt.compare(plainPassword, storedPassword);
+};
 
 const generateToken = (user) =>
-  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+  jwt.sign({ id: String(user._id), role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 
@@ -31,7 +51,7 @@ export const register = async (req, res) => {
     // Role-specific checks
     let userData = {
       name,
-      email,
+      email: normalizeEmail(email),
       password: await bcrypt.hash(password, 10),
       role,
     };
@@ -93,16 +113,28 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(req.body.email);
+    const { password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
+    }
+
+    const user = await User.findOne({
+      email: new RegExp(`^${escapeRegExp(email)}$`, "i"),
+    }).select("+password");
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = await verifyPassword(password, user.password);
     if (!match) {
       return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not configured");
+      return res.status(500).json({ message: "Authentication not configured" });
     }
 
     const token = generateToken(user);
@@ -112,10 +144,18 @@ export const login = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
+        email: user.email,
         role: user.role,
+        studentId: user.studentId,
+        semester: user.semester,
+        course: user.course,
+        teacherId: user.teacherId,
+        department: user.department,
+        departmentCode: user.departmentCode,
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

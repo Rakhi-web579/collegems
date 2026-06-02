@@ -7,6 +7,11 @@ import Class from "../models/Classes.model.js";
 
 export const getDashboardData = async (req, res) => {
   const { role, id } = req.user;
+  const user = await User.findById(id)
+    .select(
+      "name email role studentId semester course teacherId department departmentCode",
+    )
+    .lean();
 
   // 🎓 STUDENT
   if (role === "student") {
@@ -23,6 +28,8 @@ export const getDashboardData = async (req, res) => {
     const fee = await Fee.findOne({ student: id });
 
     return res.json({
+      user,
+      currentSemester: user?.semester,
       cards: [
         {
           title: "Attendance %",
@@ -44,6 +51,7 @@ export const getDashboardData = async (req, res) => {
     });
 
     return res.json({
+      user,
       cards: [
         { title: "My Courses", value: courses },
         { title: "Pending Evaluations", value: pendingEval },
@@ -59,6 +67,7 @@ export const getDashboardData = async (req, res) => {
     const classes = await Class.countDocuments();
 
     return res.json({
+      user,
       cards: [
         { title: "Students", value: students },
         { title: "Teachers", value: teachers },
@@ -75,6 +84,7 @@ export const getDashboardData = async (req, res) => {
     const teachers = await User.countDocuments({ role: "teacher" });
 
     return res.json({
+      user,
       cards: [
         { title: "Total Users", value: users },
         { title: "Students", value: students },
