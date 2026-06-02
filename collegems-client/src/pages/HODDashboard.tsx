@@ -26,6 +26,7 @@ import api from "../api/axios";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
+import Teachers from "../hod-components/Teachers";
 
 type TabType =
   | "overview"
@@ -598,6 +599,7 @@ export default function HODDashboard() {
             </div>
           )}
 
+          {activeTab === "teachers" && <Teachers />}
           {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
           {activeTab === "students" && <Students />}
           {activeTab === "salary" && <HODSalary />}
