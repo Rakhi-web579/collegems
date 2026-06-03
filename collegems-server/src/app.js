@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 
 // Auth & Core
 import authRoutes from "./routes/auth.routes.js";
@@ -15,16 +16,18 @@ import classRoutes from "./routes/class.route.js";
 import teacherAttendanceRoutes from "./routes/teacher.attendance.route.js";
 import eventRoute from "./routes/event.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
+import libraryRoutes from "./routes/library.routes.js";
 
-// Admin / HOD
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
+import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
 
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -35,6 +38,7 @@ app.use("/api/assignment", assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
 app.use("/api/events", eventRoute);
 app.use("/api/results", resultsRoutes);
+app.use("/api/library", libraryRoutes);
 
 app.use("/api/courses", courseRoutes);
 app.use("/api/classes", classRoutes);
@@ -44,6 +48,7 @@ app.use("/api/salary", salaryRoutes);
 
 app.use("/api/users", userRoutes);
 app.use("/api/examschedule", examScheduleRoutes);
+app.use("/api/academic-calendar", academicCalendarRoutes);
 
 // Health check (optional but useful)
 app.get("/", (req, res) => {

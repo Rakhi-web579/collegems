@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate, Link } from "react-router-dom";
 import {
   LayoutGrid,
   CalendarCheck,
@@ -30,6 +30,9 @@ import Courses from "../user-components/Courses";
 import ExamSchedule from "../user-components/ExamSchedule";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
+import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import Library from "../common-components-management/Library";
+
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -48,6 +51,11 @@ export default function StudentDashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  const student = data?.user;
+  const studentProgram = student?.course
+    ? `${student.course}${student.semester ? ` - Sem ${student.semester}` : ""}`
+    : "Course not set";
 
   const fetchDashboardData = async () => {
     try {
@@ -75,8 +83,10 @@ export default function StudentDashboard() {
     { id: "fees", label: "Fees", icon: Wallet },
     { id: "courses", label: "Courses", icon: BookOpen },
     { id: "examschedule", label: "Exam Schedule", icon: Calendar },
+    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
     { id: "events", label: "Events", icon: CalendarDays },
-    { id: "results", label: "Results", icon: AwardIcon }
+    { id: "results", label: "Results", icon: AwardIcon },
+    { id: "library", label: "Library", icon: BookOpen }
   ];
 
   if (loading) {
@@ -142,7 +152,7 @@ export default function StudentDashboard() {
                   Student Portal
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  {data.user?.department || "Computer Science"}
+                  {studentProgram}
                 </p>
               </div>
               <button
@@ -157,14 +167,14 @@ export default function StudentDashboard() {
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                  {data.user?.name?.charAt(0) || "S"}
+                  {student?.name?.charAt(0) || "S"}
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">
-                    {data.user?.name || "Student"}
+                    {student?.name || "Student"}
                   </p>
                   <p className="text-xs text-gray-600">
-                    ID: {data.user?.studentId || "STU001"}
+                    ID: {student?.studentId || "Not set"}
                   </p>
                 </div>
               </div>
@@ -172,12 +182,14 @@ export default function StudentDashboard() {
                 <div>
                   <span className="text-gray-500">Semester</span>
                   <p className="font-medium text-gray-900">
-                    {data.currentSemester || "5th"}
+                    {student?.semester || "Not set"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Section</span>
-                  <p className="font-medium text-gray-900">A</p>
+                  <span className="text-gray-500">Course</span>
+                  <p className="font-medium text-gray-900">
+                    {student?.course || "Not set"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -285,14 +297,14 @@ export default function StudentDashboard() {
                 </button>
                 <div className="flex items-center gap-2 px-3 py-2">
                   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                    {data.user?.name?.charAt(0) || "S"}
+                    {student?.name?.charAt(0) || "S"}
                   </div>
                   <div className="hidden sm:block text-left">
                     <p className="text-sm font-medium text-gray-900">
-                      {data.user?.name || "Student"}
+                      {student?.name || "Student"}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {data.user?.email || "student@college.edu"}
+                      {student?.email || "Not set"}
                     </p>
                   </div>
                 </div>
@@ -308,7 +320,7 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  {getGreeting()}, {data.user?.name?.split(" ")[0] || "Student"}
+                  {getGreeting()}, {student?.name?.split(" ")[0] || "Student"}
                   !
                 </h1>
                 <p className="text-gray-500 mt-1">
@@ -528,6 +540,7 @@ export default function StudentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "courses" && <Courses />}
               {activeTab === "examschedule" && <ExamSchedule />}
+              {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
               {activeTab === "settings" && (
@@ -535,6 +548,7 @@ export default function StudentDashboard() {
                   Settings are not available yet for student accounts.
                 </div>
               )}
+              {activeTab === "library" && <Library />}
 
             </div>
           )}
@@ -550,9 +564,9 @@ export default function StudentDashboard() {
                 <a href="#" className="hover:text-gray-900">
                   Help
                 </a>
-                <a href="#" className="hover:text-gray-900">
+                <Link to="/privacy" className="hover:text-gray-900">
                   Privacy
-                </a>
+                </Link>
                 <a href="#" className="hover:text-gray-900">
                   Terms
                 </a>

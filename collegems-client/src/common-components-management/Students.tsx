@@ -57,16 +57,11 @@ const Students: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.get("/users/students");
-      // Add mock data for demonstration (remove when actual data is available)
       const enrichedData = response.data.map(
-        (student: Student, index: number) => ({
+        (student: Student) => ({
           ...student,
-          course: student.course || ["BCA", "BBA", "MCA", "MBA"][index % 4],
-          semester: student.semester || (index % 8) + 1,
-          joinedAt:
-            student.joinedAt ||
-            new Date(2024, index % 12, (index % 28) + 1).toISOString(),
-          lastUpdated: student.lastUpdated || new Date().toISOString(),
+          joinedAt: student.joinedAt,
+          lastUpdated: student.lastUpdated,
         }),
       );
       setStudents(enrichedData);

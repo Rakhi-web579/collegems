@@ -8,13 +8,14 @@ import api from "../api/axios";
 import { useTheme } from "../context/ThemeContext";
 
 interface Course {
-  id: string;
+  _id: string;
   name: string;
   code: string;
   department?: string;
   semester?: number;
   credits?: number;
   instructor?: string;
+  teacher?: any;
   duration?: string;
   enrolled?: number;
   capacity?: number;
@@ -45,14 +46,26 @@ const Courses: React.FC = () => {
     fetchCourses();
   }, []);
 
+  // Helper to get instructor/teacher name (server populates `teacher`)
+  const getInstructorName = (course: Course) => {
+    if (course.instructor) return course.instructor;
+    if (course.teacher && typeof course.teacher === 'object') return course.teacher.name;
+    if (course.teacher && typeof course.teacher === 'string') return course.teacher;
+    return "";
+  };
+
+  // Filter and search courses
   const filteredCourses = courses.filter((course: Course) => {
+    const instructorName = getInstructorName(course).toLowerCase();
     const matchesSearch =
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.instructor?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+      instructorName.includes(searchTerm.toLowerCase());
+
     if (filter === "all") return matchesSearch;
     if (filter === "active") return matchesSearch && course.status === 'active';
     if (filter === "inactive") return matchesSearch && course.status === 'inactive';
+
     return matchesSearch && course.department === filter;
   });
 
@@ -249,8 +262,8 @@ const Courses: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course: Course) => (
             <div
-              key={course.id}
-              className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-lg transition-all overflow-hidden"
+              key={course._id}
+              className="group bg-white rounded-xl border border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all overflow-hidden"
             >
               <div className="relative p-5 bg-gradient-to-br from-gray-50 dark:from-gray-800 to-white dark:to-gray-900 border-b border-gray-100 dark:border-gray-700">
                 <div className="flex items-start gap-3">
@@ -282,10 +295,11 @@ const Courses: React.FC = () => {
                       <span className="text-gray-600 dark:text-gray-400">{course.department}</span>
                     </div>
                   )}
-                  {course.instructor && (
+
+                  {getInstructorName(course) && (
                     <div className="flex items-center text-sm">
-                      <UserCircle className="w-4 h-4 text-gray-400 dark:text-gray-500 mr-2" />
-                      <span className="text-gray-600 dark:text-gray-400">{course.instructor}</span>
+                      <UserCircle className="w-4 h-4 text-gray-400 mr-2" />
+                      <span className="text-gray-600">{getInstructorName(course)}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-4">
@@ -354,15 +368,15 @@ const Courses: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredCourses.map((course) => (
-                  <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                        <tr key={course._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-900 dark:text-white">{course.name}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">{course.code}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{course.department || '—'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{course.instructor || '—'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{course.semester || '—'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{course.credits || '—'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{course.department || '—'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{getInstructorName(course) || '—'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{course.semester || '—'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{course.credits || '—'}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
                         course.status === 'active'

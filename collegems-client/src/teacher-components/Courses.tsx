@@ -49,6 +49,10 @@ export default function Courses() {
   const [description, setDescription] = useState("");
   const [maxStudents, setMaxStudents] = useState("");
 
+  const currentUser = JSON.parse(localStorage.getItem("userData") || "null");
+  const teacherId = currentUser?.id || currentUser?._id || "";
+
+  // Departments and semesters
   const departments = [
     "Computer Science", "Electrical", "Mechanical", "Civil",
     "Electronics", "Mathematics", "Physics", "Chemistry",
@@ -110,6 +114,7 @@ export default function Courses() {
       const courseData = {
         name, code, department,
         semester: Number(semester),
+        teacher: teacherId,
         credits: credits ? Number(credits) : 3,
         description,
         maxStudents: maxStudents ? Number(maxStudents) : 60,

@@ -21,6 +21,8 @@ import OrganizeEvents from "../teacher-components/EventsManage";
 import TeacherResults from "../teacher-components/TeacherResults";
 import StudentAttendance from "../teacher-components/Attendance";
 import TeacherSettings from "../teacher-components/Settings";
+import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import Library from "../common-components-management/Library";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -73,6 +75,7 @@ export default function TeacherDashboard() {
     { id: "courses", label: "My Courses", icon: BookMarked },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
+    { id: "academic-calendar", label: "Academic Calendar", icon: Calendar },
     { id: "examschedules", label: "Exam Schedules", icon: Calendar },
     { id: "fees", label: "Fees", icon: BarChart3 },
     { id: "salary", label: "Salary", icon: Coins },
@@ -81,6 +84,7 @@ export default function TeacherDashboard() {
     { id: "results", label: "Results", icon: Percent },
     { id: "students", label: "Students", icon: Users },
     { id: "events", label: "Organize Events", icon: CalendarDays },
+    { id: "library", label: "Library Catalog", icon: Book },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -336,6 +340,7 @@ export default function TeacherDashboard() {
           {activeTab === "assignments" && <TeacherAssignments courseId={courses[0]?._id || "default-course-id"} />}
           {activeTab === "attendance" && <StudentAttendance />}
           {activeTab === "examschedules" && <ExamSchedule />}
+          {activeTab === "academic-calendar" && <AcademicCalendar role="teacher" />}
           {activeTab === "fees" && <TeacherFee />}
           {activeTab === "salary" && <Salary />}
           {activeTab === "classes" && <Classes />}
@@ -344,6 +349,7 @@ export default function TeacherDashboard() {
           {activeTab === "students" && <Students />}
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
+          {activeTab === "library" && <Library />}
         </main>
       </div>
     </div>

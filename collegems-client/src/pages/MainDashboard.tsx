@@ -17,7 +17,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -27,12 +27,69 @@ export default function MainDashboard() {
   const { darkMode, toggleTheme } = useTheme();
 
   const dashboardCards = [
-    { id: 1, title: "Academic Results", description: "View your semester grades and performance", icon: FileText, count: "4 Subjects", color: "blue", route: "/results" },
-    { id: 2, title: "Examination Schedule", description: "Upcoming exams dates and venues", icon: Calendar, count: "2 Upcoming", color: "amber", route: "/examschedule" },
-    { id: 3, title: "Course Catalog", description: "Browse and manage your enrolled courses", icon: BookOpen, count: "6 Enrolled", color: "emerald", route: "/courses" },
-    { id: 4, title: "Campus Events", description: "Upcoming activities and events", icon: Bell, count: "3 New", color: "purple", route: "/events" },
-    { id: 5, title: "Class Schedule", description: "Daily timetable and class details", icon: Clock, count: "This Week", color: "rose", route: "/timetable" },
-    { id: 6, title: "Faculty Directory", description: "Connect with your professors", icon: Users, count: "12 Teachers", color: "cyan", route: "/faculty" },
+    {
+      id: 1,
+      title: "Academic Results",
+      description: "View your semester grades and performance",
+      icon: FileText,
+      count: "4 Subjects",
+      color: "blue",
+      route: "/results",
+    },
+    {
+      id: 2,
+      title: "Examination Schedule",
+      description: "Upcoming exams dates and venues",
+      icon: Calendar,
+      count: "2 Upcoming",
+      color: "amber",
+      route: "/examschedule",
+    },
+    {
+      id: 3,
+      title: "Course Catalog",
+      description: "Browse and manage your enrolled courses",
+      icon: BookOpen,
+      count: "6 Enrolled",
+      color: "emerald",
+      route: "/courses",
+    },
+    {
+      id: 4,
+      title: "Campus Events",
+      description: "Upcoming activities and events",
+      icon: Bell,
+      count: "3 New",
+      color: "purple",
+      route: "/events",
+    },
+    {
+      id: 5,
+      title: "Class Schedule",
+      description: "Daily timetable and class details",
+      icon: Clock,
+      count: "This Week",
+      color: "rose",
+      route: "/timetable",
+    },
+    {
+      id: 6,
+      title: "Faculty Directory",
+      description: "Connect with your professors",
+      icon: Users,
+      count: "12 Teachers",
+      color: "cyan",
+      route: "/faculty",
+    },
+    {
+      id: 7,
+      title: "Library Catalog",
+      description: "Manage and borrow books from the library",
+      icon: Library,
+      count: "Explore",
+      color: "emerald",
+      route: "/library",
+    },
   ];
 
   const quickStats = [
@@ -264,11 +321,36 @@ export default function MainDashboard() {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-6">
-              {["Privacy", "Terms", "Contact", "Help", "FAQ"].map((link) => (
-                <a key={link} href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-                  {link}
-                </a>
-              ))}
+              <Link
+                to="/privacy"
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Privacy
+              </Link>
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Terms
+              </a>
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Contact
+              </a>
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Help
+              </a>
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                FAQ
+              </a>
             </div>
           </div>
         </div>

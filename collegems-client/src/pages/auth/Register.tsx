@@ -244,10 +244,19 @@ export default function Register() {
             </button>
 
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-              By registering, you agree to our{" "}
-              <button className="text-blue-600 hover:text-blue-500 font-medium">Terms of Service</button>{" "}and{" "}
-              <button className="text-blue-600 hover:text-blue-500 font-medium">Privacy Policy</button>
-            </p>
+  By registering, you agree to our{" "}
+  <button className="text-blue-600 hover:text-blue-500 font-medium">
+    Terms of Service
+  </button>{" "}
+  and{" "}
+  <button
+    type="button"
+    onClick={() => navigate("/privacy")}
+    className="text-blue-600 hover:text-blue-500 font-medium"
+  >
+    Privacy Policy
+  </button>
+</p>
           </form>
         </div>
 

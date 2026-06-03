@@ -11,11 +11,24 @@ import api from "../api/axios";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
+import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import Teachers from "../hod-components/Teachers";
+import Library from "../common-components-management/Library";
 
 type TabType =
-  | "overview" | "teachers" | "teachers-attendance" | "students"
-  | "courses" | "classes" | "syllabus" | "fees" | "salary"
-  | "examSchedule" | "events";
+  | "overview"
+  | "teachers"
+  | "teachers-attendance"
+  | "students"
+  | "courses"
+  | "classes"
+  | "syllabus"
+  | "fees"
+  | "salary"
+  | "examSchedule"
+  | "events"
+  | "academic-calendar"
+  | "library";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -114,6 +127,7 @@ export default function HODDashboard() {
     { id: "teachers" as TabType, label: "Teachers", icon: Users },
     { id: "teachers-attendance" as TabType, label: "Teachers Attendance", icon: Users },
     { id: "students" as TabType, label: "Students", icon: GraduationCap },
+    { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: Calendar },
     { id: "courses" as TabType, label: "Courses", icon: BookOpen },
     { id: "classes" as TabType, label: "Classes", icon: Building2 },
     { id: "syllabus" as TabType, label: "Syllabus", icon: FileText },
@@ -121,6 +135,7 @@ export default function HODDashboard() {
     { id: "salary" as TabType, label: "Salary", icon: DollarSign },
     { id: "examSchedule" as TabType, label: "Exam Schedule", icon: Calendar },
     { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
+    { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
   ];
 
   const statsCards = data?.cards.map((card, index) => ({
@@ -396,9 +411,12 @@ export default function HODDashboard() {
             </div>
           )}
 
+          {activeTab === "teachers" && <Teachers />}
           {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
           {activeTab === "students" && <Students />}
           {activeTab === "salary" && <HODSalary />}
+          {activeTab === "academic-calendar" && <AcademicCalendar role="hod" />}
+          {activeTab === "library" && <Library />}
         </main>
       </div>
     </div>
