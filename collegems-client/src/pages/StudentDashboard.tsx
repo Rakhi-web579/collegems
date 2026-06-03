@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import {
   LayoutGrid,
   CalendarCheck,
@@ -36,8 +37,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
+  const { darkMode, toggleTheme } = useTheme(); 
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -270,7 +270,7 @@ export default function StudentDashboard() {
               {/* Right Section */}
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setDarkMode(!darkMode)}
+                  onClick={toggleTheme}
                   className="p-2 hover:bg-gray-100 rounded-lg"
                 >
                   {darkMode ? (

@@ -1,20 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
-  Award,
-  Calendar,
-  BookOpen,
-  CalendarDays,
-  CalendarCheck,
-  Users,
-  ArrowLeft,
-  Search,
-  ChevronRight,
-  Sparkles,
+  Award, Calendar, BookOpen, CalendarDays, CalendarCheck, Users,
+  ArrowLeft, Search, ChevronRight, Moon, Sun,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 const allItems = [
-  // Original 6
   {
     label: "Academic Results",
     description: "View your semester grades, GPA breakdown and performance analytics",
@@ -93,6 +85,7 @@ const categories = ["All", "Academics", "Campus Life"];
 
 export default function QuickAccessAll() {
   const navigate = useNavigate();
+  const { darkMode, toggleTheme } = useTheme();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -100,26 +93,39 @@ export default function QuickAccessAll() {
     const matchSearch =
       item.label.toLowerCase().includes(search.toLowerCase()) ||
       item.description.toLowerCase().includes(search.toLowerCase());
-    const matchCategory =
-      activeCategory === "All" || item.category === activeCategory;
+    const matchCategory = activeCategory === "All" || item.category === activeCategory;
     return matchSearch && matchCategory;
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Top Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 h-16">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+              <span className="text-gray-300 dark:text-gray-600">|</span>
+              <span className="text-sm text-gray-400 dark:text-gray-500">Quick Access</span>
+            </div>
+
+            {/* Theme Toggle */}
             <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium"
+              onClick={toggleTheme}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back 
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-gray-300" />
+              ) : (
+                <Moon className="w-5 h-5 text-gray-600" />
+              )}
             </button>
-            
-            
           </div>
         </div>
       </div>
@@ -127,16 +133,15 @@ export default function QuickAccessAll() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Page Title */}
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-        
-          </div>
-
-         
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quick Access</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
+            All your academic resources and campus services in one place —{" "}
+            <span className="font-medium text-gray-700 dark:text-gray-300">{allItems.length} modules</span>
+          </p>
         </div>
 
         {/* Search + Filter Bar */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          {/* Search */}
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -144,11 +149,10 @@ export default function QuickAccessAll() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search modules..."
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
-          {/* Category Filter */}
           <div className="flex gap-2 flex-wrap">
             {categories.map((cat) => (
               <button
@@ -157,7 +161,7 @@ export default function QuickAccessAll() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeCategory === cat
                     ? "bg-blue-600 text-white"
-                    : "bg-white border border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                    : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-blue-300 hover:text-blue-600"
                 }`}
               >
                 {cat}
@@ -168,9 +172,8 @@ export default function QuickAccessAll() {
 
         {/* Results count */}
         {search && (
-          <p className="text-sm text-gray-500 mb-4">
-            Showing {filtered.length} result{filtered.length !== 1 ? "s" : ""}{" "}
-            for "{search}"
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Showing {filtered.length} result{filtered.length !== 1 ? "s" : ""} for "{search}"
           </p>
         )}
 
@@ -183,44 +186,25 @@ export default function QuickAccessAll() {
                 <button
                   key={index}
                   onClick={() => navigate(item.route)}
-                  className={`bg-white text-left rounded-xl border-2 ${item.borderColor} p-5 hover:shadow-lg transition-all duration-200 group relative overflow-hidden`}
+                  className={`bg-white dark:bg-gray-800 text-left rounded-xl border-2 ${item.borderColor} p-5 hover:shadow-lg transition-all duration-200 group relative overflow-hidden`}
                 >
-                  {/* Background tint on hover */}
-                  <div
-                    className={`absolute inset-0 ${item.bgColor} opacity-0 group-hover:opacity-30 transition-opacity duration-200`}
-                  />
-
+                  <div className={`absolute inset-0 ${item.bgColor} opacity-0 group-hover:opacity-20 transition-opacity duration-200`} />
                   <div className="relative">
-                    {/* Top row: icon + badge */}
                     <div className="flex items-start justify-between mb-4">
                       <div className={`p-3 rounded-xl ${item.bgColor}`}>
                         <Icon className={`w-6 h-6 ${item.iconColor}`} />
                       </div>
-                      <span
-                        className={`text-xs font-semibold px-2 py-1 rounded-full ${item.bgColor} ${item.badgeColor}`}
-                      >
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${item.bgColor} ${item.badgeColor}`}>
                         {item.badge}
                       </span>
                     </div>
-
-                    {/* Label + description */}
                     <div className="mb-4">
-                      <h3 className="font-semibold text-gray-900 text-base mb-1">
-                        {item.label}
-                      </h3>
-                      <p className="text-sm text-gray-500 leading-relaxed">
-                        {item.description}
-                      </p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-1">{item.label}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.description}</p>
                     </div>
-
-                    {/* Footer */}
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-400 font-medium">
-                        {item.category}
-                      </span>
-                      <div
-                        className={`flex items-center gap-1 text-xs font-medium ${item.iconColor} opacity-0 group-hover:opacity-100 transition-opacity`}
-                      >
+                      <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{item.category}</span>
+                      <div className={`flex items-center gap-1 text-xs font-medium ${item.iconColor} opacity-0 group-hover:opacity-100 transition-opacity`}>
                         Open <ChevronRight className="w-3 h-3" />
                       </div>
                     </div>
@@ -230,7 +214,7 @@ export default function QuickAccessAll() {
             })}
           </div>
         ) : (
-          <div className="text-center py-16 text-gray-400">
+          <div className="text-center py-16 text-gray-400 dark:text-gray-600">
             <Search className="w-10 h-10 mx-auto mb-3 opacity-40" />
             <p className="text-lg font-medium">No modules found</p>
             <p className="text-sm mt-1">Try a different search term</p>
