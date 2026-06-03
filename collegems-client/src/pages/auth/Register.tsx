@@ -447,7 +447,11 @@ export default function Register() {
                 Terms of Service
               </button>{' '}
               and{' '}
-              <button className="text-blue-600 hover:text-blue-500 font-medium">
+              <button
+                type="button"
+                onClick={() => navigate("/privacy")}
+                className="text-blue-600 hover:text-blue-500 font-medium"
+              >
                 Privacy Policy
               </button>
             </p>

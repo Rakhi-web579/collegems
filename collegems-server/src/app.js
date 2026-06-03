@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 
 // Auth & Core
 import authRoutes from "./routes/auth.routes.js";
@@ -15,6 +16,7 @@ import classRoutes from "./routes/class.route.js";
 import teacherAttendanceRoutes from "./routes/teacher.attendance.route.js";
 import eventRoute from "./routes/event.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
+import libraryRoutes from "./routes/library.routes.js";
 
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
@@ -25,6 +27,7 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -35,6 +38,7 @@ app.use("/api/assignment", assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
 app.use("/api/events", eventRoute);
 app.use("/api/results", resultsRoutes);
+app.use("/api/library", libraryRoutes);
 
 app.use("/api/courses", courseRoutes);
 app.use("/api/classes", classRoutes);
