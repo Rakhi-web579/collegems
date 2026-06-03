@@ -37,7 +37,7 @@ export default function App() {
         <Route path="/timetable" element={<div>Timetable Page</div>} />
         <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-        <Route path="/library" element={<Library />} />
+       
         <Route
           path="/student/dashboard"
           element={
