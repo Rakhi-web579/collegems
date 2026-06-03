@@ -34,6 +34,7 @@ const Teachers: React.FC = () => {
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filterDepartment, setFilterDepartment] = useState<string>("all");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchTeachers();
@@ -52,12 +53,13 @@ const Teachers: React.FC = () => {
   const fetchTeachers = async () => {
     try {
       setLoading(true);
+      setError("");
       const response = await api.get("/users/teachers");
       setTeachers(response.data);
       setFilteredTeachers(response.data);
     } catch (error) {
       console.error("Error fetching teachers:", error);
-      alert("Failed to load teachers data");
+      setError("Failed to load teachers data");
     } finally {
       setLoading(false);
     }
@@ -197,7 +199,11 @@ const Teachers: React.FC = () => {
           </div>
         )}
       </div>
-
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
       {/* Teachers Grid */}
       {loading ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
