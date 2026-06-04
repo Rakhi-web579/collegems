@@ -60,9 +60,24 @@ export default function HODDashboard() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profileUpdatedAt, setProfileUpdatedAt] = useState<Date | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [searchData, setSearchData] = useState({
+    students: [],
+    teachers: [],
+    courses: [],
+  });
+
+  const [searchResults, setSearchResults] = useState({
+    students: [],
+    teachers: [],
+    courses: [],
+  });
+
   useEffect(() => {
     fetchDashboardData();
     fetchProfileData();
+    fetchSearchData();
     const refreshProfile = () => fetchProfileData(true);
     const profileInterval = window.setInterval(refreshProfile, 15000);
     window.addEventListener("focus", refreshProfile);
@@ -120,6 +135,58 @@ export default function HODDashboard() {
       setProfileRefreshing(false);
     }
   };
+
+  const fetchSearchData = async () => {
+    try {
+      const [studentsRes, teachersRes, coursesRes] = await Promise.all([
+        api.get("/users/students"),
+        api.get("/users/teachers"),
+        api.get("/courses/all"),
+      ]);
+
+      setSearchData({
+        students: studentsRes.data || [],
+        teachers: teachersRes.data || [],
+        courses: coursesRes.data || [],
+      });
+    } catch (error) {
+      console.error("Error loading search data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults({
+        students: [],
+        teachers: [],
+        courses: [],
+      });
+      return;
+    }
+
+    const query = searchTerm.toLowerCase();
+
+    setSearchResults({
+      students: searchData.students.filter(
+        (student: any) =>
+          student.name?.toLowerCase().includes(query) ||
+          student.email?.toLowerCase().includes(query)
+      ),
+
+      teachers: searchData.teachers.filter(
+        (teacher: any) =>
+          teacher.name?.toLowerCase().includes(query) ||
+          teacher.email?.toLowerCase().includes(query)
+      ),
+
+      courses: searchData.courses.filter(
+        (course: any) =>
+          course.name?.toLowerCase().includes(query) ||
+          course.code?.toLowerCase().includes(query) ||
+          course.department?.toLowerCase().includes(query)
+      ),
+    });
+  }, [searchTerm, searchData]);
   // Sign out handler for HOD
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -231,7 +298,10 @@ export default function HODDashboard() {
               <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                 <Settings className="w-4 h-4 text-gray-500 dark:text-gray-400" /> Settings
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
                 <LogOut className="w-4 h-4 text-gray-500 dark:text-gray-400" /> Sign Out
               </button>
             </div>
@@ -249,9 +319,56 @@ export default function HODDashboard() {
                 <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                   <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 </button>
-                <div className="relative hidden sm:block">
+                <div className="relative hidden sm:block w-80">
                   <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input type="text" placeholder="Search..." className="pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500" />
+
+                  <input
+                    type="text"
+                    placeholder="Search students, teachers, courses..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
+
+                  {searchTerm && (
+                    <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+
+                      <div className="p-2">
+                        <h4 className="font-bold text-blue-600">Students</h4>
+                        {searchResults.students.map((student: any) => (
+                          <div key={student._id} className="p-2 border-b">
+                            {student.name}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="p-2">
+                        <h4 className="font-bold text-green-600">Faculty</h4>
+                        {searchResults.teachers.map((teacher: any) => (
+                          <div key={teacher._id} className="p-2 border-b">
+                            {teacher.name}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="p-2">
+                        <h4 className="font-bold text-purple-600">Courses</h4>
+                        {searchResults.courses.map((course: any) => (
+                          <div key={course._id} className="p-2 border-b">
+                            {course.name}
+                          </div>
+                        ))}
+                      </div>
+
+                      {searchResults.students.length === 0 &&
+                        searchResults.teachers.length === 0 &&
+                        searchResults.courses.length === 0 && (
+                          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                            No students, faculty, or courses found.
+                          </div>
+                        )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -282,6 +399,7 @@ export default function HODDashboard() {
               </div>
             </div>
           </div>
+
         </header>
 
         {/* Page Content */}

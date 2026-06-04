@@ -21,7 +21,7 @@ interface ExamSchedule {
 }
 
 const ExamSchedule: React.FC = () => {
-  const { darkMode } = useTheme();
+  useTheme();
 
   const [examName, setExamName] = useState("");
   const [course, setCourse] = useState("");
