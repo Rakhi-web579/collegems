@@ -22,6 +22,8 @@ import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
 
+import { authenticate } from "./middlewares/auth.middleware.js";
+
 const app = express();
 
 // Middlewares
@@ -33,21 +35,21 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-app.use("/api/attendance", attendanceRoutes);
-app.use("/api/assignment", assignmentRoutes);
+app.use("/api/attendance", authenticate, attendanceRoutes);
+app.use("/api/assignment", authenticate, assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
 app.use("/api/events", eventRoute);
-app.use("/api/results", resultsRoutes);
+app.use("/api/results", authenticate, resultsRoutes);
 app.use("/api/library", libraryRoutes);
 
 app.use("/api/courses", courseRoutes);
 app.use("/api/classes", classRoutes);
 
-app.use("/api/fee", feeRoutes);
-app.use("/api/salary", salaryRoutes);
+app.use("/api/fee", authenticate, feeRoutes);
+app.use("/api/salary", authenticate, salaryRoutes);
 
-app.use("/api/users", userRoutes);
-app.use("/api/examschedule", examScheduleRoutes);
+app.use("/api/users", authenticate, userRoutes);
+app.use("/api/examschedule", authenticate, examScheduleRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);
 
 // Health check (optional but useful)
