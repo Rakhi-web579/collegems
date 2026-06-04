@@ -15,6 +15,8 @@ import EventsStudent from "./user-components/EventsStudent";
 import QuickAccessAll from "./pages/QuickAccessAll";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Library from "./common-components-management/Library";
+import ReportGenerator from "./pages/ReportGenerator";
+
 export default function App() {
   return (
     <BrowserRouter>
