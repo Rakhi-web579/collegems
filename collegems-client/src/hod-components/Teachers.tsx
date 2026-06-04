@@ -18,7 +18,7 @@ interface Teacher {
 }
 
 const Teachers: React.FC = () => {
-  const { darkMode } = useTheme();
+  useTheme();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
