@@ -12,7 +12,7 @@ router.post(
   allowRoles("hod", "admin", "teacher"),
   async (req, res) => {
     try {
-      const { name, code, department, semester } = req.body;
+      const { name, code, department, semester, credits, description, maxStudents } = req.body;
       const teacher = req.body.teacher || req.user.id;
 
       if (!name || !code || !department || !semester) {
@@ -34,6 +34,9 @@ router.post(
         department,
         semester,
         teacher,
+        credits,
+        description,
+        maxStudents,
       });
 
       res.status(201).json(course);
@@ -53,10 +56,10 @@ router.put(
   async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, code, department, semester } = req.body;
+      const { name, code, department, semester, teacher, credits, description, maxStudents } = req.body;
       const course = await Course.findByIdAndUpdate(
         id,
-        { name, code, department, semester },
+        { name, code, department, semester, teacher, credits, description, maxStudents },
         { new: true },
       );
       if (!course) {
