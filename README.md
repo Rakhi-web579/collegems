@@ -47,33 +47,39 @@
 SCMS is structured around role-based modules, ensuring that every user has a tailored experience specific to their tasks and permissions.
 
 ### 🔐 Authentication & Authorization
+
 - **Secure JWT Authentication**: Industry-standard access token structure stored in global state.
 - **Role-Based Access Control (RBAC)**: Fine-grained dashboard view filtering for Students, Teachers, and HODs.
 - **Security Protocols**: Password hashing via BcryptJS, secure API middlewares, and cors configuration.
 
 ### 👨‍🎓 Student Module
+
 - **Comprehensive Profile**: Personal profile details, department information, and registration records.
 - **Academics & Attendance**: Real-time view of class attendance percentages and detailed logs.
 - **Assignments & Exams**: Track and submit assignments; view grades, exam schedules, and academic reports.
 - **Finances**: Access detailed fee structures, outstanding balances, payment status, and download official fee receipts in PDF format.
 
 ### 👨‍🏫 Teacher Module
+
 - **Academics Control**: Create, manage, and assign courses/subjects to classes.
 - **Attendance Registry**: Easy-to-use digital attendance marker with performance tracking.
 - **Assignment Hub**: Create assignments, set deadlines, and grade student submissions directly.
 - **Performance Grading**: Record and publish exam/test results seamlessly.
 
 ### 👑 HOD / Admin Module
+
 - **User Control Panel**: Add, edit, or remove Student, Teacher, and Administrator accounts.
 - **Academics Scheduling**: Oversee departments, class assignments, and courses.
 - **Financial Registry**: Manage tuition fees, salaries, and system-wide transactions.
 - **Approval Workflows**: Review leave requests, enrollment approvals, and administrative actions.
 
 ### 📊 Analytics & Reports
+
 - **Visual Dashboards**: High-fidelity charts for tracking campus performance, outstanding fees, and monthly attendance rates.
 - **Exporting Tools**: Download financial, academic, and attendance reports as PDF or Excel spreadsheets.
 
 ### ⚡ Real-Time & AI Features
+
 - **Live Notifications**: Event announcements and emergency notices sent instantly via Socket.io.
 - **Smart Insights**: Under-the-hood preparation for smart insights such as performance tracking and attendance predictors.
 
@@ -82,24 +88,28 @@ SCMS is structured around role-based modules, ensuring that every user has a tai
 ## 🛠️ Tech Stack & Ecosystem
 
 ### Frontend
+
 SCMS features a highly interactive and fluid Single Page Application (SPA) built with modern frontend best practices:
-*   **Library**: [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/)
-*   **Build Tool**: [Vite](https://vite.dev/)
-*   **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (modern styling engine) & [Material UI (MUI)](https://mui.com/)
-*   **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/) (for global and auth state)
-*   **Data Fetching**: [TanStack React Query](https://tanstack.com/query) (for query caching, pagination, and sync)
-*   **Data Visualization**: [Recharts](https://recharts.org/) (premium responsive analytics graphs)
-*   **Real-time Communication**: [Socket.io-client](https://socket.io/)
-*   **Forms & Validation**: React Hook Form & Yup
-*   **PDF Generation**: jsPDF & html2canvas
+
+- **Library**: [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vite.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (modern styling engine) & [Material UI (MUI)](https://mui.com/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/) (for global and auth state)
+- **Data Fetching**: [TanStack React Query](https://tanstack.com/query) (for query caching, pagination, and sync)
+- **Data Visualization**: [Recharts](https://recharts.org/) (premium responsive analytics graphs)
+- **Real-time Communication**: [Socket.io-client](https://socket.io/)
+- **Forms & Validation**: React Hook Form & Yup
+- **PDF Generation**: jsPDF & html2canvas
 
 ### Backend
+
 A reliable, scalable REST API built using the robust Node.js ecosystem:
-*   **Runtime**: [Node.js](https://nodejs.org/)
-*   **Framework**: [Express.js v5](https://expressjs.com/) (high performance, modern middleware support)
-*   **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) (ODM)
-*   **Security & Encryption**: BcryptJS & JSON Web Tokens (JWT)
-*   **Utilities**: Nodemailer (Email integration) & Multer (Multi-part file uploads)
+
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express.js v5](https://expressjs.com/) (high performance, modern middleware support)
+- **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) (ODM)
+- **Security & Encryption**: BcryptJS & JSON Web Tokens (JWT)
+- **Utilities**: Nodemailer (Email integration) & Multer (Multi-part file uploads)
 
 ---
 
@@ -136,7 +146,7 @@ flowchart TD
     classDef client fill:#003366,stroke:#33b5e5,stroke-width:2px,color:#fff;
     classDef server fill:#2e3033,stroke:#a886f7,stroke-width:2px,color:#fff;
     classDef database fill:#1c2d1b,stroke:#4db33d,stroke-width:2px,color:#fff;
-    
+
     class User,Frontend,Redux,Query client;
     class Express,Sockets,AuthG,Controllers server;
     class DB,Email,Storage database;
@@ -169,11 +179,13 @@ sequenceDiagram
 Follow these steps to run a copy of the project locally on your machine.
 
 ### Pre-requisites
+
 - **Node.js** (v18.x or above recommended)
 - **MongoDB** (Local instance or MongoDB Atlas cluster URI)
 - **NPM** or **Yarn**
 
 ### 1. Backend Setup
+
 1. Open your terminal and navigate to the backend server directory:
    ```bash
    cd collegems-server
@@ -196,9 +208,10 @@ Follow these steps to run a copy of the project locally on your machine.
    ```bash
    npm run start
    ```
-   *The server will start running on* `http://localhost:5000`
+   _The server will start running on_ `http://localhost:5000`
 
 ### 2. Frontend Setup
+
 1. Open a new terminal window/tab and navigate to the client directory:
    ```bash
    cd collegems-client
@@ -219,7 +232,27 @@ Follow these steps to run a copy of the project locally on your machine.
    ```bash
    npm run dev
    ```
-   *The client app will compile and start running on* `http://localhost:5173` *(or your local Vite default port)*
+   _The client app will compile and start running on_ `http://localhost:5173` _(or your local Vite default port)_
+
+### 3. Database Seeding (Dummy Users)
+
+To help developers quickly populate the database with sample data for local development and testing, a seed script is included.
+
+1. Ensure your local MongoDB instance is running.
+2. Verify that your `.env` file in the `collegems-server` directory contains your correct `MONGO_URI`.
+3. Open your terminal, navigate to the `collegems-server` folder, and run:
+   ```bash
+   npm run seed
+   ```
+
+**Available Dummy Accounts:**
+_All accounts share the default password:_ `password123`
+
+- **Student:** student@example.com
+- **Teacher:** teacher@example.com
+- **HOD:** hod@college.edu
+
+````
 
 ---
 
@@ -257,7 +290,7 @@ collegems/
 │   ├── server.js              # Server entry point
 │   └── package.json
 └── README.md
-```
+````
 
 ---
 
@@ -275,7 +308,7 @@ This codebase is configured to be easily deployable on cloud platforms like **Re
    npm start
    ```
 
-*Note: Since the backend and frontend are located in separate directories, we highly recommend deploying them as two separate services on Render (Static Site for `collegems-client` and Web Service for `collegems-server`) or utilizing the monorepo deployment rules in Render by setting the **Root Directory** configurations accordingly.*
+_Note: Since the backend and frontend are located in separate directories, we highly recommend deploying them as two separate services on Render (Static Site for `collegems-client` and Web Service for `collegems-server`) or utilizing the monorepo deployment rules in Render by setting the **Root Directory** configurations accordingly._
 
 ---
 
@@ -301,8 +334,8 @@ If you find this project helpful or educational, please consider giving it a **s
 
 ## 👤 Author
 
-*   **Anchal Singh** - *Full Stack Developer*
-    *   [GitHub](https://github.com/imanchalsingh)
+- **Anchal Singh** - _Full Stack Developer_
+  - [GitHub](https://github.com/imanchalsingh)
 
 ---
 
