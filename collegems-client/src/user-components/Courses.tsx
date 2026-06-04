@@ -29,7 +29,7 @@ const Courses: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const { darkMode } = useTheme();
+  useTheme();
 
   useEffect(() => {
     const fetchCourses = async () => {
