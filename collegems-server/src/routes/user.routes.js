@@ -1,6 +1,6 @@
 import express from "express";
 import { protect } from "../middlewares/auth.middleware.js";
-import { allowRoles } from "../middlewares/role.middleware.js";
+import { authorize } from "../middlewares/role.middleware.js";
 import User from "../models/User.model.js";
 import {
   getMe,
@@ -13,24 +13,24 @@ import {
 
 const router = express.Router();
 
-router.get("/me", protect, allowRoles("teacher", "hod"), getMe);
-router.put("/me", protect, allowRoles("teacher", "hod"), updateMe);
+router.get("/me", protect, authorize("teacher", "hod"), getMe);
+router.put("/me", protect, authorize("teacher", "hod"), updateMe);
 router.put(
   "/me/password",
   protect,
-  allowRoles("teacher", "hod"),
+  authorize("teacher", "hod"),
   updatePassword,
 );
 router.get(
   "/me/preferences",
   protect,
-  allowRoles("teacher", "hod"),
+  authorize("teacher", "hod"),
   getPreferences,
 );
 router.put(
   "/me/preferences",
   protect,
-  allowRoles("teacher", "hod"),
+  authorize("teacher", "hod"),
   updatePreferences,
 );
 
@@ -38,7 +38,7 @@ router.put(
 router.get(
   "/students",
   protect,
-  allowRoles("teacher", "hod"),
+  authorize("teacher", "hod"),
   async (req, res) => {
     const students = await User.find({ role: "student" }).select(
       "name email role studentId course semester",
@@ -51,11 +51,11 @@ router.get(
 router.get(
   "/students/:id",
   protect,
-  allowRoles("teacher", "hod"),
+  authorize("teacher", "hod"),
   getStudentProfile
 );
 
-router.get("/teachers", protect, async (req, res) => {
+router.get("/teachers", protect, authorize("hod"), async (req, res) => {
   const teachers = await User.find({ role: "teacher" }).select("name email role teacherId department phone");
 
   res.json(teachers);
