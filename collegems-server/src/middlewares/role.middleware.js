@@ -9,3 +9,5 @@ export const authorize = (...allowedRoles) => {
     next();
   };
 };
+
+export const allowRoles = authorize;
