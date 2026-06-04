@@ -9,16 +9,9 @@ const normalizeEmail = (email) => email?.trim().toLowerCase();
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const isBcryptHash = (password) =>
-  typeof password === "string" && BCRYPT_HASH_PATTERN.test(password);
-
 const verifyPassword = async (plainPassword, storedPassword) => {
   if (typeof storedPassword !== "string" || !storedPassword) {
     return false;
-  }
-
-  if (!isBcryptHash(storedPassword)) {
-    return plainPassword === storedPassword;
   }
 
   return bcrypt.compare(plainPassword, storedPassword);
