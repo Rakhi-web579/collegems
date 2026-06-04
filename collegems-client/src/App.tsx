@@ -14,6 +14,7 @@ import StudentResults from "./user-components/StudentResults";
 import EventsStudent from "./user-components/EventsStudent";
 import QuickAccessAll from "./pages/QuickAccessAll";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Library from "./common-components-management/Library";
 export default function App() {
   return (
     <BrowserRouter>
@@ -37,7 +38,7 @@ export default function App() {
         <Route path="/timetable" element={<div>Timetable Page</div>} />
         <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-        <Route path="/library" element={<Library />} />
+       
         <Route
           path="/student/dashboard"
           element={
