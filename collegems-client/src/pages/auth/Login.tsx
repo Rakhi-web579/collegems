@@ -15,9 +15,15 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    if (!email || !password) { alert("Please enter both email and password"); return; }
+    setError("");
+    if (!email || !password) {
+    setError("Please enter both email and password");
+    return;
+    }
+
     if (loading) return;
     setLoading(true);
     try {
@@ -31,7 +37,10 @@ export default function Login() {
       const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard" };
       navigate(routes[role] || "/");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Login failed. Please check your credentials.");
+      const errorMessage =
+        err.response?.data?.message ||
+        "Login failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -105,14 +114,19 @@ export default function Login() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
-                <input
-                  id="email" type="email" value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                />
+             <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
+                onKeyPress={handleKeyPress}
+                className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                placeholder="you@example.com"
+                autoComplete="email"
+              />
               </div>
             </div>
 
@@ -126,8 +140,13 @@ export default function Login() {
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="password" type={showPassword ? "text" : "password"} value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
                   onKeyPress={handleKeyPress}
                   className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                   placeholder="••••••••"
@@ -157,6 +176,12 @@ export default function Login() {
                 Forgot password?
               </button>
             </div>
+
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
 
             {/* Login Button */}
             <button

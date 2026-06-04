@@ -14,12 +14,23 @@ export default function Register() {
   const [role, setRole] = useState("student");
   const [form, setForm] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleChange = (e: any) => setForm({ ...form, [e.target.name]: e.target.value });
-
+  const handleChange = (e: any) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+  };
+  
   const handleRegister = async () => {
     if (loading) return;
-    if (!form.name || !form.email || !form.password) { alert("Please fill in all required fields"); return; }
+
+    setError("");
+
+    if (!form.name || !form.email || !form.password) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await api.post("/auth/register", { ...form, role });
@@ -30,7 +41,7 @@ export default function Register() {
       const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard" };
       navigate(routes[res.data.user.role] || "/");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -230,7 +241,12 @@ export default function Register() {
                 </div>
               </div>
             )}
-
+              {/* Error Message */}
+              {error && (
+                <p className="text-red-500 text-sm text-center">
+                  {error}
+                </p>
+              )}
             {/* Submit Button */}
             <button
               type="button" onClick={handleRegister} disabled={loading}
