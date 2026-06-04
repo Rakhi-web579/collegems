@@ -4,7 +4,6 @@ import {
   UserCircle, GraduationCap, BookOpen, ChevronRight, Filter,
 } from "lucide-react";
 import api from "../api/axios";
-import { useTheme } from "../context/ThemeContext";
 
 interface Teacher {
   name: string;
@@ -18,7 +17,10 @@ interface Teacher {
 }
 
 const Teachers: React.FC = () => {
+<<<<<<< HEAD
   useTheme();
+=======
+>>>>>>> e1cf284 (feat(exams): implement online examination form registration and HOD management system)
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

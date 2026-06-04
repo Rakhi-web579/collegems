@@ -16,6 +16,7 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
+import HODExamForms from "../hod-components/ExamForms";
 
 type TabType =
   | "overview"
@@ -32,7 +33,11 @@ type TabType =
   | "academic-calendar"
   | "library"
   | "settings"
+<<<<<<< HEAD
   | "reports";
+=======
+  | "exam-forms";
+>>>>>>> e1cf284 (feat(exams): implement online examination form registration and HOD management system)
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -215,6 +220,7 @@ export default function HODDashboard() {
     { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
     { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
     { id: "reports" as TabType, label: "Report Generator", icon: FileText },
+    { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
   ];
 
   const statsCards = data?.cards.map((card, index) => ({
@@ -306,10 +312,14 @@ export default function HODDashboard() {
               <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                 <Settings className="w-4 h-4 text-gray-500 dark:text-gray-400" /> Settings
               </button>
+<<<<<<< HEAD
               <button
                 onClick={handleSignOut}
                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
+=======
+              <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+>>>>>>> e1cf284 (feat(exams): implement online examination form registration and HOD management system)
                 <LogOut className="w-4 h-4 text-gray-500 dark:text-gray-400" /> Sign Out
               </button>
             </div>
@@ -538,6 +548,7 @@ export default function HODDashboard() {
           {activeTab === "library" && <Library />}
           {activeTab === "courses" && <HODCourses />}
           {activeTab === "settings" && <HODSettings />}
+          {activeTab === "exam-forms" && <HODExamForms />}
         </main>
       </div>
     </div>
