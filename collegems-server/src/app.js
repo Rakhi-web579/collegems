@@ -21,6 +21,7 @@ import libraryRoutes from "./routes/library.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
+import reportRoutes from "./routes/report.routes.js";
 
 import { authenticate } from "./middlewares/auth.middleware.js";
 
@@ -32,6 +33,10 @@ app.use(cors({
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"]
+  origin: (origin, callback) => {
+    callback(null, true);
+  },
+  credentials: true
 }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -56,6 +61,7 @@ app.use("/api/salary", authenticate, salaryRoutes);
 app.use("/api/users", authenticate, userRoutes);
 app.use("/api/examschedule", authenticate, examScheduleRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Health check (optional but useful)
 app.get("/", (req, res) => {

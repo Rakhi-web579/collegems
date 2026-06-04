@@ -1,0 +1,360 @@
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+
+// Load env variables
+dotenv.config();
+
+// Import models
+import User from "../models/User.model.js";
+import Course from "../models/Course.model.js";
+import Attendance from "../models/Attendance.model.js";
+import TeacherAttendance from "../models/TeacherAttendance.js";
+import Results from "../models/Results.model.js";
+import Leave from "../models/Leave.model.js";
+import Assignment from "../models/Assignment.model.js";
+import Salary from "../models/Salary.model.js";
+
+const seedData = async () => {
+  try {
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+      console.error("MONGO_URI not configured in .env");
+      process.exit(1);
+    }
+
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect(mongoUri);
+    console.log("Connected to MongoDB. Starting seed...");
+
+    // 1. Create or Find HOD
+    const hashedPassword = await bcrypt.hash("password123", 10);
+    let hod = await User.findOne({ email: "hod@college.edu" });
+    if (!hod) {
+      hod = await User.create({
+        name: "Dr. Alice Vance",
+        email: "hod@college.edu",
+        password: hashedPassword,
+        role: "hod",
+        phone: "+15550199",
+        departmentCode: "CSE"
+      });
+      console.log("HOD created: hod@college.edu");
+    }
+
+    // 2. Create Teachers
+    let teacher1 = await User.findOne({ email: "david.evans@college.edu" });
+    if (!teacher1) {
+      teacher1 = await User.create({
+        name: "Dr. David Evans",
+        email: "david.evans@college.edu",
+        password: hashedPassword,
+        role: "teacher",
+        phone: "+15550188",
+        teacherId: "T-1001",
+        department: "Computer Science"
+      });
+      console.log("Teacher 1 created: david.evans@college.edu");
+    }
+
+    let teacher2 = await User.findOne({ email: "sarah.jenkins@college.edu" });
+    if (!teacher2) {
+      teacher2 = await User.create({
+        name: "Prof. Sarah Jenkins",
+        email: "sarah.jenkins@college.edu",
+        password: hashedPassword,
+        role: "teacher",
+        phone: "+15550177",
+        teacherId: "T-1002",
+        department: "Computer Science"
+      });
+      console.log("Teacher 2 created: sarah.jenkins@college.edu");
+    }
+
+    // 3. Create Students
+    let student1 = await User.findOne({ email: "alice.johnson@college.edu" });
+    if (!student1) {
+      student1 = await User.create({
+        name: "Alice Johnson",
+        email: "alice.johnson@college.edu",
+        password: hashedPassword,
+        role: "student",
+        phone: "+15550155",
+        studentId: "S-2001",
+        semester: "3",
+        course: "Computer Science"
+      });
+      console.log("Student 1 created: alice.johnson@college.edu");
+    }
+
+    let student2 = await User.findOne({ email: "bob.smith@college.edu" });
+    if (!student2) {
+      student2 = await User.create({
+        name: "Bob Smith",
+        email: "bob.smith@college.edu",
+        password: hashedPassword,
+        role: "student",
+        phone: "+15550144",
+        studentId: "S-2002",
+        semester: "3",
+        course: "Computer Science"
+      });
+      console.log("Student 2 created: bob.smith@college.edu");
+    }
+
+    // 4. Create Courses
+    let course1 = await Course.findOne({ code: "CS-301" });
+    if (!course1) {
+      course1 = await Course.create({
+        name: "Computer Networks",
+        code: "CS-301",
+        department: "Computer Science",
+        semester: 3,
+        teacher: teacher1._id
+      });
+      console.log("Course 1 created: CS-301");
+    }
+
+    let course2 = await Course.findOne({ code: "CS-302" });
+    if (!course2) {
+      course2 = await Course.create({
+        name: "Operating Systems",
+        code: "CS-302",
+        department: "Computer Science",
+        semester: 3,
+        teacher: teacher2._id
+      });
+      console.log("Course 2 created: CS-302");
+    }
+
+    // 5. Create Student Attendance over last 10 days
+    console.log("Seeding student attendance...");
+    const dates = [
+      "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22",
+      "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29"
+    ];
+
+    for (const d of dates) {
+      // Alice: 80% attendance
+      const status1 = d === "2026-05-20" || d === "2026-05-27" ? "absent" : "present";
+      await Attendance.findOneAndUpdate(
+        { student: student1._id, course: course1._id, date: d },
+        { status: status1 },
+        { upsert: true }
+      );
+      await Attendance.findOneAndUpdate(
+        { student: student1._id, course: course2._id, date: d },
+        { status: status1 },
+        { upsert: true }
+      );
+
+      // Bob: 70% attendance
+      const status2 = d === "2026-05-19" || d === "2026-05-22" || d === "2026-05-28" ? "absent" : "present";
+      await Attendance.findOneAndUpdate(
+        { student: student2._id, course: course1._id, date: d },
+        { status: status2 },
+        { upsert: true }
+      );
+      await Attendance.findOneAndUpdate(
+        { student: student2._id, course: course2._id, date: d },
+        { status: status2 },
+        { upsert: true }
+      );
+    }
+
+    // 6. Create Teacher Attendance over last 10 days
+    console.log("Seeding teacher attendance...");
+    for (const d of dates) {
+      const dateObj = new Date(d);
+
+      // Teacher 1
+      const t1Status = d === "2026-05-21" ? "Late" : d === "2026-05-25" ? "Absent" : "Present";
+      await TeacherAttendance.findOneAndUpdate(
+        { teacher: teacher1._id, date: dateObj },
+        { status: t1Status, markedBy: hod._id },
+        { upsert: true }
+      );
+
+      // Teacher 2
+      const t2Status = d === "2026-05-27" ? "Absent" : "Present";
+      await TeacherAttendance.findOneAndUpdate(
+        { teacher: teacher2._id, date: dateObj },
+        { status: t2Status, markedBy: hod._id },
+        { upsert: true }
+      );
+    }
+
+    // 7. Create Student Results
+    console.log("Seeding results...");
+    // Student 1 (Alice)
+    await Results.findOneAndUpdate(
+      { studentId: student1._id, courseId: course1._id },
+      {
+        semester: "3",
+        internalMarks: 25,
+        externalMarks: 62,
+        practicalMarks: 10,
+        totalMarks: 97,
+        grade: "A+",
+        status: "published",
+        createdBy: teacher1._id
+      },
+      { upsert: true }
+    );
+    await Results.findOneAndUpdate(
+      { studentId: student1._id, courseId: course2._id },
+      {
+        semester: "3",
+        internalMarks: 22,
+        externalMarks: 58,
+        practicalMarks: 9,
+        totalMarks: 89,
+        grade: "A",
+        status: "published",
+        createdBy: teacher2._id
+      },
+      { upsert: true }
+    );
+
+    // Student 2 (Bob)
+    await Results.findOneAndUpdate(
+      { studentId: student2._id, courseId: course1._id },
+      {
+        semester: "3",
+        internalMarks: 18,
+        externalMarks: 48,
+        practicalMarks: 8,
+        totalMarks: 74,
+        grade: "B",
+        status: "published",
+        createdBy: teacher1._id
+      },
+      { upsert: true }
+    );
+    await Results.findOneAndUpdate(
+      { studentId: student2._id, courseId: course2._id },
+      {
+        semester: "3",
+        internalMarks: 20,
+        externalMarks: 50,
+        practicalMarks: 8,
+        totalMarks: 78,
+        grade: "B+",
+        status: "published",
+        createdBy: teacher2._id
+      },
+      { upsert: true }
+    );
+
+    // 8. Create Assignments and Submissions
+    console.log("Seeding assignments and submissions...");
+    let assign1 = await Assignment.findOne({ title: "Socket Programming Project" });
+    if (!assign1) {
+      assign1 = await Assignment.create({
+        title: "Socket Programming Project",
+        course: course1._id,
+        teacher: teacher1._id,
+        dueDate: new Date("2026-05-24"),
+        submissions: [
+          { student: student1._id, submittedAt: new Date("2026-05-22"), marks: 95 },
+          { student: student2._id, submittedAt: new Date("2026-05-24"), marks: 82 }
+        ]
+      });
+      console.log("Assignment 1 created");
+    }
+
+    let assign2 = await Assignment.findOne({ title: "CPU Scheduler Simulation" });
+    if (!assign2) {
+      assign2 = await Assignment.create({
+        title: "CPU Scheduler Simulation",
+        course: course2._id,
+        teacher: teacher2._id,
+        dueDate: new Date("2026-05-28"),
+        submissions: [
+          { student: student1._id, submittedAt: new Date("2026-05-27"), marks: 90 },
+          { student: student2._id, submittedAt: new Date("2026-05-28"), marks: 75 }
+        ]
+      });
+      console.log("Assignment 2 created");
+    }
+
+    // 9. Create Leaves
+    console.log("Seeding leaves...");
+    // Student 1 Sick leave
+    await Leave.findOneAndUpdate(
+      { user: student1._id, reason: "Severe Flu" },
+      {
+        role: "student",
+        startDate: new Date("2026-05-20"),
+        endDate: new Date("2026-05-22"),
+        reason: "Severe Flu",
+        status: "Approved",
+        type: "Sick"
+      },
+      { upsert: true }
+    );
+
+    // Teacher 1 Duty leave
+    await Leave.findOneAndUpdate(
+      { user: teacher1._id, reason: "National Conference on AI" },
+      {
+        role: "teacher",
+        startDate: new Date("2026-05-21"),
+        endDate: new Date("2026-05-22"),
+        reason: "National Conference on AI",
+        status: "Approved",
+        type: "Duty"
+      },
+      { upsert: true }
+    );
+
+    // Teacher 2 Pending Sick leave
+    await Leave.findOneAndUpdate(
+      { user: teacher2._id, reason: "Dental Surgery" },
+      {
+        role: "teacher",
+        startDate: new Date("2026-06-05"),
+        endDate: new Date("2026-06-06"),
+        reason: "Dental Surgery",
+        status: "Pending",
+        type: "Sick"
+      },
+      { upsert: true }
+    );
+
+    // 10. Seeding Salaries
+    console.log("Seeding salaries...");
+    await Salary.findOneAndUpdate(
+      { staff: teacher1._id },
+      {
+        total: 95000,
+        paid: 95000,
+        dueDate: new Date("2026-05-01"),
+        status: "Paid",
+        installments: [{ amount: 95000, paidOn: new Date("2026-05-01") }]
+      },
+      { upsert: true }
+    );
+
+    await Salary.findOneAndUpdate(
+      { staff: teacher2._id },
+      {
+        total: 85000,
+        paid: 60000,
+        dueDate: new Date("2026-05-01"),
+        status: "Partial",
+        installments: [{ amount: 60000, paidOn: new Date("2026-05-02") }]
+      },
+      { upsert: true }
+    );
+
+    console.log("Seeding successfully completed! 🎉");
+    await mongoose.connection.close();
+    console.log("Database connection closed.");
+  } catch (error) {
+    console.error("Seeding failed:", error);
+    process.exit(1);
+  }
+};
+
+seedData();

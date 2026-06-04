@@ -146,6 +146,7 @@ export default function HODDashboard() {
     { id: "examSchedule" as TabType, label: "Exam Schedule", icon: Calendar },
     { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
     { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
+    { id: "reports" as TabType, label: "Report Generator", icon: FileText },
   ];
 
   const statsCards = data?.cards.map((card, index) => ({
