@@ -13,14 +13,8 @@ import Teachers from "./hod-components/Teachers";
 import StudentResults from "./user-components/StudentResults";
 import EventsStudent from "./user-components/EventsStudent";
 import QuickAccessAll from "./pages/QuickAccessAll";
-<<<<<<< HEAD
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Library from "./common-components-management/Library";
-=======
-import Library from "./common-components-management/Library";
-import ReportGenerator from "./pages/ReportGenerator";
-
->>>>>>> 3ce949d (feat(hod): add dedicated report generator with filtering and export support)
 export default function App() {
   return (
     <BrowserRouter>
