@@ -24,10 +24,19 @@ const verifyPassword = async (plainPassword, storedPassword) => {
   return bcrypt.compare(plainPassword, storedPassword);
 };
 
-const generateToken = (user) =>
+const generateAccessToken = (user) =>
   jwt.sign({ id: String(user._id), role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
+    expiresIn: "15m",
   });
+
+const generateRefreshToken = (user) =>
+  jwt.sign(
+    { id: String(user._id), role: user.role },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
 
 export const register = async (req, res) => {
   try {
@@ -98,11 +107,19 @@ export const register = async (req, res) => {
     // Create user
     const user = await User.create(userData);
 
-    const token = generateToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     res.status(201).json({
       message: "Registered successfully",
-      token,
+      accessToken,
       user: { id: user._id, name: user.name, role: user.role },
     });
   } catch (err) {
@@ -132,15 +149,23 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    if (!process.env.JWT_SECRET) {
-      console.error("JWT_SECRET is not configured");
+    if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+      console.error("JWT secrets are not configured");
       return res.status(500).json({ message: "Authentication not configured" });
     }
 
-    const token = generateToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     res.json({
-      token,
+      accessToken,
       user: {
         id: user._id,
         name: user.name,
@@ -156,6 +181,51 @@ export const login = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const refresh = async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token missing" });
+    }
+
+    jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET,
+      async (err, decoded) => {
+        if (err) {
+          return res.status(403).json({ message: "Invalid refresh token" });
+        }
+
+        const user = await User.findById(decoded.id);
+        if (!user) {
+          return res.status(401).json({ message: "User not found" });
+        }
+
+        const accessToken = generateAccessToken(user);
+        res.json({ accessToken });
+      }
+    );
+  } catch (err) {
+    console.error("Refresh error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    res.json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("Logout error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
