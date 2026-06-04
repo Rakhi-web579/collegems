@@ -24,6 +24,17 @@ const courseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    credits: {
+      type: Number,
+      default: 3,
+    },
+    description: {
+      type: String,
+    },
+    maxStudents: {
+      type: Number,
+      default: 60,
+    },
   },
   { timestamps: true },
 );
