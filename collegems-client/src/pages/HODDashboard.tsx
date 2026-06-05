@@ -33,7 +33,8 @@ type TabType =
   | "academic-calendar"
   | "library"
   | "settings"
-  | "reports";
+  | "reports"
+  | "exam-forms";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
