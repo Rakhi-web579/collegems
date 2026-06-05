@@ -13,6 +13,7 @@ import {
   UserCheck,
   UserX,
   RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -36,6 +37,8 @@ export default function TeacherAttendance() {
   const [search, setSearch] = useState("");
   const [subject, setSubject] = useState("");
   const [subjects, setSubjects] = useState<string[]>([]);
+  const [activeView, setActiveView] = useState<"mark" | "low">("mark");
+  const [lowAttendanceStudents, setLowAttendanceStudents] = useState<any[]>([]);
 
   useEffect(() => {
     fetchStudents();
@@ -72,6 +75,24 @@ export default function TeacherAttendance() {
       "English",
     ]);
   };
+
+  const fetchLowAttendance = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/attendance/low");
+      setLowAttendanceStudents(res.data);
+    } catch (error) {
+      console.error("Error fetching low attendance:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeView === "low") {
+      fetchLowAttendance();
+    }
+  }, [activeView]);
 
   const handleAttendanceChange = (studentId: string, status: string) => {
     setAttendance((prev) => ({
@@ -175,8 +196,91 @@ export default function TeacherAttendance() {
 
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* View Toggle */}
+      <div className="flex bg-gray-100 p-1 rounded-lg w-fit">
+        <button
+          onClick={() => setActiveView("mark")}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeView === "mark" ? "bg-white text-blue-600 shadow-sm" : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Mark Attendance
+        </button>
+        <button
+          onClick={() => setActiveView("low")}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+            activeView === "low" ? "bg-white text-red-600 shadow-sm" : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <AlertTriangle className="w-4 h-4" />
+          Low Attendance Report
+        </button>
+      </div>
+
+      {activeView === "low" ? (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Students with Low Attendance</h2>
+              <p className="text-sm text-gray-500">Students whose attendance is below 75%</p>
+            </div>
+            <span className="px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full">
+              {lowAttendanceStudents.length} Students at Risk
+            </span>
+          </div>
+          <div className="p-6">
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-red-600 border-t-transparent"></div>
+                <p className="mt-2 text-gray-500">Loading report...</p>
+              </div>
+            ) : lowAttendanceStudents.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-3" />
+                <p className="text-gray-500">All students are maintaining good attendance!</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Student</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">ID / Course</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Classes Attended</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Attendance %</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {lowAttendanceStudents.map((record, index) => (
+                      <tr key={index} className="hover:bg-red-50/50 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="font-medium text-gray-900">{record.student?.name}</div>
+                          <div className="text-sm text-gray-500">{record.student?.email}</div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="text-sm text-gray-900">{record.student?.studentId || "N/A"}</div>
+                          <div className="text-xs text-gray-500">{record.student?.course} {record.student?.semester ? `(Sem ${record.student.semester})` : ""}</div>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          {record.presentClasses} / {record.totalClasses}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            {Math.round(record.percentage)}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-blue-50 rounded-lg">
@@ -530,6 +634,8 @@ export default function TeacherAttendance() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
