@@ -33,6 +33,7 @@ import EventsStudent from "../user-components/EventsStudent";
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import Library from "../common-components-management/Library";
 import ExaminationForm from "../user-components/ExaminationForm";
+import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 
 
 export default function StudentDashboard() {
@@ -561,7 +562,9 @@ export default function StudentDashboard() {
                   )}
                 </div>
               </div>
+        <UpcomingExamsWidget />
             </div>
+            
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               {activeTab === "attendance" && <Attendance />}
