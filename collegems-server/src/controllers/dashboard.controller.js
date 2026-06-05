@@ -27,17 +27,31 @@ export const getDashboardData = async (req, res) => {
 
     const fee = await Fee.findOne({ student: id });
 
+    const attendancePercentage = total ? Math.round((present / total) * 100) : 0;
+    
+    const notifications = [];
+    if (total > 0 && attendancePercentage < 75) {
+      notifications.push({
+        id: "low_attendance",
+        type: "warning",
+        title: "Low Attendance Alert",
+        message: `Your attendance is critically low (${attendancePercentage}%). Please maintain at least 75% to avoid academic penalties.`,
+        date: new Date().toISOString()
+      });
+    }
+
     return res.json({
       user,
       currentSemester: user?.semester,
       cards: [
         {
-          title: "Attendance %",
-          value: total ? Math.round((present / total) * 100) + "%" : "0%",
+          title: "Attendance",
+          value: total ? attendancePercentage + "%" : "0%",
         },
         { title: "Pending Assignments", value: assignments },
         { title: "Fee Due", value: fee ? fee.total - fee.paid : 0 },
       ],
+      notifications
     });
   }
 
