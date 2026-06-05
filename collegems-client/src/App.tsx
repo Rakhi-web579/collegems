@@ -21,7 +21,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainDashboard />} />
+         <Route path="/" element={<MainDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />

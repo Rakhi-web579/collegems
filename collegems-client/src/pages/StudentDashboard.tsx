@@ -1,3 +1,11 @@
+// ─── FILE: collegems-client/src/pages/StudentDashboard.tsx ───────────────────
+// WHAT CHANGED (search for "NEW" comments):
+//  1. Added import for AssignmentReminder (line ~30)
+//  2. Rendered <AssignmentReminder /> in the overview tab, below the stats
+//     grid and above the Quick Actions section.
+// Everything else is identical to your original file.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -32,7 +40,7 @@ import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import Library from "../common-components-management/Library";
-
+import AssignmentReminder from "../common-components-management/AssignmentReminder"; // ← NEW
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -40,7 +48,8 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { darkMode, toggleTheme } = useTheme(); 
+  const { darkMode, toggleTheme } = useTheme();
+
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -86,7 +95,7 @@ export default function StudentDashboard() {
     { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
     { id: "events", label: "Events", icon: CalendarDays },
     { id: "results", label: "Results", icon: AwardIcon },
-    { id: "library", label: "Library", icon: BookOpen }
+    { id: "library", label: "Library", icon: BookOpen },
   ];
 
   if (loading) {
@@ -151,9 +160,7 @@ export default function StudentDashboard() {
                 <h2 className="text-xl font-bold text-gray-900">
                   Student Portal
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {studentProgram}
-                </p>
+                <p className="text-sm text-gray-500 mt-1">{studentProgram}</p>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -213,8 +220,7 @@ export default function StudentDashboard() {
                       transition-colors relative
                       ${isActive
                         ? "bg-blue-50 text-blue-700"
-                        : "text-gray-700 hover:bg-gray-100"
-                      }
+                        : "text-gray-700 hover:bg-gray-100"}
                     `}
                   >
                     <Icon
@@ -261,7 +267,6 @@ export default function StudentDashboard() {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              {/* Left Section */}
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setSidebarOpen(true)}
@@ -279,7 +284,6 @@ export default function StudentDashboard() {
                 </div>
               </div>
 
-              {/* Right Section */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={toggleTheme}
@@ -320,8 +324,8 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  {getGreeting()}, {student?.name?.split(" ")[0] || "Student"}
-                  !
+                  {getGreeting()},{" "}
+                  {student?.name?.split(" ")[0] || "Student"}!
                 </h1>
                 <p className="text-gray-500 mt-1">
                   Here's what's happening with your academic progress today.
@@ -415,6 +419,10 @@ export default function StudentDashboard() {
                   );
                 })}
               </div>
+
+              {/* ── NEW: Assignment Reminders widget ─────────────────────── */}
+              <AssignmentReminder />
+              {/* ─────────────────────────────────────────────────────────── */}
 
               {/* Quick Actions */}
               <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -540,7 +548,9 @@ export default function StudentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "courses" && <Courses />}
               {activeTab === "examschedule" && <ExamSchedule />}
-              {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
+              {activeTab === "academic-calendar" && (
+                <AcademicCalendar role="student" />
+              )}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
               {activeTab === "settings" && (
@@ -549,7 +559,6 @@ export default function StudentDashboard() {
                 </div>
               )}
               {activeTab === "library" && <Library />}
-
             </div>
           )}
 
