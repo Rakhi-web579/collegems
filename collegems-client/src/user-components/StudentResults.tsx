@@ -14,7 +14,7 @@ import {
   Printer,
 } from "lucide-react";
 import axios from "../api/axios";
-import Navbar from "../layouts/Navbar";
+
 
 interface Course {
   _id: string;
