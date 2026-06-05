@@ -15,12 +15,12 @@ import {
   LogOut,
   Settings,
   TrendingUp,
-  Award,
   ChevronRight,
   Moon,
   Sun,
   CalendarDays,
   AwardIcon,
+  AlertCircle,
 } from "lucide-react";
 import api from "../api/axios";
 import Attendance from "../user-components/Attendance";
@@ -342,6 +342,21 @@ export default function StudentDashboard() {
               </div>
             </div>
           </div>
+          
+          {/* Notifications Section */}
+          {data?.notifications && data.notifications.length > 0 && (
+            <div className="mb-8 space-y-4">
+              {data.notifications.map((notif: any, idx: number) => (
+                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
+                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div>
+                    <h3 className="font-medium text-red-800">{notif.title}</h3>
+                    <p className="text-sm text-red-700 mt-1">{notif.message}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Content Area */}
           {activeTab === "overview" ? (
@@ -351,28 +366,28 @@ export default function StudentDashboard() {
                 {[
                   {
                     title: "Attendance",
-                    value: "85%",
+                    value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%",
                     icon: CalendarCheck,
                     color: "blue",
-                    trend: "+2.5%",
+                    trend: "Overall",
                   },
                   {
-                    title: "Assignments",
-                    value: "8/10",
+                    title: "Pending Assignments",
+                    value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0",
                     icon: FileText,
                     color: "amber",
-                    trend: "2 pending",
+                    trend: "Current",
                   },
                   {
-                    title: "CGPA",
-                    value: "3.8",
-                    icon: Award,
+                    title: "Fee Due",
+                    value: "₹" + (data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"),
+                    icon: Wallet,
                     color: "emerald",
-                    trend: "+0.3",
+                    trend: "Total",
                   },
                   {
                     title: "Courses",
-                    value: "6",
+                    value: "Active",
                     icon: BookOpen,
                     color: "purple",
                     trend: "Active",
@@ -405,12 +420,12 @@ export default function StudentDashboard() {
                         </div>
                       </div>
                       <div className="mt-4 flex items-center gap-1 text-sm">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                        <span className="text-green-600 font-medium">
+                        <TrendingUp className={`w-4 h-4 ${stat.title === "Fee Due" && stat.value !== "₹0" ? "text-amber-600" : "text-green-600"}`} />
+                        <span className={`font-medium ${stat.title === "Fee Due" && stat.value !== "₹0" ? "text-amber-600" : "text-green-600"}`}>
                           {stat.trend}
                         </span>
                         <span className="text-gray-500 ml-1">
-                          from last month
+                          status
                         </span>
                       </div>
                     </div>
