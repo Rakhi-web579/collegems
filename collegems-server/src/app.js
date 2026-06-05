@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import path from "path";
 
 // Auth & Core
@@ -29,17 +30,24 @@ import { authenticate } from "./middlewares/auth.middleware.js";
 const app = express();
 
 // Middlewares
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173", "http://localhost:5555"];
+
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(",") || ["http://localhost:5173"],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (same-origin, mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(null, true);
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  origin: (origin, callback) => {
-    callback(null, true);
-  },
-  credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
