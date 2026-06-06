@@ -129,6 +129,15 @@ const EventsSchema = new mongoose.Schema(
             type: String,
             trim: true,
         },
+        qrCode: {
+            type: String,
+            unique: true,
+            sparse: true,
+        },
+        qrCodeActive: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true }
 );
