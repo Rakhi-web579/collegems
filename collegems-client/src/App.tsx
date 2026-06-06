@@ -20,7 +20,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 
-import DashboardLayout from "./layouts/DashboardLayout"; 
+import DashboardLayout from "./layouts/DashboardLayout";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -34,24 +35,28 @@ export default function App() {
 
         {/* DASHBOARD LAYOUT WRAPPER */}
         <Route element={<DashboardLayout />}>
-          
+
           {/* student/user pages */}
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
           <Route path="/events" element={<EventsStudent />} />
-          <Route path="/courses" element={
-            <ProtectedRoute>
-              <Courses />
-            </ProtectedRoute> } 
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <Courses />
+              </ProtectedRoute>
+            }
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-          <Route path="/timetable" element={<div>Timetable Page</div>} />
+          <Route path="/timetable" element={ <TimeTable /> } />
 
         </Route>
 
-        {/* role-based dashboards (keep separate if needed) */}
-        <Route path="/student/dashboard"
+        {/* Role-based dashboards */}
+        <Route
+          path="/student/dashboard"
           element={<RoleRoute role="student"><StudentDashboard /></RoleRoute>}
         />
         <Route
@@ -70,8 +75,8 @@ export default function App() {
             </RoleRoute>
           }
         />
-
-        <Route path="/hod/dashboard"
+        <Route
+          path="/hod/dashboard"
           element={<RoleRoute role="hod"><HodDashboard /></RoleRoute>}
         />
 
