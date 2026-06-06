@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 import {
   BookOpen, Search, Filter, ChevronDown, X, Users, Calendar,
   Clock, Award, Building2, UserCircle, Eye, PlusCircle,
   Grid3x3, List, Download,
 } from "lucide-react";
 import api from "../api/axios";
-import { useTheme } from "../context/ThemeContext";
 
 interface Course {
   _id: string;

@@ -3,7 +3,8 @@ import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import {
   markAttendance,
-  getMyAttendance
+  getMyAttendance,
+  getLowAttendance
 } from "../controllers/attendance.controller.js";
 
 const router = express.Router();
@@ -20,6 +21,13 @@ router.get(
   protect,
   allowRoles("student"),
   getMyAttendance
+);
+
+router.get(
+  "/low",
+  protect,
+  allowRoles("teacher", "hod"),
+  getLowAttendance
 );
 
 export default router;

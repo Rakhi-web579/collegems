@@ -19,7 +19,7 @@ const verifyPassword = async (plainPassword, storedPassword) => {
 
 const generateAccessToken = (user) =>
   jwt.sign({ id: String(user._id), role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "2h",
   });
 
 const generateRefreshToken = (user) =>
@@ -44,7 +44,7 @@ export const register = async (req, res) => {
       departmentCode,
       semester,
       course,
-    } = req.body;
+    } = req.body || {};
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: "All fields required" });
@@ -123,8 +123,9 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const email = normalizeEmail(req.body.email);
-    const { password } = req.body;
+    const body = req.body || {};
+    const email = normalizeEmail(body.email);
+    const { password } = body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });

@@ -30,3 +30,48 @@ export const getMyAttendance = async (req, res) => {
 
   res.json(data);
 };
+
+export const getLowAttendance = async (req, res) => {
+  try {
+    const aggregateData = await Attendance.aggregate([
+      {
+        $group: {
+          _id: "$student",
+          totalClasses: { $sum: 1 },
+          presentClasses: {
+            $sum: { $cond: [{ $eq: ["$status", "present"] }, 1, 0] }
+          }
+        }
+      },
+      {
+        $project: {
+          student: "$_id",
+          totalClasses: 1,
+          presentClasses: 1,
+          percentage: {
+            $multiply: [
+              { $divide: ["$presentClasses", "$totalClasses"] },
+              100
+            ]
+          }
+        }
+      },
+      {
+        $match: {
+          percentage: { $lt: 75 },
+          totalClasses: { $gt: 0 }
+        }
+      }
+    ]);
+
+    await Attendance.populate(aggregateData, {
+      path: "student",
+      model: "User",
+      select: "name email studentId course semester"
+    });
+
+    res.json(aggregateData);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch low attendance data" });
+  }
+};
