@@ -20,6 +20,7 @@ import {
   Sun,
   CalendarDays,
   AwardIcon,
+  Trophy,
   AlertCircle,
   ClipboardList,
 } from "lucide-react";
@@ -36,6 +37,7 @@ import Library from "../common-components-management/Library";
 import ExaminationForm from "../user-components/ExaminationForm";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 import LeaveRequest from "../user-components/LeaveRequest";
+import StudentAchievements from "../user-components/StudentAchievements";
 
 
 export default function StudentDashboard() {
@@ -91,6 +93,7 @@ export default function StudentDashboard() {
     { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
     { id: "events", label: "Events", icon: CalendarDays },
     { id: "results", label: "Results", icon: AwardIcon },
+    { id: "achievements", label: "Achievements", icon: Trophy },
     { id: "leave", label: "Leave Requests", icon: ClipboardList },
     { id: "library", label: "Library", icon: BookOpen },
     { id: "exam-form", label: "Examination Form", icon: FileText }
@@ -566,10 +569,11 @@ export default function StudentDashboard() {
                 </div>
               </div>
         <UpcomingExamsWidget />
+              <StudentAchievements />
             </div>
             
           ) : (
-            <div className={activeTab === "leave" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
+            <div className={activeTab === "leave" || activeTab === "achievements" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
               {activeTab === "attendance" && <Attendance />}
               {activeTab === "assignments" && <Assignment />}
               {activeTab === "fees" && <Fees />}
@@ -578,6 +582,7 @@ export default function StudentDashboard() {
               {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
+              {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "settings" && (
                 <div className="text-sm text-gray-600">

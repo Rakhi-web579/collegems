@@ -6,7 +6,7 @@ import {
   Users, BarChart3, FileText, Clock, Bell, Search, LayoutDashboard,
   CheckSquare, ClipboardList, BookMarked, Book, Coins, Menu, X,
   ChevronRight, Calendar, LogOut, Settings, GraduationCap, CalendarDays,
-  Percent, Moon, Sun, ClipboardCheck,
+  Percent, Moon, Sun, ClipboardCheck, Trophy,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
@@ -24,6 +24,7 @@ import TeacherSettings from "../teacher-components/Settings";
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import Library from "../common-components-management/Library";
 import LeaveApprovals from "../teacher-components/LeaveApprovals";
+import AchievementSubmissionForm from "../teacher-components/AchievementSubmissionForm";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -85,6 +86,7 @@ export default function TeacherDashboard() {
     { id: "syllabus", label: "Syllabus", icon: FileText },
     { id: "results", label: "Results", icon: Percent },
     { id: "students", label: "Students", icon: Users },
+    { id: "achievements", label: "Add Achievements", icon: Trophy },
     { id: "events", label: "Organize Events", icon: CalendarDays },
     { id: "library", label: "Library Catalog", icon: Book },
   ];
@@ -350,6 +352,7 @@ export default function TeacherDashboard() {
           {activeTab === "syllabus" && <Syllabus />}
           {activeTab === "results" && <TeacherResults />}
           {activeTab === "students" && <Students />}
+          {activeTab === "achievements" && <AchievementSubmissionForm />}
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}
