@@ -206,7 +206,7 @@ Follow these steps to run a copy of the project locally on your machine.
    ```
 5. Start the backend server in development mode:
    ```bash
-   npm run start
+   npm run dev
    ```
    _The server will start running on_ `http://localhost:5000`
 
@@ -234,9 +234,9 @@ Follow these steps to run a copy of the project locally on your machine.
    ```
    _The client app will compile and start running on_ `http://localhost:5173` _(or your local Vite default port)_
 
-### 3. Database Seeding (Dummy Users)
+### 3. Database Seeding & Demo Data
 
-To help developers quickly populate the database with sample data for local development and testing, a seed script is included.
+To help contributors quickly test the application locally without manually creating records, a comprehensive demo dataset is provided. This dataset populates Users, Courses, Attendance, Assignments, Results, Leaves, and Salaries.
 
 1. Ensure your local MongoDB instance is running.
 2. Verify that your `.env` file in the `collegems-server` directory contains your correct `MONGO_URI`.
@@ -244,17 +244,22 @@ To help developers quickly populate the database with sample data for local deve
    ```bash
    npm run seed
    ```
+   _(Note: You can run this command anytime to reset/refresh the database with the baseline demo data.)_
 
-**Available Dummy Accounts:**
+**🔑 Available Demo Accounts:**
 _All accounts share the default password:_ `password123`
 
-- **Student:** student@example.com
-- **Teacher:** teacher@example.com
-- **HOD:** hod@college.edu
+| Role            | Name                | Email                       |
+| :-------------- | :------------------ | :-------------------------- |
+| **HOD / Admin** | Dr. Alice Vance     | `hod@college.edu`           |
+| **Teacher**     | Dr. David Evans     | `david.evans@college.edu`   |
+| **Teacher**     | Prof. Sarah Jenkins | `sarah.jenkins@college.edu` |
+| **Student**     | Alice Johnson       | `alice.johnson@college.edu` |
+| **Student**     | Bob Smith           | `bob.smith@college.edu`     |
 
-````
+**🧪 Testing the Setup:**
+Once seeded, you can log in as **Alice Johnson** (Student) to verify that you can see published results, upcoming assignments (like the _Socket Programming Project_), and past attendance records. You can then log in as **Dr. David Evans** (Teacher) to test grading submissions, managing leaves, and viewing salary records.
 
----
 
 ## 📁 Project Directory Structure
 
