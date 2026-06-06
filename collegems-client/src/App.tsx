@@ -20,6 +20,7 @@ import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 
 import DashboardLayout from "./layouts/DashboardLayout"; 
+import TimeTable from "./user-components/TimeTable";
 export default function App() {
   return (
     <BrowserRouter>
@@ -45,7 +46,7 @@ export default function App() {
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-          <Route path="/timetable" element={<div>Timetable Page</div>} />
+          <Route path="/timetable" element={ <TimeTable /> } />
 
         </Route>
 
