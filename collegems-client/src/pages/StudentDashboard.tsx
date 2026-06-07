@@ -31,6 +31,7 @@ import ExamSchedule from "../user-components/ExamSchedule";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import Library from "../common-components-management/Library";
 import ExaminationForm from "../user-components/ExaminationForm";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
@@ -40,6 +41,7 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { darkMode, toggleTheme } = useTheme(); 
@@ -53,6 +55,18 @@ export default function StudentDashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+    useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/users/me");
+      setProfileData(res.data);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  };
+  fetchProfile();
+}, []);
+ 
 
   const student = data?.user;
   const studentProgram = student?.course
@@ -347,6 +361,14 @@ export default function StudentDashboard() {
           {/* Content Area */}
           {activeTab === "overview" ? (
             <div className="space-y-8">
+              {/* Profile Completion */}
+{profileData?.profileCompletion && (
+  <ProfileCompletionCard
+    percentage={profileData.profileCompletion.percentage}
+    missingFields={profileData.profileCompletion.missingFields}
+  />
+)}
+
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[

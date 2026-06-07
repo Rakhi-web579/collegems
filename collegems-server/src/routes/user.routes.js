@@ -13,7 +13,7 @@ import {
 
 const router = express.Router();
 
-router.get("/me", protect, authorize("teacher", "hod"), getMe);
+router.get("/me", protect, getMe);
 router.put("/me", protect, authorize("teacher", "hod"), updateMe);
 router.put(
   "/me/password",
