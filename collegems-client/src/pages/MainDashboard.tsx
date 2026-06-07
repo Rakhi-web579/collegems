@@ -24,7 +24,9 @@ import { useTheme } from "../context/ThemeContext";
 export default function MainDashboard() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [searchTerm,  setSearchTerm]  = useState("");
   const { darkMode, toggleTheme } = useTheme();
+  const [showSuggestions,setShowSuggestions]=useState(false);
 
   const dashboardCards = [
     {
@@ -91,6 +93,10 @@ export default function MainDashboard() {
       route: "/library",
     },
   ];
+  const filteredCards =dashboardCards.filter((card) =>
+  card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  card.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const quickStats = [
     { label: "Attendance", value: "92%", icon: Clock, color: "blue" },
@@ -115,6 +121,44 @@ export default function MainDashboard() {
   };
 
   return (
+    <div>
+      <>
+      {/*input box */}
+      <input
+        value={searchTerm}
+        onChange={(e)=> {
+          setSearchTerm(e.target.value);
+          setShowSuggestions(true);
+        }}
+        onBlur={()=>setTimeout(()=>setShowSuggestions(false),150)}
+        placeholder="search dashboard,courses,exams..."
+        className="w-full px-4 py-2 border rounded lg"
+        onKeyDown={(e)=>{
+          if(e.key==="Enter" && filteredCards.length > 0){
+            navigate(filteredCards[0].route);
+          }
+        }}
+      />
+      {showSuggestions && searchTerm && (
+  <div className="absolute bg-white dark:bg-gray-800 border rounded-lg mt-2 w-full shadow-lg z-50">
+    {dashboardCards
+      .filter((c) =>
+        c.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .slice(0, 5)
+      .map((c) => (
+        <div
+          key={c.id}
+          onClick={() => navigate(c.route)}
+          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+        >
+          {c.title}
+        </div>
+      ))}
+  </div>
+)}
+      </>
+
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Top Navigation Bar */}
       <nav className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -168,6 +212,7 @@ export default function MainDashboard() {
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Welcome back, Student!
+            Here's your academic overview
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
             Here's your academic overview and upcoming activities
@@ -209,7 +254,7 @@ export default function MainDashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dashboardCards.map((card) => {
+            {filteredCards.map((card) => {
               const Icon = card.icon;
               const colors = colorClasses[card.color as keyof typeof colorClasses];
               const isHovered = hoveredCard === card.id;
@@ -356,5 +401,6 @@ export default function MainDashboard() {
         </div>
       </footer>
     </div>
+  </div>
   );
 }
