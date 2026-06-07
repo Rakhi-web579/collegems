@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
+import { Scanner } from '@yudiel/react-qr-scanner';
 import {
   Calendar,
   MapPin,
@@ -23,6 +24,8 @@ import {
   Info,
   AlertCircle,
   Loader2,
+  QrCode,
+  CheckCircle,
 } from 'lucide-react';
 
 interface Event {
@@ -62,6 +65,11 @@ export default function EventsStudent() {
     const [showFilters, setShowFilters] = useState<boolean>(false);
     const [selectedevent, setSelectedevent] = useState<Event | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
+
+    // Scanner state
+    const [showScanner, setShowScanner] = useState<boolean>(false);
+    const [checkingIn, setCheckingIn] = useState<boolean>(false);
+    const [checkInMessage, setCheckInMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
     // Get unique categories
     const categories = ["all", ...new Set(events.map(w => w.category))];
@@ -127,6 +135,23 @@ export default function EventsStudent() {
     const closeModal = () => {
         setShowModal(false);
         setSelectedevent(null);
+    };
+
+    const handleScan = async (data: any) => {
+        if (data && data.length > 0 && data[0].rawValue && !checkingIn) {
+            const qrCodeValue = data[0].rawValue;
+            setCheckingIn(true);
+            try {
+                const res = await axios.post('/events/check-in', { qrCode: qrCodeValue });
+                setCheckInMessage({ type: 'success', text: res.data.message });
+                setShowScanner(false);
+            } catch (err: any) {
+                setCheckInMessage({ type: 'error', text: err.response?.data?.message || 'Check-in failed' });
+                setShowScanner(false);
+            } finally {
+                setCheckingIn(false);
+            }
+        }
     };
 
     const formatDate = (dateString: string) => {
@@ -312,11 +337,30 @@ export default function EventsStudent() {
                 <p className="text-sm text-gray-500">
                     Showing <span className="font-medium text-gray-700">{filteredEvents.length}</span> events
                 </p>
-                <button className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2">
-                    <Download className="w-4 h-4" />
-                    Export
-                </button>
+                <div className="flex gap-2">
+                    <button onClick={() => setShowScanner(true)} className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium shadow-sm">
+                        <QrCode className="w-4 h-4" />
+                        Scan Check-in QR
+                    </button>
+                    <button className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 hidden md:flex">
+                        <Download className="w-4 h-4" />
+                        Export
+                    </button>
+                </div>
             </div>
+
+            {/* Check-in Message Toast */}
+            {checkInMessage && (
+                <div className={`p-4 rounded-xl border flex items-center justify-between ${checkInMessage.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}>
+                    <div className="flex items-center gap-3">
+                        {checkInMessage.type === 'success' ? <CheckCircle className="w-5 h-5 text-emerald-600" /> : <AlertCircle className="w-5 h-5 text-rose-600" />}
+                        <span className="font-medium">{checkInMessage.text}</span>
+                    </div>
+                    <button onClick={() => setCheckInMessage(null)} className="p-1 hover:bg-white/50 rounded-lg">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
 
             {/* events Grid */}
             {filteredEvents.length === 0 ? (
@@ -592,6 +636,58 @@ export default function EventsStudent() {
                                     </a>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* QR Scanner Modal */}
+            {showScanner && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
+                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                <QrCode className="w-5 h-5 text-blue-600" /> Event Check-in
+                            </h3>
+                            <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                                <X className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="p-6 flex flex-col items-center">
+                            {checkingIn ? (
+                                <div className="py-12 flex flex-col items-center">
+                                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+                                    <p className="text-gray-600 font-medium">Verifying check-in...</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="text-sm text-gray-500 mb-6 text-center">Point your camera at the event QR code to check in.</p>
+                                    <div className="w-full max-w-[300px] aspect-square rounded-2xl overflow-hidden border-4 border-blue-100 shadow-inner relative bg-gray-900 mb-4">
+                                        <Scanner onScan={handleScan} />
+                                    </div>
+                                    <div className="w-full max-w-[300px]">
+                                        <p className="text-xs text-gray-400 mb-2 text-center">Or enter code manually for testing:</p>
+                                        <div className="flex gap-2">
+                                            <input 
+                                                id="manual-qr-input"
+                                                type="text" 
+                                                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" 
+                                                placeholder="Paste QR secret"
+                                            />
+                                            <button 
+                                                id="manual-qr-submit"
+                                                onClick={() => {
+                                                    const val = (document.getElementById('manual-qr-input') as HTMLInputElement).value;
+                                                    if(val) handleScan([{rawValue: val}]);
+                                                }}
+                                                className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm"
+                                            >
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const COLLEGE_DOMAIN = "@college.edu";
-const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$.{53}$/;
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
 
@@ -19,7 +18,7 @@ const verifyPassword = async (plainPassword, storedPassword) => {
 
 const generateAccessToken = (user) =>
   jwt.sign({ id: String(user._id), role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "2h",
   });
 
 const generateRefreshToken = (user) =>
@@ -44,7 +43,8 @@ export const register = async (req, res) => {
       departmentCode,
       semester,
       course,
-    } = req.body;
+      childStudentId,
+    } = req.body || {};
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: "All fields required" });
@@ -93,8 +93,19 @@ export const register = async (req, res) => {
       userData = { ...userData, departmentCode };
     }
 
+    if (role === "parent") {
+      if (!childStudentId) {
+        return res.status(400).json({ message: "Child's Student ID required" });
+      }
+      const student = await User.findOne({ studentId: childStudentId, role: "student" });
+      if (!student) {
+        return res.status(404).json({ message: "Student with this ID does not exist" });
+      }
+      userData = { ...userData, childId: student._id };
+    }
+
     // Check existing user
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ email: normalizeEmail(email) });
     if (exists) return res.status(400).json({ message: "User already exists" });
 
     // Create user
@@ -123,8 +134,9 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const email = normalizeEmail(req.body.email);
-    const { password } = req.body;
+    const body = req.body || {};
+    const email = normalizeEmail(body.email);
+    const { password } = body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
@@ -170,6 +182,7 @@ export const login = async (req, res) => {
         teacherId: user.teacherId,
         department: user.department,
         departmentCode: user.departmentCode,
+        childId: user.childId,
       },
     });
   } catch (err) {
