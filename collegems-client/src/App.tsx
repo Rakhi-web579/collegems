@@ -8,6 +8,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
+import ParentDashboard from "./pages/ParentDashboard";
 
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
@@ -81,8 +82,12 @@ export default function App() {
           path="/hod/dashboard"
           element={<RoleRoute role="hod"><HodDashboard /></RoleRoute>}
         />
-        <Route
-          path="/hod/reports"
+
+        <Route path="/parent/dashboard"
+          element={<RoleRoute role="parent"><ParentDashboard /></RoleRoute>}
+        />
+
+        <Route path="/hod/reports"
           element={<RoleRoute role="hod"><ReportGenerator /></RoleRoute>}
         />
 
