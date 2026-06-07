@@ -5,6 +5,7 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
+  Moon, Sun, MessageSquare,
   Moon, Sun, Bus,
 } from "lucide-react";
 import api from "../api/axios";
@@ -17,7 +18,7 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
-import HODExamForms from "../hod-components/ExamForms";
+import FeedbackManagement from "../hod-components/FeedbackManagement";
 
 type TabType =
   | "overview"
@@ -35,6 +36,7 @@ type TabType =
   | "library"
   | "settings"
   | "reports"
+  | "feedback";
   | "exam-forms"
   | "bus-routes";
 
@@ -219,6 +221,7 @@ export default function HODDashboard() {
     { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
     { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
     { id: "reports" as TabType, label: "Report Generator", icon: FileText },
+    { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
     { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
     { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
   ];
@@ -544,6 +547,7 @@ export default function HODDashboard() {
           {activeTab === "library" && <Library />}
           {activeTab === "courses" && <HODCourses />}
           {activeTab === "settings" && <HODSettings />}
+          {activeTab === "feedback" && <FeedbackManagement />}
           {activeTab === "exam-forms" && <HODExamForms />}
           {activeTab === "bus-routes" && <BusRoutes />}
         </main>
