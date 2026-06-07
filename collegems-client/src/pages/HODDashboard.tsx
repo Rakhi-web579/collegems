@@ -6,8 +6,10 @@ import {
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
   Moon, Sun, MessageSquare,
+  Moon, Sun, Bus,
 } from "lucide-react";
 import api from "../api/axios";
+import BusRoutes from "../common-components-management/BusRoutes";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
@@ -35,6 +37,8 @@ type TabType =
   | "settings"
   | "reports"
   | "feedback";
+  | "exam-forms"
+  | "bus-routes";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -218,6 +222,8 @@ export default function HODDashboard() {
     { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
     { id: "reports" as TabType, label: "Report Generator", icon: FileText },
     { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
+    { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
+    { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
   ];
 
   const statsCards = data?.cards.map((card, index) => ({
@@ -542,6 +548,8 @@ export default function HODDashboard() {
           {activeTab === "courses" && <HODCourses />}
           {activeTab === "settings" && <HODSettings />}
           {activeTab === "feedback" && <FeedbackManagement />}
+          {activeTab === "exam-forms" && <HODExamForms />}
+          {activeTab === "bus-routes" && <BusRoutes />}
         </main>
       </div>
     </div>
