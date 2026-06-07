@@ -5,9 +5,10 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun,
+  Moon, Sun, Award,
 } from "lucide-react";
 import api from "../api/axios";
+import Scholarships from "../common-components-management/Scholarships";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
@@ -34,7 +35,8 @@ type TabType =
   | "library"
   | "settings"
   | "reports"
-  | "exam-forms";
+  | "exam-forms"
+  | "scholarships";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -218,6 +220,7 @@ export default function HODDashboard() {
     { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
     { id: "reports" as TabType, label: "Report Generator", icon: FileText },
     { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
+    { id: "scholarships" as TabType, label: "Scholarship Approvals", icon: Award },
   ];
 
   const statsCards = data?.cards.map((card, index) => ({
@@ -542,6 +545,7 @@ export default function HODDashboard() {
           {activeTab === "courses" && <HODCourses />}
           {activeTab === "settings" && <HODSettings />}
           {activeTab === "exam-forms" && <HODExamForms />}
+          {activeTab === "scholarships" && <Scholarships />}
         </main>
       </div>
     </div>

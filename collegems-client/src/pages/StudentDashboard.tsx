@@ -41,6 +41,7 @@ import AssignmentReminder from "../common-components-management/AssignmentRemind
 import ExaminationForm from "../user-components/ExaminationForm";                   // ← master
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";            // ← master
 import LeaveRequest from "../user-components/LeaveRequest";                         // ← master
+import Scholarships from "../common-components-management/Scholarships";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -99,6 +100,7 @@ export default function StudentDashboard() {
     { id: "leave",              label: "Leave Requests",    icon: ClipboardList }, // ← master
     { id: "library",            label: "Library",           icon: BookOpen },
     { id: "exam-form",          label: "Examination Form",  icon: FileText },      // ← master
+    { id: "scholarships",       label: "Scholarships",      icon: AwardIcon },
   ];
 
   if (loading) {
@@ -555,6 +557,7 @@ export default function StudentDashboard() {
               {activeTab === "leave"             && <LeaveRequest />}
               {activeTab === "library"           && <Library />}
               {activeTab === "exam-form"         && <ExaminationForm />}
+              {activeTab === "scholarships"      && <Scholarships />}
               {activeTab === "settings"          && (
                 <div className="text-sm text-gray-600">
                   Settings are not available yet for student accounts.
