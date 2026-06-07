@@ -23,6 +23,7 @@ import VerifyStudent from "./pages/VerifyStudent";
 import TimeTable from "./user-components/TimeTable";
 
 import DashboardLayout from "./layouts/DashboardLayout";
+import TimeTable from "./user-components/TimeTable";
 
 export default function App() {
   return (
