@@ -30,6 +30,7 @@ import reportRoutes from "./routes/report.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js"; // ← NEW
 import examFormRoutes from "./routes/examForm.routes.js";
 import leaveRoutes from "./routes/leave.routes.js";
+import scholarshipRoutes from "./routes/scholarship.routes.js";
 import idCardRoutes from "./routes/idcard.routes.js";
 import { verifyStudent } from "./controllers/idcard.controller.js";
 import busRouteRoutes from "./routes/busRoute.routes.js";
@@ -69,6 +70,11 @@ app.use("/api/classes",  classRoutes);
 app.use("/api/fee",    authenticate, feeRoutes);
 app.use("/api/salary", authenticate, salaryRoutes);
 
+app.use("/api/users", authenticate, userRoutes);
+app.use("/api/leaves", authenticate, leaveRoutes);
+app.use("/api/scholarships", authenticate, scholarshipRoutes);
+app.use("/api/examschedule", authenticate, examScheduleRoutes);
+app.use("/api/exam-forms", examFormRoutes);
 app.use("/api/users",           authenticate, userRoutes);
 app.use("/api/examschedule",    authenticate, examScheduleRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);

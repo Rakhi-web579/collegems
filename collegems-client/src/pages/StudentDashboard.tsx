@@ -58,6 +58,7 @@ import AssignmentReminder from "../common-components-management/AssignmentRemind
 import ExaminationForm from "../user-components/ExaminationForm";                   // ← master
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";            // ← master
 import LeaveRequest from "../user-components/LeaveRequest";                         // ← master
+koimport Scholarships from "../common-components-management/Scholarships";
 import IDCard from "../user-components/IDCard";
 
 export default function StudentDashboard() {
@@ -130,6 +131,7 @@ export default function StudentDashboard() {
     { id: "leave",              label: "Leave Requests",    icon: ClipboardList }, // ← master
     { id: "library",            label: "Library",           icon: BookOpen },
     { id: "exam-form",          label: "Examination Form",  icon: FileText },      // ← master
+    { id: "scholarships",       label: "Scholarships",      icon: AwardIcon },
     { id: "id-card",            label: "ID Card",           icon: IdCard },
     { id: "overview", label: "Overview", icon: LayoutGrid },
     { id: "attendance", label: "Attendance", icon: CalendarCheck },
@@ -611,6 +613,7 @@ export default function StudentDashboard() {
               {activeTab === "leave"             && <LeaveRequest />}
               {activeTab === "library"           && <Library />}
               {activeTab === "exam-form"         && <ExaminationForm />}
+              {activeTab === "scholarships"      && <Scholarships />}
               {activeTab === "feedback"          && <StudentFeedback />}
               {activeTab === "id-card"           && <IDCard student={student} />}
               {activeTab === "settings"          && (
