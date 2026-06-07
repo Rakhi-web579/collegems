@@ -1,4 +1,3 @@
-import express from "express";
 import {
     createEvent,
     getAllEvents,
@@ -9,13 +8,38 @@ import {
     toggleQRCodeStatus,
     checkInEvent,
     getEventAttendance
+    markEventAsRead,
+    markEventAsUnread,
+    getReadCount,
+    getReaders,
+    getUnreadStudents,
 } from "../controllers/events.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
+import express from "express";
 
 
 const router = express.Router();
+router.get(
+    "/:id/read-count",
+    protect,
+    allowRoles("hod", "teacher"),
+    getReadCount
+);
 
+router.get(
+    "/:id/readers",
+    protect,
+    allowRoles("hod", "teacher"),
+    getReaders
+);
+
+router.get(
+    "/:id/unreaders",
+    protect,
+    allowRoles("hod", "teacher"),
+    getUnreadStudents
+);
 // PUBLIC ROUTES
 router.get("/", getAllEvents);
 router.get("/:id", getEventById);
@@ -33,4 +57,7 @@ router.get("/:id/attendance", protect, allowRoles('hod', 'teacher'), getEventAtt
 // STUDENT / PARTICIPANT ROUTES
 router.post("/check-in", protect, checkInEvent);
 
+export default router;
+router.post("/:id/read", protect, markEventAsRead);
+router.post("/:id/unread", protect, markEventAsUnread);
 export default router;
