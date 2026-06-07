@@ -34,6 +34,8 @@ import scholarshipRoutes from "./routes/scholarship.routes.js";
 import idCardRoutes from "./routes/idcard.routes.js";
 import { verifyStudent } from "./controllers/idcard.controller.js";
 import busRouteRoutes from "./routes/busRoute.routes.js";
+import syllabusRoutes from "./routes/syllabus.route.js";
+import officeHoursRoutes from "./routes/officeHours.routes.js";
 
 import { authenticate } from "./middlewares/auth.middleware.js";
 
@@ -59,9 +61,6 @@ app.use("/api/teacher-attendance", teacherAttendanceRoutes);
 app.use("/api/events",            eventRoute);
 app.use("/api/results",           authenticate, resultsRoutes);
 app.use("/api/library",           libraryRoutes);
-app.use("/api/events", eventRoute);
-app.use("/api/results", authenticate, resultsRoutes);
-app.use("/api/library", libraryRoutes);
 app.use("/api/assessments", authenticate, assessmentRoutes);
 
 app.use("/api/courses",  courseRoutes);
@@ -75,15 +74,14 @@ app.use("/api/leaves", authenticate, leaveRoutes);
 app.use("/api/scholarships", authenticate, scholarshipRoutes);
 app.use("/api/examschedule", authenticate, examScheduleRoutes);
 app.use("/api/exam-forms", examFormRoutes);
-app.use("/api/users",           authenticate, userRoutes);
-app.use("/api/examschedule",    authenticate, examScheduleRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);
+app.use("/api/syllabus", authenticate, syllabusRoutes);
 app.use("/api/reports",         reportRoutes);
-app.use("/api/feedback",        authenticate, feedbackRoutes); // ← NEW
-app.use("/api/reports", reportRoutes);
+app.use("/api/feedback",        authenticate, feedbackRoutes);
 app.use("/api/student/idcard", idCardRoutes);
 app.get("/api/verify/student/:studentId", verifyStudent);
 app.use("/api/bus-routes", authenticate, busRouteRoutes);
+app.use("/api/office-hours", officeHoursRoutes);
 
 // Health check
 app.get("/", (_req, res) => res.send("SCMS Backend Running 🚀"));

@@ -4,7 +4,7 @@ import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
-import TimeTable from "./user-components/TimeTable";
+//import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
@@ -22,10 +22,10 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 import VerifyStudent from "./pages/VerifyStudent";
-import TimeTable from "./user-components/TimeTable";
+//import TimeTable from "./user-components/TimeTable";
 
 import DashboardLayout from "./layouts/DashboardLayout";
-import TimeTable from "./user-components/TimeTable";
+//import TimeTable from "./user-components/TimeTable";
 
 export default function App() {
   return (
@@ -54,7 +54,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/faculty" element={<Teachers />} />
+          <Route path="/faculty" element={<ProtectedRoute><Teachers /></ProtectedRoute>} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
           {/* <Route path="/timetable" element={ <TimeTable /> } /> */}
 

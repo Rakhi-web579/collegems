@@ -16,6 +16,7 @@ import {
   Bell,
   Search,
   LogOut,
+  Users,
   Settings,
   TrendingUp,
   ChevronRight,
@@ -46,20 +47,9 @@ import ExaminationForm from "../user-components/ExaminationForm";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
-
-
-import AcademicCalendar from "../common-components-management/AcademicCalendar";
-import Library from "../common-components-management/Library";
-import AssignmentReminder from "../common-components-management/AssignmentReminder";
-import ExaminationForm from "../user-components/ExaminationForm";
-import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
-import LeaveRequest from "../user-components/LeaveRequest";
-import AssignmentReminder from "../common-components-management/AssignmentReminder"; // ← your branch
-import ExaminationForm from "../user-components/ExaminationForm";                   // ← master
-import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";            // ← master
-import LeaveRequest from "../user-components/LeaveRequest";                         // ← master
-koimport Scholarships from "../common-components-management/Scholarships";
+import Scholarships from "../common-components-management/Scholarships";
 import IDCard from "../user-components/IDCard";
+import Teachers from "../hod-components/Teachers";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -114,42 +104,16 @@ export default function StudentDashboard() {
     { id: "examschedule",      label: "Exam Schedule",     icon: Calendar },
     { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
     { id: "events",            label: "Events",            icon: CalendarDays },
+    { id: "faculty",           label: "Faculty",           icon: Users },
     { id: "results",           label: "Results",           icon: AwardIcon },
+    { id: "achievements",      label: "Achievements",      icon: Trophy },
     { id: "leave",             label: "Leave Requests",    icon: ClipboardList },
     { id: "library",           label: "Library",           icon: BookOpen },
     { id: "exam-form",         label: "Examination Form",  icon: FileText },
-    { id: "feedback",          label: "Feedback",          icon: MessageSquare }, // ← NEW
-    { id: "overview",           label: "Overview",          icon: LayoutGrid },
-    { id: "attendance",         label: "Attendance",        icon: CalendarCheck },
-    { id: "assignments",        label: "Assignments",       icon: FileText },
-    { id: "fees",               label: "Fees",              icon: Wallet },
-    { id: "courses",            label: "Courses",           icon: BookOpen },
-    { id: "examschedule",       label: "Exam Schedule",     icon: Calendar },
-    { id: "academic-calendar",  label: "Academic Calendar", icon: CalendarDays },
-    { id: "events",             label: "Events",            icon: CalendarDays },
-    { id: "results",            label: "Results",           icon: AwardIcon },
-    { id: "leave",              label: "Leave Requests",    icon: ClipboardList }, // ← master
-    { id: "library",            label: "Library",           icon: BookOpen },
-    { id: "exam-form",          label: "Examination Form",  icon: FileText },      // ← master
-    { id: "scholarships",       label: "Scholarships",      icon: AwardIcon },
-    { id: "id-card",            label: "ID Card",           icon: IdCard },
-    { id: "overview", label: "Overview", icon: LayoutGrid },
-    { id: "attendance", label: "Attendance", icon: CalendarCheck },
-    { id: "assignments", label: "Assignments", icon: FileText },
-    { id: "fees", label: "Fees", icon: Wallet },
-    { id: "courses", label: "Courses", icon: BookOpen },
-    { id: "examschedule", label: "Exam Schedule", icon: Calendar },
-    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
-    { id: "events", label: "Events", icon: CalendarDays },
-    { id: "results", label: "Results", icon: AwardIcon },
-    { id: "achievements", label: "Achievements", icon: Trophy },
-    { id: "leave", label: "Leave Requests", icon: ClipboardList },
-    { id: "library", label: "Library", icon: BookOpen },
-    { id: "exam-form", label: "Examination Form", icon: FileText }
-    { id: "leave", label: "Leave Requests", icon: ClipboardList },
-    { id: "library", label: "Library", icon: BookOpen },
-    { id: "exam-form", label: "Examination Form", icon: FileText },
-    { id: "bus-routes", label: "Bus Tracking", icon: Bus }
+    { id: "feedback",          label: "Feedback",          icon: MessageSquare },
+    { id: "scholarships",      label: "Scholarships",      icon: AwardIcon },
+    { id: "id-card",           label: "ID Card",           icon: IdCard },
+    { id: "bus-routes",        label: "Bus Tracking",      icon: Bus },
   ];
 
   if (loading) {
@@ -602,27 +566,20 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
+              {activeTab === "faculty" && <Teachers />}
               {activeTab === "results" && <StudentResults />}
               {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
+              {activeTab === "scholarships" && <Scholarships />}
+              {activeTab === "feedback" && <StudentFeedback />}
+              {activeTab === "id-card" && <IDCard student={student} />}
               {activeTab === "settings" && (
-              {activeTab === "events"            && <EventsStudent />}
-              {activeTab === "results"           && <StudentResults />}
-              {activeTab === "leave"             && <LeaveRequest />}
-              {activeTab === "library"           && <Library />}
-              {activeTab === "exam-form"         && <ExaminationForm />}
-              {activeTab === "scholarships"      && <Scholarships />}
-              {activeTab === "feedback"          && <StudentFeedback />}
-              {activeTab === "id-card"           && <IDCard student={student} />}
-              {activeTab === "settings"          && (
                 <div className="text-sm text-gray-600">
                   Settings are not available yet for student accounts.
                 </div>
               )}
-              {activeTab === "library" && <Library />}
-              {activeTab === "exam-form" && <ExaminationForm />}
               {activeTab === "bus-routes" && <BusRoutes />}
 
             </div>
