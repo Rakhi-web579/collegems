@@ -5,14 +5,10 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun, Award,
+  Moon, Sun, Award, MessageSquare, Bus,
 } from "lucide-react";
 import api from "../api/axios";
 import Scholarships from "../common-components-management/Scholarships";
-  Moon, Sun, MessageSquare,
-  Moon, Sun, Bus,
-} from "lucide-react";
-import api from "../api/axios";
 import BusRoutes from "../common-components-management/BusRoutes";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
@@ -23,6 +19,7 @@ import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
 import FeedbackManagement from "../hod-components/FeedbackManagement";
+import HODExamForms from "../hod-components/ExamForms";
 
 type TabType =
   | "overview"
@@ -41,10 +38,10 @@ type TabType =
   | "settings"
   | "reports"
   | "exam-forms"
-  | "scholarships";
-  | "feedback";
+  | "scholarships"
+  | "feedback"
   | "exam-forms"
-  | "bus-routes";
+  | "bus-routes"
 
 interface Data {
   cards: Array<{ title: string; value: number }>;

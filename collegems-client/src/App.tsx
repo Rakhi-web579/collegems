@@ -22,10 +22,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 import VerifyStudent from "./pages/VerifyStudent";
-import TimeTable from "./user-components/TimeTable";
 
 import DashboardLayout from "./layouts/DashboardLayout";
-import TimeTable from "./user-components/TimeTable";
+import Library from "./common-components-management/Library";
 
 export default function App() {
   return (
@@ -56,7 +55,8 @@ export default function App() {
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-          {/* <Route path="/timetable" element={ <TimeTable /> } /> */}
+          <Route path="/timetable" element={ <TimeTable /> } />
+          <Route path="/library" element={ <Library /> } />
 
         </Route>
 
