@@ -9,6 +9,11 @@ import {
 } from "lucide-react";
 import api from "../api/axios";
 import Scholarships from "../common-components-management/Scholarships";
+  Moon, Sun, MessageSquare,
+  Moon, Sun, Bus,
+} from "lucide-react";
+import api from "../api/axios";
+import BusRoutes from "../common-components-management/BusRoutes";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
@@ -17,7 +22,7 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
-import HODExamForms from "../hod-components/ExamForms";
+import FeedbackManagement from "../hod-components/FeedbackManagement";
 
 type TabType =
   | "overview"
@@ -37,6 +42,9 @@ type TabType =
   | "reports"
   | "exam-forms"
   | "scholarships";
+  | "feedback";
+  | "exam-forms"
+  | "bus-routes";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -219,8 +227,10 @@ export default function HODDashboard() {
     { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
     { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
     { id: "reports" as TabType, label: "Report Generator", icon: FileText },
+    { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
     { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
     { id: "scholarships" as TabType, label: "Scholarship Approvals", icon: Award },
+    { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
   ];
 
   const statsCards = data?.cards.map((card, index) => ({
@@ -544,8 +554,10 @@ export default function HODDashboard() {
           {activeTab === "library" && <Library />}
           {activeTab === "courses" && <HODCourses />}
           {activeTab === "settings" && <HODSettings />}
+          {activeTab === "feedback" && <FeedbackManagement />}
           {activeTab === "exam-forms" && <HODExamForms />}
           {activeTab === "scholarships" && <Scholarships />}
+          {activeTab === "bus-routes" && <BusRoutes />}
         </main>
       </div>
     </div>
