@@ -53,7 +53,7 @@ export default function App() {
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-          <Route path="/timetable" element={ <TimeTable /> } />
+          {/* <Route path="/timetable" element={ <TimeTable /> } /> */}
 
         </Route>
 
