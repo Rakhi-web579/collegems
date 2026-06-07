@@ -23,6 +23,7 @@ import {
   Trophy,
   Wallet,
   X,
+  AlertCircle,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -129,6 +130,19 @@ export default function StudentDashboard() {
     if (activeTab === "overview") {
       return (
         <div className="space-y-8">
+          {data?.notifications && data.notifications.length > 0 && (
+            <div className="space-y-4">
+              {data.notifications.map((notif: any, idx: number) => (
+                <div key={idx} className={`flex items-start gap-4 p-4 rounded-xl border ${notif.type === 'danger' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+                  <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${notif.type === 'danger' ? 'text-red-600' : 'text-amber-600'}`} />
+                  <div>
+                    <h3 className="font-semibold">{notif.title}</h3>
+                    <p className="text-sm mt-1">{notif.message}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: "Attendance", value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%", icon: CalendarCheck, color: "bg-blue-50 text-blue-700" },
