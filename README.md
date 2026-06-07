@@ -73,6 +73,12 @@ SCMS is structured around role-based modules, ensuring that every user has a tai
 - **Financial Registry**: Manage tuition fees, salaries, and system-wide transactions.
 - **Approval Workflows**: Review leave requests, enrollment approvals, and administrative actions.
 
+### 👨‍👩‍👧 Parent Portal Module
+
+- **Secure Login & Verification**: Verification matching for parent/guardian logins.
+- **Student Progress Monitoring**: Real-time view of child's attendance stats, leave history, and academic results.
+- **Financial Access**: View and track children's tuition fees and pending balances.
+
 ### 📊 Analytics & Reports
 
 - **Visual Dashboards**: High-fidelity charts for tracking campus performance, outstanding fees, and monthly attendance rates.
