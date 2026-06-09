@@ -17,6 +17,8 @@ import {
   MessageSquare,
   Moon,
   Search,
+  LogOut,
+  Users,
   Settings,
   Sun,
   Ticket,
@@ -42,6 +44,8 @@ import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import Scholarships from "../common-components-management/Scholarships";
+import IDCard from "../user-components/IDCard";
+import Teachers from "../hod-components/Teachers";
 
 
 import IDCard from "../user-components/IDCard";
@@ -139,10 +143,16 @@ export default function StudentDashboard() {
     { id: "examschedule",      label: "Exam Schedule",     icon: Calendar },
     { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
     { id: "events",            label: "Events",            icon: CalendarDays },
+    { id: "faculty",           label: "Faculty",           icon: Users },
     { id: "results",           label: "Results",           icon: AwardIcon },
+    { id: "achievements",      label: "Achievements",      icon: Trophy },
     { id: "leave",             label: "Leave Requests",    icon: ClipboardList },
     { id: "library",           label: "Library",           icon: BookOpen },
     { id: "exam-form",         label: "Examination Form",  icon: FileText },
+    { id: "feedback",          label: "Feedback",          icon: MessageSquare },
+    { id: "scholarships",      label: "Scholarships",      icon: AwardIcon },
+    { id: "id-card",           label: "ID Card",           icon: IdCard },
+    { id: "bus-routes",        label: "Bus Tracking",      icon: Bus },
     { id: "feedback",          label: "Feedback",          icon: MessageSquare }, // ← NEW
     { id: "overview",           label: "Overview",          icon: LayoutGrid },
     { id: "attendance",         label: "Attendance",        icon: CalendarCheck },
@@ -588,11 +598,16 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
+              {activeTab === "faculty" && <Teachers />}
               {activeTab === "results" && <StudentResults />}
               {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
+              {activeTab === "scholarships" && <Scholarships />}
+              {activeTab === "feedback" && <StudentFeedback />}
+              {activeTab === "id-card" && <IDCard student={student} />}
+              {activeTab === "settings" && (
               {activeTab === "settings" && <EventsStudent />}
               {activeTab === "results"           && <StudentResults />}
               {activeTab === "leave"             && <LeaveRequest />}
@@ -606,8 +621,6 @@ export default function StudentDashboard() {
                   Settings are not available yet for student accounts.
                 </div>
               )}
-              {activeTab === "library" && <Library />}
-              {activeTab === "exam-form" && <ExaminationForm />}
               {activeTab === "bus-routes" && <BusRoutes />}
 
             </div>

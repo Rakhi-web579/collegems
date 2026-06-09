@@ -13,7 +13,7 @@ import TeacherAssignments from "../teacher-components/Assignment";
 import Students from "../common-components-management/Students";
 import ExamSchedule from "../teacher-components/ExamSchedule";
 import Classes from "../teacher-components/Classes";
-import TeacherFee from "../teacher-components/Fee";
+import TeacherFee from "../teacher-components/Teacherfee";
 import Salary from "../teacher-components/Salary";
 import Syllabus from "../teacher-components/Syllabus";
 import MyAttendance from "../teacher-components/MyAttendance";
@@ -27,6 +27,7 @@ import LeaveApprovals from "../teacher-components/LeaveApprovals";
 import AchievementSubmissionForm from "../teacher-components/AchievementSubmissionForm";
 import AssessmentSettings from "../teacher-components/AssessmentSettings";
 import InternalMarksEntry from "../teacher-components/InternalMarksEntry";
+import OfficeHours from "../teacher-components/OfficeHours";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -76,6 +77,7 @@ export default function TeacherDashboard() {
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
+    { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
@@ -344,6 +346,7 @@ export default function TeacherDashboard() {
           )}
 
           {activeTab === "myattendance" && <MyAttendance />}
+          {activeTab === "officehours" && <OfficeHours />}
           {activeTab === "courses" && <HodCourses />}
           {activeTab === "assignments" && <TeacherAssignments courseId={courses[0]?._id || "default-course-id"} />}
           {activeTab === "attendance" && <StudentAttendance />}
@@ -357,11 +360,8 @@ export default function TeacherDashboard() {
           {activeTab === "results" && <TeacherResults />}
           {activeTab === "students" && <Students />}
           {activeTab === "achievements" && <AchievementSubmissionForm />}
-          { activeTab === "syllabus" && <Syllabus /> }
-          { activeTab === "results" && <TeacherResults /> }
-          { activeTab === "assessments" && <AssessmentSettings /> }
-          { activeTab === "internal-marks" && <InternalMarksEntry /> }
-          { activeTab === "students" && <Students /> }
+          {activeTab === "assessments" && <AssessmentSettings />}
+          {activeTab === "internal-marks" && <InternalMarksEntry />}
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}

@@ -74,6 +74,7 @@ type TabType =
   | "exam-forms"
   | "scholarships"
   | "feedback"
+  | "bus-routes";
   | "exam-forms"
   | "bus-routes"
   | "bus-routes"
