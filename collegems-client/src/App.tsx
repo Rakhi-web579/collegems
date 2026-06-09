@@ -21,6 +21,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 import VerifyStudent from "./pages/VerifyStudent";
+
+import DashboardLayout from "./layouts/DashboardLayout";
+import Library from "./common-components-management/Library";
 import ExamHalls from "./hod-components/ExamHalls";
 import HallAllocation from "./hod-components/HallAllocation";
 import StudentSeatView from "./user-components/StudentSeatView";
@@ -49,6 +52,9 @@ export default function App() {
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
+          <Route path="/timetable" element={ <TimeTable /> } />
+          <Route path="/library" element={ <Library /> } />
+
         </Route>
 
         <Route

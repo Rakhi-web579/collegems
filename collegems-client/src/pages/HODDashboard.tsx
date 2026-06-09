@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
+  Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
+  Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
+  Moon, Sun, Award, MessageSquare, Bus,
+} from "lucide-react";
+import api from "../api/axios";
+import Scholarships from "../common-components-management/Scholarships";
   Award,
   Bell,
   BookOpen,
@@ -41,6 +48,11 @@ import HODSalary from "../hod-components/Salary";
 import HODSettings from "../hod-components/Settings";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 import Teachers from "../hod-components/Teachers";
+import Library from "../common-components-management/Library";
+import HODSettings from "../hod-components/Settings";
+import HODCourses from "../hod-components/Courses";
+import FeedbackManagement from "../hod-components/FeedbackManagement";
+import HODExamForms from "../hod-components/ExamForms";
 
 type TabType =
   | "overview"
@@ -61,6 +73,9 @@ type TabType =
   | "feedback"
   | "exam-forms"
   | "scholarships"
+  | "feedback"
+  | "exam-forms"
+  | "bus-routes"
   | "bus-routes"
   | "exam-halls"
   | "hall-allocation";

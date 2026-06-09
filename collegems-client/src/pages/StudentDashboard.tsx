@@ -41,6 +41,10 @@ import Fees from "../user-components/Fee";
 import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
+import Scholarships from "../common-components-management/Scholarships";
+
+
+import IDCard from "../user-components/IDCard";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
@@ -126,6 +130,52 @@ export default function StudentDashboard() {
     return "Good evening";
   };
 
+  const navigationItems = [
+    { id: "overview",          label: "Overview",          icon: LayoutGrid },
+    { id: "attendance",        label: "Attendance",        icon: CalendarCheck },
+    { id: "assignments",       label: "Assignments",       icon: FileText },
+    { id: "fees",              label: "Fees",              icon: Wallet },
+    { id: "courses",           label: "Courses",           icon: BookOpen },
+    { id: "examschedule",      label: "Exam Schedule",     icon: Calendar },
+    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
+    { id: "events",            label: "Events",            icon: CalendarDays },
+    { id: "results",           label: "Results",           icon: AwardIcon },
+    { id: "leave",             label: "Leave Requests",    icon: ClipboardList },
+    { id: "library",           label: "Library",           icon: BookOpen },
+    { id: "exam-form",         label: "Examination Form",  icon: FileText },
+    { id: "feedback",          label: "Feedback",          icon: MessageSquare }, // ← NEW
+    { id: "overview",           label: "Overview",          icon: LayoutGrid },
+    { id: "attendance",         label: "Attendance",        icon: CalendarCheck },
+    { id: "assignments",        label: "Assignments",       icon: FileText },
+    { id: "fees",               label: "Fees",              icon: Wallet },
+    { id: "courses",            label: "Courses",           icon: BookOpen },
+    { id: "examschedule",       label: "Exam Schedule",     icon: Calendar },
+    { id: "academic-calendar",  label: "Academic Calendar", icon: CalendarDays },
+    { id: "events",             label: "Events",            icon: CalendarDays },
+    { id: "results",            label: "Results",           icon: AwardIcon },
+    { id: "leave",              label: "Leave Requests",    icon: ClipboardList }, // ← master
+    { id: "library",            label: "Library",           icon: BookOpen },
+    { id: "exam-form",          label: "Examination Form",  icon: FileText },      // ← master
+    { id: "scholarships",       label: "Scholarships",      icon: AwardIcon },
+    { id: "id-card",            label: "ID Card",           icon: IdCard },
+    { id: "overview", label: "Overview", icon: LayoutGrid },
+    { id: "attendance", label: "Attendance", icon: CalendarCheck },
+    { id: "assignments", label: "Assignments", icon: FileText },
+    { id: "fees", label: "Fees", icon: Wallet },
+    { id: "courses", label: "Courses", icon: BookOpen },
+    { id: "examschedule", label: "Exam Schedule", icon: Calendar },
+    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
+    { id: "events", label: "Events", icon: CalendarDays },
+    { id: "results", label: "Results", icon: AwardIcon },
+    { id: "achievements", label: "Achievements", icon: Trophy },
+    { id: "leave", label: "Leave Requests", icon: ClipboardList },
+    { id: "library", label: "Library", icon: BookOpen },
+    { id: "exam-form", label: "Examination Form", icon: FileText },
+    { id: "leave", label: "Leave Requests", icon: ClipboardList },
+    { id: "library", label: "Library", icon: BookOpen },
+    { id: "exam-form", label: "Examination Form", icon: FileText },
+    { id: "bus-routes", label: "Bus Tracking", icon: Bus }
+  ];
   const renderTab = () => {
     if (activeTab === "overview") {
       return (
@@ -305,6 +355,265 @@ export default function StudentDashboard() {
             </h1>
             <p className="text-gray-500 mt-1">Here's what's happening with your academic progress.</p>
           </div>
+
+          {/* Notifications Section */}
+          {data?.notifications && data.notifications.length > 0 && (
+            <div className="mb-8 space-y-4">
+              {data.notifications.map((notif: any, idx: number) => (
+                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
+                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div>
+                    <h3 className="font-medium text-red-800">{notif.title}</h3>
+                    <p className="text-sm text-red-700 mt-1">{notif.message}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Content Area */}
+          {activeTab === "overview" ? (
+            <div className="space-y-8">
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  {
+                    title: "Attendance",
+                    value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%",
+                    icon: CalendarCheck,
+                    color: "blue",
+                    trend: "Overall",
+                  },
+                  {
+                    title: "Pending Assignments",
+                    value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0",
+                    icon: FileText,
+                    color: "amber",
+                    trend: "Current",
+                  },
+                  {
+                    title: "Fee Due",
+                    value: "₹" + (data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"),
+                    icon: Wallet,
+                    color: "emerald",
+                    trend: "Total",
+                  },
+                  {
+                    title: "Courses",
+                    value: "Active",
+                    icon: BookOpen,
+                    color: "purple",
+                    trend: "Active",
+                  },
+                ].map((stat, index) => {
+                  const Icon = stat.icon;
+                  const colorClasses = {
+                    blue: "bg-blue-50 text-blue-700",
+                    amber: "bg-amber-50 text-amber-700",
+                    emerald: "bg-emerald-50 text-emerald-700",
+                    purple: "bg-purple-50 text-purple-700",
+                  }[stat.color];
+
+                  return (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
+                          <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                        </div>
+                        <div className={`p-3 rounded-lg ${colorClasses}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center gap-1 text-sm">
+                        <TrendingUp
+                          className={`w-4 h-4 ${
+                            stat.title === "Fee Due" && stat.value !== "₹0"
+                              ? "text-amber-600"
+                              : "text-green-600"
+                          }`}
+                        />
+                        <span
+                          className={`font-medium ${
+                            stat.title === "Fee Due" && stat.value !== "₹0"
+                              ? "text-amber-600"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {stat.trend}
+                        </span>
+                        <span className="text-gray-500 ml-1">status</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Assignment Reminders widget */}
+              <AssignmentReminder />
+
+              {/* Quick Actions */}
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    {
+                      label: "Submit Assignment",
+                      description: "You have 2 pending assignments",
+                      icon: FileText,
+                      color: "blue",
+                      onClick: () => setActiveTab("assignments"),
+                    },
+                    {
+                      label: "Pay Fees",
+                      description: "Due date: March 15, 2024",
+                      icon: Wallet,
+                      color: "amber",
+                      onClick: () => setActiveTab("fees"),
+                    },
+                    {
+                      label: "Submit Feedback",
+                      description: "Share your thoughts on courses and campus",
+                      icon: MessageSquare,
+                      color: "emerald",
+                      onClick: () => setActiveTab("feedback"),
+                    },
+                  ].map((action, index) => {
+                    const Icon = action.icon;
+                    const colorClasses = {
+                      blue: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+                      amber: "bg-amber-50 text-amber-700 hover:bg-amber-100",
+                      emerald: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+                    }[action.color];
+
+                    return (
+                      <button
+                        key={index}
+                        onClick={action.onClick}
+                        className={`flex items-start gap-4 p-4 rounded-lg border border-gray-200
+                          transition-colors text-left ${colorClasses}`}
+                      >
+                        <div className="p-2 rounded-lg bg-white">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{action.label}</p>
+                          <p className="text-sm text-gray-500 mt-1">{action.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Today's Schedule */}
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
+                  <button
+                    onClick={() => setShowScheduleModal(true)}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    View all
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {data?.todayClasses && data.todayClasses.length > 0 ? (
+                    data.todayClasses.slice(0, 3).map((class_: any, index: number) => {
+                      const parseTime = (timeStr: string) => {
+                        const [time, modifier] = timeStr.split(" ");
+                        let [hours, minutes] = time.split(":");
+                        if (hours === "12") hours = "00";
+                        if (modifier.toUpperCase() === "PM")
+                          hours = String(parseInt(hours, 10) + 12);
+                        return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+                      };
+                      const now = new Date();
+                      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                      const isUpcoming =
+                        data.todayClasses.findIndex(
+                          (c: any) => parseTime(c.time) >= currentMinutes
+                        ) === index;
+
+                      return (
+                        <div
+                          key={class_.id || index}
+                          className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                            isUpcoming
+                              ? "bg-blue-50 border border-blue-200 shadow-sm"
+                              : "bg-gray-50 border border-transparent"
+                          }`}
+                        >
+                          <div className={`w-16 text-sm font-medium ${isUpcoming ? "text-blue-700" : "text-gray-700"}`}>
+                            {class_.time}
+                          </div>
+                          <div className="flex-1">
+                            <p className={`font-medium ${isUpcoming ? "text-blue-900" : "text-gray-900"}`}>
+                              {class_.subject}
+                            </p>
+                            <p className={`text-sm ${isUpcoming ? "text-blue-600" : "text-gray-500"}`}>
+                              {class_.faculty} • {class_.room} • {class_.type}
+                            </p>
+                          </div>
+                          {isUpcoming && (
+                            <span className="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full animate-pulse">
+                              Next
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="py-6 text-center text-gray-500">
+                      <Calendar className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                      <p>No classes scheduled for today.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+        <UpcomingExamsWidget />
+          <StudentAchievements />
+            </div>
+          ) : (
+            <div className={activeTab === "leave" || activeTab === "achievements" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
+              {activeTab === "attendance" && <Attendance />}
+              {activeTab === "assignments" && <Assignment />}
+              {activeTab === "fees" && <Fees />}
+              {activeTab === "courses" && <Courses />}
+              {activeTab === "examschedule" && <ExamSchedule />}
+              {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
+              {activeTab === "events" && <EventsStudent />}
+              {activeTab === "results" && <StudentResults />}
+              {activeTab === "achievements" && <StudentAchievements />}
+              {activeTab === "leave" && <LeaveRequest />}
+              {activeTab === "library" && <Library />}
+              {activeTab === "exam-form" && <ExaminationForm />}
+              {activeTab === "settings" && <EventsStudent />}
+              {activeTab === "results"           && <StudentResults />}
+              {activeTab === "leave"             && <LeaveRequest />}
+              {activeTab === "library"           && <Library />}
+              {activeTab === "exam-form"         && <ExaminationForm />}
+              {activeTab === "scholarships"      && <Scholarships />}
+              {activeTab === "feedback"          && <StudentFeedback />}
+              {activeTab === "id-card"           && <IDCard student={student} />}
+              {activeTab === "settings"          && (
+                <div className="text-sm text-gray-600">
+                  Settings are not available yet for student accounts.
+                </div>
+              )}
+              {activeTab === "library" && <Library />}
+              {activeTab === "exam-form" && <ExaminationForm />}
+              {activeTab === "bus-routes" && <BusRoutes />}
+
+            </div>
+          )}
+
+          {/* Footer */}
           {renderTab()}
           <footer className="mt-8 pt-6 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
