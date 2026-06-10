@@ -6,39 +6,15 @@ import {
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
   Moon, Sun, Award, MessageSquare, Bus,
 } from "lucide-react";
-import api from "../api/axios";
-import Scholarships from "../common-components-management/Scholarships";
-  Award,
-  Bell,
-  BookOpen,
-  Building2,
-  Bus,
-  Calendar,
-  CalendarDays,
-  ChevronRight,
-  DollarSign,
-  FileText,
-  GraduationCap,
-  LayoutGrid,
-  LogOut,
-  Menu,
-  MessageSquare,
-  Moon,
-  RefreshCw,
-  Search,
-  Settings,
-  Sun,
-  Users,
-  Wallet,
-  X,
-} from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
+
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import BusRoutes from "../common-components-management/BusRoutes";
 import Library from "../common-components-management/Library";
 import Scholarships from "../common-components-management/Scholarships";
 import Students from "../common-components-management/Students";
+
 import FeedbackManagement from "../hod-components/FeedbackManagement";
 import ExamForms from "../hod-components/ExamForms";
 import ExamHalls from "../hod-components/ExamHalls";
@@ -48,11 +24,7 @@ import HODSalary from "../hod-components/Salary";
 import HODSettings from "../hod-components/Settings";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 import Teachers from "../hod-components/Teachers";
-import Library from "../common-components-management/Library";
-import HODSettings from "../hod-components/Settings";
-import HODCourses from "../hod-components/Courses";
-import FeedbackManagement from "../hod-components/FeedbackManagement";
-import HODExamForms from "../hod-components/ExamForms";
+import AuditLogs from "../hod-components/AuditLogs";
 
 type TabType =
   | "overview"
@@ -73,13 +45,10 @@ type TabType =
   | "feedback"
   | "exam-forms"
   | "scholarships"
-  | "feedback"
-  | "bus-routes";
-  | "exam-forms"
-  | "bus-routes"
   | "bus-routes"
   | "exam-halls"
-  | "hall-allocation";
+  | "hall-allocation"
+  | "audit-logs";
 
 interface Data {
   cards?: Array<{ title: string; value: number | string }>;

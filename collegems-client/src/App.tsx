@@ -32,6 +32,7 @@ import Library from "./common-components-management/Library";
 import ExamHalls from "./hod-components/ExamHalls";
 import HallAllocation from "./hod-components/HallAllocation";
 import StudentSeatView from "./user-components/StudentSeatView";
+import AuditLogs from "./hod-components/AuditLogs";
 
 export default function App() {
   return (
@@ -131,6 +132,14 @@ export default function App() {
           element={
             <RoleRoute role="hod">
               <HallAllocation />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/hod/audit-logs"
+          element={
+            <RoleRoute role="hod">
+              <AuditLogs />
             </RoleRoute>
           }
         />

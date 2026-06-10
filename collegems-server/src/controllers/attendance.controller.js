@@ -1,5 +1,6 @@
 import Attendance from "../models/Attendance.model.js";
 import User from "../models/User.model.js";
+import { logAction } from "../utils/auditService.js";
 
 export const markAttendance = async (req, res) => {
   try {
@@ -19,6 +20,9 @@ export const markAttendance = async (req, res) => {
     }
 
     res.json({ message: "Attendance saved" });
+
+    // Log action
+    await logAction(req.user.id, "UPDATE_ATTENDANCE", "Attendance", date, { recordsCount: records.length });
   } catch (err) {
     res.status(500).json({ message: "Attendance failed" });
   }
