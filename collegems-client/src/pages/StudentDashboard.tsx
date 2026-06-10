@@ -48,6 +48,18 @@ import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
 
 
+import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+import Library from "../common-components-management/Library";
+import AssignmentReminder from "../common-components-management/AssignmentReminder";
+import ExaminationForm from "../user-components/ExaminationForm";
+import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
+import LeaveRequest from "../user-components/LeaveRequest";
+import AssignmentReminder from "../common-components-management/AssignmentReminder"; // ← your branch
+import ExaminationForm from "../user-components/ExaminationForm";                   // ← master
+import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";            // ← master
+import LeaveRequest from "../user-components/LeaveRequest";                         // ← master
+koimport Scholarships from "../common-components-management/Scholarships";
 import IDCard from "../user-components/IDCard";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
@@ -96,12 +108,25 @@ export default function StudentDashboard() {
   const { darkMode, toggleTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [profileData, setProfileData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+    useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/users/me");
+      setProfileData(res.data);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  };
+  fetchProfile();
+}, []);
+ 
 
   const fetchDashboardData = async () => {
     try {
@@ -384,6 +409,13 @@ export default function StudentDashboard() {
           {/* Content Area */}
           {activeTab === "overview" ? (
             <div className="space-y-8">
+              {/* Profile Completion */}
+{profileData?.profileCompletion && (
+  <ProfileCompletionCard
+    percentage={profileData.profileCompletion.percentage}
+    missingFields={profileData.profileCompletion.missingFields}
+  />
+)}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

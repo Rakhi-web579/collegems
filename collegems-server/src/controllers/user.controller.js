@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
+import calculateProfileCompletion from "../utils/profileCompletion.js";
 
 const normalizeSettings = (settings) => {
   const safeSettings = settings || {};
@@ -26,7 +27,15 @@ export const getMe = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user);
+    let profileCompletion = null;
+    if (user.role === "student") {
+      profileCompletion = calculateProfileCompletion(user);
+    }
+
+    res.json({
+      ...user.toObject(),
+      profileCompletion,
+    });
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ message: "Server error" });
