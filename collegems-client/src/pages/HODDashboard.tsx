@@ -6,13 +6,14 @@ import {
   Bell, Search, LogOut, Settings, CalendarDays,
   Moon, Sun, Award, MessageSquare, Bus, ShieldAlert
 } from "lucide-react";
-import api from "../api/axios";
-import Scholarships from "../common-components-management/Scholarships";
 import { useTheme } from "../context/ThemeContext";
+import api from "../api/axios";
+
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import BusRoutes from "../common-components-management/BusRoutes";
 import Library from "../common-components-management/Library";
 import Students from "../common-components-management/Students";
+
 import FeedbackManagement from "../hod-components/FeedbackManagement";
 import ExamForms from "../hod-components/ExamForms";
 import ExamHalls from "../hod-components/ExamHalls";
@@ -45,7 +46,6 @@ type TabType =
   | "feedback"
   | "exam-forms"
   | "scholarships"
-  | "feedback"
   | "bus-routes"
   | "exam-halls"
   | "hall-allocation"
