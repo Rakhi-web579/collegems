@@ -4,7 +4,7 @@ import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
-//import TimeTable from "./user-components/TimeTable";
+import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";

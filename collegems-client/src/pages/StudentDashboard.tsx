@@ -20,8 +20,8 @@ import {
 
   Settings,
   Sun,
-  Ticket,
   Trophy,
+  TrendingUp,
   Wallet,
   X,
   AlertCircle,
@@ -80,14 +80,16 @@ const navigationItems = [
   { id: "fees" as TabType, label: "Fees", icon: Wallet },
   { id: "courses" as TabType, label: "Courses", icon: BookOpen },
   { id: "examschedule" as TabType, label: "Exam Schedule", icon: Calendar },
-  { id: "my-seat" as TabType, label: "My Exam Seat", icon: Ticket },
   { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: CalendarDays },
   { id: "events" as TabType, label: "Events", icon: CalendarDays },
+  { id: "faculty" as TabType, label: "Faculty", icon: Users },
   { id: "results" as TabType, label: "Results", icon: AwardIcon },
   { id: "achievements" as TabType, label: "Achievements", icon: Trophy },
   { id: "leave" as TabType, label: "Leave Requests", icon: ClipboardList },
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
+  { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
+  { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
@@ -98,12 +100,26 @@ export default function StudentDashboard() {
   const { darkMode, toggleTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [profileData, setProfileData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [, setShowScheduleModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+    useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/users/me");
+      setProfileData(res.data);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  };
+  fetchProfile();
+}, []);
+ 
 
   const fetchDashboardData = async () => {
     try {
@@ -336,6 +352,13 @@ export default function StudentDashboard() {
           {/* Content Area */}
           {activeTab === "overview" ? (
             <div className="space-y-8">
+              {/* Profile Completion */}
+{profileData?.profileCompletion && (
+  <ProfileCompletionCard
+    percentage={profileData.profileCompletion.percentage}
+    missingFields={profileData.profileCompletion.missingFields}
+  />
+)}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

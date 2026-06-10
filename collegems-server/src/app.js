@@ -91,7 +91,9 @@ app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
-app.use("/api/audit-logs", authenticate, auditLogRoutes);
+app.use("/api/mentorships", mentorshipRoutes);
+app.use("/api/complaints", complaintRoutes);
+
 // Health check
 app.get("/", (_req, res) => res.send("SCMS Backend Running 🚀"));
 
