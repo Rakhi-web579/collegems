@@ -24,7 +24,7 @@ import VerifyStudent from "./pages/VerifyStudent";
 import ExamHalls from "./hod-components/ExamHalls";
 import HallAllocation from "./hod-components/HallAllocation";
 import StudentSeatView from "./user-components/StudentSeatView";
-
+import FacultyAssignment from "./hod-components/FacultyAssignment";
 export default function App() {
   return (
     <BrowserRouter>
@@ -120,6 +120,14 @@ export default function App() {
           element={
             <RoleRoute role="hod">
               <HallAllocation />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/hod/faculty-assignments"
+          element={
+            <RoleRoute role="hod">
+              <FacultyAssignment />
             </RoleRoute>
           }
         />

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import MyAssignments from "../teacher-components/MyAssignments";
 import api from "../api/axios";
 import {
   Users, BarChart3, FileText, Clock, Bell, Search, LayoutDashboard,
   CheckSquare, ClipboardList, BookMarked, Book, Coins, Menu, X,
   ChevronRight, Calendar, LogOut, Settings, GraduationCap, CalendarDays,
   Percent, Moon, Sun, ClipboardCheck, Trophy,
+  Briefcase,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
@@ -77,6 +79,7 @@ export default function TeacherDashboard() {
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "courses", label: "My Courses", icon: BookMarked },
+      { id: "my-assignments", label: "My Assignments", icon: Briefcase },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
     { id: "leave-approvals", label: "Leave Approvals", icon: ClipboardCheck },
@@ -365,6 +368,7 @@ export default function TeacherDashboard() {
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}
+          {activeTab === "my-assignments" && <MyAssignments />}
         </main>
       </div>
     </div>

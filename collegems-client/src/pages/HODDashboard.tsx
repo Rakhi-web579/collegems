@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Award,
   Bell,
+  Briefcase,
   BookOpen,
   Building2,
   Bus,
@@ -41,6 +42,7 @@ import HODSalary from "../hod-components/Salary";
 import HODSettings from "../hod-components/Settings";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 import Teachers from "../hod-components/Teachers";
+import FacultyAssignment from "../hod-components/FacultyAssignment";
 
 type TabType =
   | "overview"
@@ -63,8 +65,8 @@ type TabType =
   | "scholarships"
   | "bus-routes"
   | "exam-halls"
-  | "hall-allocation";
-
+  | "hall-allocation"
+  | "faculty-assignments";
 interface Data {
   cards?: Array<{ title: string; value: number | string }>;
 }
@@ -100,6 +102,7 @@ const navigationItems = [
   { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
   { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
   { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
+  { id: "faculty-assignments" as TabType, label: "Faculty Assignments", icon: Briefcase },
 ];
 
 export default function HODDashboard() {
@@ -276,6 +279,7 @@ export default function HODDashboard() {
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "exam-halls" && <ExamHalls />}
         {activeTab === "hall-allocation" && <HallAllocation />}
+        {activeTab === "faculty-assignments" && <FacultyAssignment />}
       </>
     );
   };

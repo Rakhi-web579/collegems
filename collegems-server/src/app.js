@@ -36,6 +36,7 @@ import { verifyStudent } from "./controllers/idcard.controller.js";
 import busRouteRoutes from "./routes/busRoute.routes.js";
 import examHallRoutes from "./routes/examHall.routes.js";
 import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
+import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 
 import { authenticate } from "./middlewares/auth.middleware.js";
 
@@ -54,7 +55,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // Routes
 app.use("/api/auth",      authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/faculty-assignments", facultyAssignmentRoutes);
 app.use("/api/attendance",        authenticate, attendanceRoutes);
 app.use("/api/assignment",        authenticate, assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
@@ -82,6 +83,7 @@ app.use("/api/examschedule",    authenticate, examScheduleRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);
 app.use("/api/reports",         reportRoutes);
 app.use("/api/feedback",        authenticate, feedbackRoutes); // ← NEW
+
 app.use("/api/reports", reportRoutes);
 app.use("/api/student/idcard", idCardRoutes);
 app.get("/api/verify/student/:studentId", verifyStudent);

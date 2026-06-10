@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import FacultyView from "../user-components/FacultyView";
 import {
   AwardIcon,
   Bell,
@@ -24,6 +25,7 @@ import {
   Wallet,
   X,
   AlertCircle,
+  GraduationCap,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -62,7 +64,8 @@ type TabType =
   | "my-seat"
   | "feedback"
   | "bus-routes"
-  | "settings";
+  | "settings"
+  | "faculty"
 
 const navigationItems = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
@@ -81,6 +84,7 @@ const navigationItems = [
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
+  { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
 ];
 
 export default function StudentDashboard() {
@@ -190,6 +194,7 @@ export default function StudentDashboard() {
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
+        {activeTab === "faculty" && <FacultyView />}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>
     );
