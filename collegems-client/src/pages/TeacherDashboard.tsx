@@ -6,14 +6,14 @@ import {
   Users, BarChart3, FileText, Clock, Bell, Search, LayoutDashboard,
   CheckSquare, ClipboardList, BookMarked, Book, Coins, Menu, X,
   ChevronRight, Calendar, LogOut, Settings, GraduationCap, CalendarDays,
-  Percent, Moon, Sun, ClipboardCheck,
+  Percent, Moon, Sun, ClipboardCheck, Trophy,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
 import Students from "../common-components-management/Students";
 import ExamSchedule from "../teacher-components/ExamSchedule";
 import Classes from "../teacher-components/Classes";
-import TeacherFee from "../teacher-components/Fee";
+import TeacherFee from "../teacher-components/Teacherfee";
 import Salary from "../teacher-components/Salary";
 import Syllabus from "../teacher-components/Syllabus";
 import MyAttendance from "../teacher-components/MyAttendance";
@@ -24,6 +24,11 @@ import TeacherSettings from "../teacher-components/Settings";
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import Library from "../common-components-management/Library";
 import LeaveApprovals from "../teacher-components/LeaveApprovals";
+import AchievementSubmissionForm from "../teacher-components/AchievementSubmissionForm";
+import AssessmentSettings from "../teacher-components/AssessmentSettings";
+import InternalMarksEntry from "../teacher-components/InternalMarksEntry";
+import OfficeHours from "../teacher-components/OfficeHours";
+import ResourceBooking from "../user-components/ResourceBooking";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -73,6 +78,7 @@ export default function TeacherDashboard() {
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
+    { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
@@ -84,9 +90,13 @@ export default function TeacherDashboard() {
     { id: "classes", label: "Classes", icon: Book },
     { id: "syllabus", label: "Syllabus", icon: FileText },
     { id: "results", label: "Results", icon: Percent },
+    { id: "assessments", label: "Assessment Config", icon: Settings },
+    { id: "internal-marks", label: "Internal Marks", icon: Percent },
     { id: "students", label: "Students", icon: Users },
+    { id: "achievements", label: "Add Achievements", icon: Trophy },
     { id: "events", label: "Organize Events", icon: CalendarDays },
     { id: "library", label: "Library Catalog", icon: Book },
+    { id: "book-resources", label: "Book Resources", icon: CalendarDays },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -338,6 +348,7 @@ export default function TeacherDashboard() {
           )}
 
           {activeTab === "myattendance" && <MyAttendance />}
+          {activeTab === "officehours" && <OfficeHours />}
           {activeTab === "courses" && <HodCourses />}
           {activeTab === "assignments" && <TeacherAssignments courseId={courses[0]?._id || "default-course-id"} />}
           {activeTab === "attendance" && <StudentAttendance />}
@@ -350,9 +361,13 @@ export default function TeacherDashboard() {
           {activeTab === "syllabus" && <Syllabus />}
           {activeTab === "results" && <TeacherResults />}
           {activeTab === "students" && <Students />}
+          {activeTab === "achievements" && <AchievementSubmissionForm />}
+          {activeTab === "assessments" && <AssessmentSettings />}
+          {activeTab === "internal-marks" && <InternalMarksEntry />}
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}
+          {activeTab === "book-resources" && <ResourceBooking />}
         </main>
       </div>
     </div>

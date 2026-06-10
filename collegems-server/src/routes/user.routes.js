@@ -13,7 +13,7 @@ import {
 
 const router = express.Router();
 
-router.get("/me", protect, authorize("teacher", "hod"), getMe);
+router.get("/me", protect, getMe);
 router.put("/me", protect, authorize("teacher", "hod"), updateMe);
 router.put(
   "/me/password",
@@ -55,7 +55,7 @@ router.get(
   getStudentProfile
 );
 
-router.get("/teachers", protect, authorize("hod", "teacher"), async (req, res) => {
+router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
   const teachers = await User.find({ role: "teacher" }).select("name email role teacherId department phone");
 
   res.json(teachers);

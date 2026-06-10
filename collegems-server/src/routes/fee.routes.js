@@ -2,7 +2,8 @@ import express from "express";
 import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import Fee from "../models/Fee.model.js";
-
+import User from "../models/User.model.js";
+import { logAction } from "../utils/auditService.js";
 const router = express.Router();
 
 // hod sets fee of students
@@ -31,17 +32,29 @@ router.post("/set", protect, allowRoles("hod"), async (req, res) => {
     });
 
     res.status(201).json(fee);
+
+    // Log setting fee
+    await logAction(req.user.id, "SET_FEE", "Fee", fee._id, { student, total, dueDate });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 // installment pay
-router.post("/pay", protect, allowRoles("student"), async (req, res) => {
+router.post("/pay", protect, allowRoles("student", "parent"), async (req, res) => {
   try {
     const { amount } = req.body;
 
-    const fee = await Fee.findOne({ student: req.user.id });
+    let studentId = req.user.id;
+    if (req.user.role === "parent") {
+      const parent = await User.findById(req.user.id);
+      if (!parent || !parent.childId) {
+        return res.status(400).json({ message: "No child linked to parent account" });
+      }
+      studentId = parent.childId;
+    }
+
+    const fee = await Fee.findOne({ student: studentId });
 
     if (!fee) {
       return res.status(404).json({ message: "Fee record not found" });
@@ -57,6 +70,9 @@ router.post("/pay", protect, allowRoles("student"), async (req, res) => {
     await fee.save();
 
     res.json({ message: "Payment successful", fee });
+
+    // Log fee payment
+    await logAction(req.user.id, "PAY_FEE", "Fee", fee._id, { amount, studentId });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -64,9 +80,18 @@ router.post("/pay", protect, allowRoles("student"), async (req, res) => {
 
 //  Student views own fee
 
-router.get("/me", protect, allowRoles("student"), async (req, res) => {
+router.get("/me", protect, allowRoles("student", "parent"), async (req, res) => {
   try {
-    const fee = await Fee.findOne({ student: req.user.id });
+    let studentId = req.user.id;
+    if (req.user.role === "parent") {
+      const parent = await User.findById(req.user.id);
+      if (!parent || !parent.childId) {
+        return res.status(400).json({ message: "No child linked to parent account" });
+      }
+      studentId = parent.childId;
+    }
+
+    const fee = await Fee.findOne({ student: studentId });
 
     if (!fee) {
       return res.status(404).json({

@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
+import { logAction } from "../utils/auditService.js";
 
 const normalizeSettings = (settings) => {
   const safeSettings = settings || {};
@@ -26,7 +27,15 @@ export const getMe = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user);
+    let profileCompletion = null;
+    if (user.role === "student") {
+      profileCompletion = calculateProfileCompletion(user);
+    }
+
+    res.json({
+      ...user.toObject(),
+      profileCompletion,
+    });
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ message: "Server error" });
@@ -61,6 +70,9 @@ export const updateMe = async (req, res) => {
     delete safeUser.password;
 
     res.json(safeUser);
+
+    // Log the update
+    await logAction(req.user.id, "UPDATE_PROFILE", "User", req.user.id, { updatedFields: req.body });
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ message: "Server error" });
@@ -90,6 +102,9 @@ export const updatePassword = async (req, res) => {
     await user.save();
 
     res.json({ message: "Password updated successfully" });
+
+    // Log password update
+    await logAction(req.user.id, "UPDATE_PASSWORD", "User", req.user.id, {});
   } catch (error) {
     console.error("Error updating password:", error);
     res.status(500).json({ message: "Server error" });
