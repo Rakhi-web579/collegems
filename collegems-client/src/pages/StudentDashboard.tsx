@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import FacultyView from "../user-components/FacultyView";
 import {
   AwardIcon,
   Bell,
@@ -17,7 +18,6 @@ import {
   MessageSquare,
   Moon,
   Search,
-
   Settings,
   Sun,
   Trophy,
@@ -25,7 +25,9 @@ import {
   Wallet,
   X,
   AlertCircle,
-  TrendingUp,
+  GraduationCap,
+  Users,
+  IdCard,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -44,14 +46,13 @@ import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import Scholarships from "../common-components-management/Scholarships";
-import IDCard from "../user-components/IDCard";
+// import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
-
-
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 import ResourceBooking from "../user-components/ResourceBooking";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 
 type TabType =
   | "overview"
@@ -70,6 +71,8 @@ type TabType =
   | "my-seat"
   | "feedback"
   | "bus-routes"
+  | "settings"
+  | "faculty"
   | "book-resources"
   | "settings";
 
@@ -89,9 +92,10 @@ const navigationItems = [
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
-  { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
+{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
+  { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
 
@@ -217,6 +221,7 @@ export default function StudentDashboard() {
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
+        {activeTab === "faculty" && <FacultyView />}
         {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>

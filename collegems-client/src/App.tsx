@@ -31,7 +31,7 @@ import AuditLogs from "./hod-components/AuditLogs";
 import ResourceBooking from "./user-components/ResourceBooking";
 import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
-
+import FacultyAssignment from "./hod-components/FacultyAssignment";
 export default function App() {
   return (
     <BrowserRouter>
@@ -149,29 +149,40 @@ export default function App() {
           }
         />
         <Route
-          path="/hod/audit-logs"
-          element={
-            <RoleRoute role="hod">
-              <AuditLogs />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/hod/manage-bookings"
-          element={
-            <RoleRoute role="hod">
-              <BookingManagement />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/hod/manage-resources"
-          element={
-            <RoleRoute role="hod">
-              <ResourceManagement />
-            </RoleRoute>
-          }
-        />
+  path="/hod/audit-logs"
+  element={
+    <RoleRoute role="hod">
+      <AuditLogs />
+    </RoleRoute>
+  }
+/>
+
+<Route
+  path="/hod/manage-bookings"
+  element={
+    <RoleRoute role="hod">
+      <BookingManagement />
+    </RoleRoute>
+  }
+/>
+
+<Route
+  path="/hod/manage-resources"
+  element={
+    <RoleRoute role="hod">
+      <ResourceManagement />
+    </RoleRoute>
+  }
+/>
+
+<Route
+  path="/hod/faculty-assignments"
+  element={
+    <RoleRoute role="hod">
+      <FacultyAssignment />
+    </RoleRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );
