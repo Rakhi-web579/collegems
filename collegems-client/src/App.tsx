@@ -18,6 +18,7 @@ import QuickAccessAll from "./pages/QuickAccessAll";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
+import LostFoundPortal from "./pages/LostFoundPortal";
 
 import DashboardLayout from "./layouts/DashboardLayout"; 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
         <Route element={<DashboardLayout />}>
           
           {/* student/user pages */}
+          
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
           <Route path="/events" element={<EventsStudent />} />
@@ -45,6 +47,7 @@ export default function App() {
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
+          <Route path="/lost-found" element={<LostFoundPortal />} />
           <Route path="/timetable" element={<div>Timetable Page</div>} />
 
         </Route>
