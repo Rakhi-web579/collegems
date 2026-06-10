@@ -4,7 +4,7 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, LogOut, Settings, CalendarDays,
-  Moon, Sun, Award, MessageSquare, Bus,
+  Moon, Sun, Award, MessageSquare, Bus, ShieldAlert
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -24,7 +24,8 @@ import HODSalary from "../hod-components/Salary";
 import HODSettings from "../hod-components/Settings";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 import Teachers from "../hod-components/Teachers";
-import AuditLogs from "../hod-components/AuditLogs";
+import ComplaintManagement from "../hod-components/ComplaintManagement";
+
 
 type TabType =
   | "overview"
@@ -48,7 +49,8 @@ type TabType =
   | "bus-routes"
   | "exam-halls"
   | "hall-allocation"
-  | "audit-logs";
+  | "mentor-assignment"
+  | "complaints";
 
 interface Data {
   cards?: Array<{ title: string; value: number | string }>;
@@ -86,6 +88,7 @@ const navigationItems = [
   { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
   { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
   { id: "mentor-assignment" as TabType, label: "Mentor Assignment", icon: Users },
+  { id: "complaints" as TabType, label: "Complaints", icon: ShieldAlert },
 ];
 
 export default function HODDashboard() {
@@ -263,6 +266,7 @@ export default function HODDashboard() {
         {activeTab === "exam-halls" && <ExamHalls />}
         {activeTab === "hall-allocation" && <HallAllocation />}
         {activeTab === "mentor-assignment" && <MentorAssignment />}
+        {activeTab === "complaints" && <ComplaintManagement />}
       </>
     );
   };

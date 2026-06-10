@@ -26,6 +26,7 @@ import {
   X,
   AlertCircle,
   IdCard,
+  ShieldAlert,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -50,6 +51,7 @@ import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 import StudentMentorshipView from "../user-components/StudentMentorshipView";
+import StudentComplaints from "../user-components/StudentComplaints";
 
 type TabType =
   | "overview"
@@ -72,7 +74,8 @@ type TabType =
   | "mentorship"
   | "id-card"
   | "faculty"
-  | "scholarships";
+  | "scholarships"
+  | "complaints";
 
 const navigationItems = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
@@ -94,6 +97,7 @@ const navigationItems = [
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "mentorship" as TabType, label: "Mentorship", icon: Users },
+  { id: "complaints" as TabType, label: "Complaints", icon: ShieldAlert },
 ];
 
 export default function StudentDashboard() {
@@ -589,6 +593,7 @@ export default function StudentDashboard() {
               )}
               {activeTab === "bus-routes" && <BusRoutes />}
               {activeTab === "mentorship" && <StudentMentorshipView />}
+              {activeTab === "complaints" && <StudentComplaints />}
             </div>
           )}
 
