@@ -20,6 +20,20 @@ const normalizeSettings = (settings) => {
   };
 };
 
+const calculateProfileCompletion = (user) => {
+  const fields = ['name', 'email', 'phone', 'department', 'studentId', 'course', 'semester'];
+  let filled = 0;
+  const missingFields = [];
+  fields.forEach(field => {
+    if (user[field]) filled++;
+    else missingFields.push(field);
+  });
+  return {
+    percentage: Math.round((filled / fields.length) * 100),
+    missingFields
+  };
+};
+
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
