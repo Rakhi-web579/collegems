@@ -4,7 +4,7 @@ import axios from "../api/axios";
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Calendar, Clock, MapPin, Video, Users, Mail, Phone, User,
-  Building, Image, CheckCircle, XCircle, FileText, Tag,
+  Image, CheckCircle, XCircle, FileText, Tag,
   ChevronRight, ChevronLeft, Loader2, Sparkles, Target, BookOpen,
   List, Plus, QrCode, Play, Square, Download, Trash2
 } from 'lucide-react';
