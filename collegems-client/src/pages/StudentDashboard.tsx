@@ -101,13 +101,26 @@ export default function StudentDashboard() {
   const { darkMode, toggleTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [profileData, setProfileData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [, setShowScheduleModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+    useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/users/me");
+      setProfileData(res.data);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  };
+  fetchProfile();
+}, []);
+ 
 
   const fetchDashboardData = async () => {
     try {
@@ -339,6 +352,13 @@ export default function StudentDashboard() {
           {/* Content Area */}
           {activeTab === "overview" ? (
             <div className="space-y-8">
+              {/* Profile Completion */}
+{profileData?.profileCompletion && (
+  <ProfileCompletionCard
+    percentage={profileData.profileCompletion.percentage}
+    missingFields={profileData.profileCompletion.missingFields}
+  />
+)}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
