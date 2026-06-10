@@ -27,6 +27,7 @@ import Attendance from "../user-components/Attendance";
 import Fees from "../user-components/Fee";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
+import AnnouncementsView from "../user-components/AnnouncementsView";
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
@@ -73,6 +74,7 @@ export default function ParentDashboard() {
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutGrid },
+    { id: "announcements" as TabType, label: "Announcements", icon: Bell },
     { id: "attendance", label: "Child's Attendance", icon: CalendarCheck },
     { id: "results", label: "Child's Results", icon: AwardIcon },
     { id: "fees", label: "Child's Fees", icon: Wallet },
@@ -444,6 +446,7 @@ export default function ParentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "bus-routes" && <BusRoutes />}
+              {activeTab === "announcements" && <AnnouncementsView />}
             </div>
           )}
 
