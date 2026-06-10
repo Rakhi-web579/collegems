@@ -24,8 +24,9 @@ import HODSalary from "../hod-components/Salary";
 import HODSettings from "../hod-components/Settings";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
 import Teachers from "../hod-components/Teachers";
-import ComplaintManagement from "../hod-components/ComplaintManagement";
-
+import AuditLogs from "../hod-components/AuditLogs";
+import BookingManagement from "../hod-components/BookingManagement";
+import ResourceManagement from "../hod-components/ResourceManagement";
 
 type TabType =
   | "overview"
@@ -49,8 +50,9 @@ type TabType =
   | "bus-routes"
   | "exam-halls"
   | "hall-allocation"
-  | "mentor-assignment"
-  | "complaints";
+  | "audit-logs"
+  | "manage-bookings"
+  | "manage-resources";
 
 interface Data {
   cards?: Array<{ title: string; value: number | string }>;
@@ -87,8 +89,9 @@ const navigationItems = [
   { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
   { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
   { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
-  { id: "mentor-assignment" as TabType, label: "Mentor Assignment", icon: Users },
-  { id: "complaints" as TabType, label: "Complaints", icon: ShieldAlert },
+  { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
+  { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
+  { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
 ];
 
 export default function HODDashboard() {
@@ -265,8 +268,9 @@ export default function HODDashboard() {
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "exam-halls" && <ExamHalls />}
         {activeTab === "hall-allocation" && <HallAllocation />}
-        {activeTab === "mentor-assignment" && <MentorAssignment />}
-        {activeTab === "complaints" && <ComplaintManagement />}
+        {activeTab === "audit-logs" && <AuditLogs />}
+        {activeTab === "manage-bookings" && <BookingManagement />}
+        {activeTab === "manage-resources" && <ResourceManagement />}
       </>
     );
   };

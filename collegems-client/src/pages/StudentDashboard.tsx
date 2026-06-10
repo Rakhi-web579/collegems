@@ -17,7 +17,7 @@ import {
   MessageSquare,
   Moon,
   Search,
-  Users,
+
   Settings,
   Sun,
   Trophy,
@@ -25,8 +25,7 @@ import {
   Wallet,
   X,
   AlertCircle,
-  IdCard,
-  ShieldAlert,
+  TrendingUp,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -47,11 +46,12 @@ import StudentAchievements from "../user-components/StudentAchievements";
 import Scholarships from "../common-components-management/Scholarships";
 import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
+
+
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
-import StudentMentorshipView from "../user-components/StudentMentorshipView";
-import StudentComplaints from "../user-components/StudentComplaints";
+import ResourceBooking from "../user-components/ResourceBooking";
 
 type TabType =
   | "overview"
@@ -70,12 +70,8 @@ type TabType =
   | "my-seat"
   | "feedback"
   | "bus-routes"
-  | "settings"
-  | "mentorship"
-  | "id-card"
-  | "faculty"
-  | "scholarships"
-  | "complaints";
+  | "book-resources"
+  | "settings";
 
 const navigationItems = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
@@ -96,8 +92,7 @@ const navigationItems = [
   { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
-  { id: "mentorship" as TabType, label: "Mentorship", icon: Users },
-  { id: "complaints" as TabType, label: "Complaints", icon: ShieldAlert },
+  { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
 
 export default function StudentDashboard() {
@@ -222,6 +217,7 @@ export default function StudentDashboard() {
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
+        {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>
     );
@@ -504,7 +500,7 @@ export default function StudentDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
                   <button
-                    onClick={() => setShowScheduleModal(true)}
+                    onClick={() => {}}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     View all
@@ -577,23 +573,24 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
-              {activeTab === "faculty" && <Teachers />}
+              
               {activeTab === "results" && <StudentResults />}
               {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
-              {activeTab === "scholarships"      && <Scholarships />}
+              
+              {activeTab === "feedback" && <StudentFeedback />}
+              
               {activeTab === "feedback"          && <StudentFeedback />}
-              {activeTab === "id-card"           && <IDCard student={student} />}
+
+              {activeTab === "bus-routes" && <BusRoutes />}
+              {activeTab === "book-resources" && <ResourceBooking />}
               {activeTab === "settings"          && (
                 <div className="text-sm text-gray-600">
                   Settings are not available yet for student accounts.
                 </div>
               )}
-              {activeTab === "bus-routes" && <BusRoutes />}
-              {activeTab === "mentorship" && <StudentMentorshipView />}
-              {activeTab === "complaints" && <StudentComplaints />}
             </div>
           )}
 
