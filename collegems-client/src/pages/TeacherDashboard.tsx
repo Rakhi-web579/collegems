@@ -28,6 +28,7 @@ import AchievementSubmissionForm from "../teacher-components/AchievementSubmissi
 import AssessmentSettings from "../teacher-components/AssessmentSettings";
 import InternalMarksEntry from "../teacher-components/InternalMarksEntry";
 import OfficeHours from "../teacher-components/OfficeHours";
+import MentorshipManagement from "../teacher-components/MentorshipManagement";
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -95,6 +96,7 @@ export default function TeacherDashboard() {
     { id: "achievements", label: "Add Achievements", icon: Trophy },
     { id: "events", label: "Organize Events", icon: CalendarDays },
     { id: "library", label: "Library Catalog", icon: Book },
+    { id: "mentorship", label: "Mentorship", icon: Users },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -365,6 +367,7 @@ export default function TeacherDashboard() {
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}
+          {activeTab === "mentorship" && <MentorshipManagement />}
         </main>
       </div>
     </div>

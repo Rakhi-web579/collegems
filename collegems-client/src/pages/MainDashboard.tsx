@@ -24,9 +24,9 @@ import { useTheme } from "../context/ThemeContext";
 export default function MainDashboard() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [searchTerm,  setSearchTerm]  = useState("");
+  const [searchTerm] = useState("");
   const { darkMode, toggleTheme } = useTheme();
-  const [showSuggestions,setShowSuggestions]=useState(false);
+  const [showSuggestions] = useState(false);
 
   const dashboardCards = [
     {
