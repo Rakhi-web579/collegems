@@ -25,7 +25,8 @@ import {
   Wallet,
   X,
   AlertCircle,
-  TrendingUp,
+  Users,
+  IdCard,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -51,7 +52,10 @@ import Teachers from "../hod-components/Teachers";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import ResourceBooking from "../user-components/ResourceBooking";
+import NotificationBell from "../common-components-management/NotificationBell";
+import { formatDistanceToNow } from "date-fns";
 
 type TabType =
   | "overview"
@@ -157,19 +161,6 @@ export default function StudentDashboard() {
     if (activeTab === "overview") {
       return (
         <div className="space-y-8">
-          {data?.notifications && data.notifications.length > 0 && (
-            <div className="space-y-4">
-              {data.notifications.map((notif: any, idx: number) => (
-                <div key={idx} className={`flex items-start gap-4 p-4 rounded-xl border ${notif.type === 'danger' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
-                  <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${notif.type === 'danger' ? 'text-red-600' : 'text-amber-600'}`} />
-                  <div>
-                    <h3 className="font-semibold">{notif.title}</h3>
-                    <p className="text-sm mt-1">{notif.message}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: "Attendance", value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%", icon: CalendarCheck, color: "bg-blue-50 text-blue-700" },
@@ -321,7 +312,7 @@ export default function StudentDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-600" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-              <Bell className="w-5 h-5 text-gray-600" />
+              <NotificationBell />
             </div>
           </div>
         </header>
@@ -333,21 +324,6 @@ export default function StudentDashboard() {
             </h1>
             <p className="text-gray-500 mt-1">Here's what's happening with your academic progress.</p>
           </div>
-
-          {/* Notifications Section */}
-          {data?.notifications && data.notifications.length > 0 && (
-            <div className="mb-8 space-y-4">
-              {data.notifications.map((notif: any, idx: number) => (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-red-800">{notif.title}</h3>
-                    <p className="text-sm text-red-700 mt-1">{notif.message}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Content Area */}
           {activeTab === "overview" ? (

@@ -41,6 +41,9 @@ import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
 import auditLogRoutes from "./routes/auditLog.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
+import mentorshipRoutes from "./routes/mentorship.routes.js";
+import complaintRoutes from "./routes/complaint.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 
 const app = express();
@@ -93,6 +96,7 @@ app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
 app.use("/api/mentorships", mentorshipRoutes);
 app.use("/api/complaints", complaintRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Health check
 app.get("/", (_req, res) => res.send("SCMS Backend Running 🚀"));

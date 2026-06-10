@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
 import { logAction } from "../utils/auditService.js";
+import calculateProfileCompletion from "../utils/profileCompletion.js";
 
 const normalizeSettings = (settings) => {
   const safeSettings = settings || {};
