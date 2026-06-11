@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import FacultyView from "../user-components/FacultyView";
 import {
   AwardIcon,
   Bell,
@@ -17,15 +18,16 @@ import {
   MessageSquare,
   Moon,
   Search,
-  LogOut,
-  Users,
   Settings,
   Sun,
-  Ticket,
   Trophy,
+  TrendingUp,
   Wallet,
   X,
   AlertCircle,
+  GraduationCap,
+  Users,
+  IdCard,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -44,14 +46,14 @@ import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import Scholarships from "../common-components-management/Scholarships";
-import IDCard from "../user-components/IDCard";
+// import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
-
-
-import IDCard from "../user-components/IDCard";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+import ResourceBooking from "../user-components/ResourceBooking";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 
 type TabType =
   | "overview"
@@ -70,6 +72,9 @@ type TabType =
   | "my-seat"
   | "feedback"
   | "bus-routes"
+  | "settings"
+  | "faculty"
+  | "book-resources"
   | "settings";
 
 const navigationItems = [
@@ -79,16 +84,20 @@ const navigationItems = [
   { id: "fees" as TabType, label: "Fees", icon: Wallet },
   { id: "courses" as TabType, label: "Courses", icon: BookOpen },
   { id: "examschedule" as TabType, label: "Exam Schedule", icon: Calendar },
-  { id: "my-seat" as TabType, label: "My Exam Seat", icon: Ticket },
   { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: CalendarDays },
   { id: "events" as TabType, label: "Events", icon: CalendarDays },
+  { id: "faculty" as TabType, label: "Faculty", icon: Users },
   { id: "results" as TabType, label: "Results", icon: AwardIcon },
   { id: "achievements" as TabType, label: "Achievements", icon: Trophy },
   { id: "leave" as TabType, label: "Leave Requests", icon: ClipboardList },
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
+  { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
+{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
+  { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
+  { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
 
 export default function StudentDashboard() {
@@ -96,12 +105,26 @@ export default function StudentDashboard() {
   const { darkMode, toggleTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [profileData, setProfileData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [, setShowScheduleModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+    useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/users/me");
+      setProfileData(res.data);
+    } catch (err) {
+      console.error("Profile fetch error:", err);
+    }
+  };
+  fetchProfile();
+}, []);
+ 
 
   const fetchDashboardData = async () => {
     try {
@@ -134,58 +157,7 @@ export default function StudentDashboard() {
     return "Good evening";
   };
 
-  const navigationItems = [
-    { id: "overview",          label: "Overview",          icon: LayoutGrid },
-    { id: "attendance",        label: "Attendance",        icon: CalendarCheck },
-    { id: "assignments",       label: "Assignments",       icon: FileText },
-    { id: "fees",              label: "Fees",              icon: Wallet },
-    { id: "courses",           label: "Courses",           icon: BookOpen },
-    { id: "examschedule",      label: "Exam Schedule",     icon: Calendar },
-    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
-    { id: "events",            label: "Events",            icon: CalendarDays },
-    { id: "faculty",           label: "Faculty",           icon: Users },
-    { id: "results",           label: "Results",           icon: AwardIcon },
-    { id: "achievements",      label: "Achievements",      icon: Trophy },
-    { id: "leave",             label: "Leave Requests",    icon: ClipboardList },
-    { id: "library",           label: "Library",           icon: BookOpen },
-    { id: "exam-form",         label: "Examination Form",  icon: FileText },
-    { id: "feedback",          label: "Feedback",          icon: MessageSquare },
-    { id: "scholarships",      label: "Scholarships",      icon: AwardIcon },
-    { id: "id-card",           label: "ID Card",           icon: IdCard },
-    { id: "bus-routes",        label: "Bus Tracking",      icon: Bus },
-    { id: "feedback",          label: "Feedback",          icon: MessageSquare }, // ← NEW
-    { id: "overview",           label: "Overview",          icon: LayoutGrid },
-    { id: "attendance",         label: "Attendance",        icon: CalendarCheck },
-    { id: "assignments",        label: "Assignments",       icon: FileText },
-    { id: "fees",               label: "Fees",              icon: Wallet },
-    { id: "courses",            label: "Courses",           icon: BookOpen },
-    { id: "examschedule",       label: "Exam Schedule",     icon: Calendar },
-    { id: "academic-calendar",  label: "Academic Calendar", icon: CalendarDays },
-    { id: "events",             label: "Events",            icon: CalendarDays },
-    { id: "results",            label: "Results",           icon: AwardIcon },
-    { id: "leave",              label: "Leave Requests",    icon: ClipboardList }, // ← master
-    { id: "library",            label: "Library",           icon: BookOpen },
-    { id: "exam-form",          label: "Examination Form",  icon: FileText },      // ← master
-    { id: "scholarships",       label: "Scholarships",      icon: AwardIcon },
-    { id: "id-card",            label: "ID Card",           icon: IdCard },
-    { id: "overview", label: "Overview", icon: LayoutGrid },
-    { id: "attendance", label: "Attendance", icon: CalendarCheck },
-    { id: "assignments", label: "Assignments", icon: FileText },
-    { id: "fees", label: "Fees", icon: Wallet },
-    { id: "courses", label: "Courses", icon: BookOpen },
-    { id: "examschedule", label: "Exam Schedule", icon: Calendar },
-    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
-    { id: "events", label: "Events", icon: CalendarDays },
-    { id: "results", label: "Results", icon: AwardIcon },
-    { id: "achievements", label: "Achievements", icon: Trophy },
-    { id: "leave", label: "Leave Requests", icon: ClipboardList },
-    { id: "library", label: "Library", icon: BookOpen },
-    { id: "exam-form", label: "Examination Form", icon: FileText },
-    { id: "leave", label: "Leave Requests", icon: ClipboardList },
-    { id: "library", label: "Library", icon: BookOpen },
-    { id: "exam-form", label: "Examination Form", icon: FileText },
-    { id: "bus-routes", label: "Bus Tracking", icon: Bus }
-  ];
+
   const renderTab = () => {
     if (activeTab === "overview") {
       return (
@@ -250,6 +222,8 @@ export default function StudentDashboard() {
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
+        {activeTab === "faculty" && <FacultyView />}
+        {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>
     );
@@ -353,7 +327,7 @@ export default function StudentDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-600" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-              <Bell className="w-5 h-5 text-gray-600" />
+              <NotificationBell />
             </div>
           </div>
         </header>
@@ -366,24 +340,16 @@ export default function StudentDashboard() {
             <p className="text-gray-500 mt-1">Here's what's happening with your academic progress.</p>
           </div>
 
-          {/* Notifications Section */}
-          {data?.notifications && data.notifications.length > 0 && (
-            <div className="mb-8 space-y-4">
-              {data.notifications.map((notif: any, idx: number) => (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-red-800">{notif.title}</h3>
-                    <p className="text-sm text-red-700 mt-1">{notif.message}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Content Area */}
           {activeTab === "overview" ? (
             <div className="space-y-8">
+              {/* Profile Completion */}
+{profileData?.profileCompletion && (
+  <ProfileCompletionCard
+    percentage={profileData.profileCompletion.percentage}
+    missingFields={profileData.profileCompletion.missingFields}
+  />
+)}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -525,7 +491,7 @@ export default function StudentDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
                   <button
-                    onClick={() => setShowScheduleModal(true)}
+                    onClick={() => {}}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     View all
@@ -598,36 +564,26 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
-              {activeTab === "faculty" && <Teachers />}
+              
               {activeTab === "results" && <StudentResults />}
               {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
-              {activeTab === "scholarships" && <Scholarships />}
+              
               {activeTab === "feedback" && <StudentFeedback />}
-              {activeTab === "id-card" && <IDCard student={student} />}
-              {activeTab === "settings" && (
-              {activeTab === "settings" && <EventsStudent />}
-              {activeTab === "results"           && <StudentResults />}
-              {activeTab === "leave"             && <LeaveRequest />}
-              {activeTab === "library"           && <Library />}
-              {activeTab === "exam-form"         && <ExaminationForm />}
-              {activeTab === "scholarships"      && <Scholarships />}
-              {activeTab === "feedback"          && <StudentFeedback />}
-              {activeTab === "id-card"           && <IDCard student={student} />}
+
+              {activeTab === "bus-routes" && <BusRoutes />}
+              {activeTab === "book-resources" && <ResourceBooking />}
               {activeTab === "settings"          && (
                 <div className="text-sm text-gray-600">
                   Settings are not available yet for student accounts.
                 </div>
               )}
-              {activeTab === "bus-routes" && <BusRoutes />}
-
             </div>
           )}
 
           {/* Footer */}
-          {renderTab()}
           <footer className="mt-8 pt-6 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
               <p>Copyright {new Date().getFullYear()} Student Portal. All rights reserved.</p>

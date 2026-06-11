@@ -1,7 +1,7 @@
 import Results from "../models/Results.model.js";
 import Student from "../models/User.model.js";
 import Course from "../models/Course.model.js";
-
+import { logAction } from "../utils/auditService.js";
 export const getResults = async (req, res) => {
     try {
         if (!req.user) {
@@ -60,8 +60,10 @@ export const createResult = async (req, res) => {
             marks,
             grade,
         });
-
         res.status(201).json(result);
+
+        // Log result creation
+        await logAction(req.user.id, "CREATE_RESULT", "Result", result._id, { studentId, courseId, marks, grade });
     } catch (err) {
         console.log("Create Result Error:", err);
         res.status(500).json({ message: "Server Error" });
@@ -75,8 +77,10 @@ export const publishResult = async (req, res) => {
             { status: "published" },
             { new: true }
         );
-
         res.json(result);
+
+        // Log result publish
+        await logAction(req.user.id, "PUBLISH_RESULT", "Result", result._id, { studentId: result.studentId });
     } catch (error) {
         res.status(500).json({ message: "Publish failed" });
     }

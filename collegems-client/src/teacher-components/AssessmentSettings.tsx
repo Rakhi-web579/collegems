@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, AlertCircle, CheckCircle, Loader2, Settings } from "lucide-react";
+import { Save, Plus, Trash2, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import api from "../api/axios";
 
 interface Course {
@@ -18,7 +18,7 @@ export default function AssessmentSettings() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [components, setComponents] = useState<AssessmentComponent[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);

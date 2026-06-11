@@ -3,7 +3,7 @@ import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import Fee from "../models/Fee.model.js";
 import User from "../models/User.model.js";
-
+import { logAction } from "../utils/auditService.js";
 const router = express.Router();
 
 // hod sets fee of students
@@ -32,6 +32,9 @@ router.post("/set", protect, allowRoles("hod"), async (req, res) => {
     });
 
     res.status(201).json(fee);
+
+    // Log setting fee
+    await logAction(req.user.id, "SET_FEE", "Fee", fee._id, { student, total, dueDate });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -67,6 +70,9 @@ router.post("/pay", protect, allowRoles("student", "parent"), async (req, res) =
     await fee.save();
 
     res.json({ message: "Payment successful", fee });
+
+    // Log fee payment
+    await logAction(req.user.id, "PAY_FEE", "Fee", fee._id, { amount, studentId });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
