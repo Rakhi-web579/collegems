@@ -1,10 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
-  Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
-  Bell, Search, LogOut, Settings, CalendarDays,
-  Moon, Sun, Award, MessageSquare, Bus, ShieldAlert
+  Award,
+  Bell,
+  Briefcase,
+  BookOpen,
+  Building2,
+  Bus,
+  Calendar,
+  CalendarDays,
+  ChevronRight,
+  DollarSign,
+  FileText,
+  GraduationCap,
+  LayoutGrid,
+  LogOut,
+  Menu,
+  MessageSquare,
+  Moon,
+  RefreshCw,
+  Search,
+  Settings,
+  Sun,
+  Users,
+  Wallet,
+  X,
+  ShieldAlert,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -13,7 +34,7 @@ import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import BusRoutes from "../common-components-management/BusRoutes";
 import Library from "../common-components-management/Library";
 import Students from "../common-components-management/Students";
-
+import Scholarships from "../common-components-management/Scholarships";
 import FeedbackManagement from "../hod-components/FeedbackManagement";
 import ExamForms from "../hod-components/ExamForms";
 import ExamHalls from "../hod-components/ExamHalls";
@@ -27,6 +48,7 @@ import Teachers from "../hod-components/Teachers";
 import AuditLogs from "../hod-components/AuditLogs";
 import BookingManagement from "../hod-components/BookingManagement";
 import ResourceManagement from "../hod-components/ResourceManagement";
+import FacultyAssignment from "../hod-components/FacultyAssignment";
 
 type TabType =
   | "overview"
@@ -50,10 +72,11 @@ type TabType =
   | "bus-routes"
   | "exam-halls"
   | "hall-allocation"
+  | "dashboard"
   | "audit-logs"
   | "manage-bookings"
-  | "manage-resources";
-
+  | "manage-resources"
+  | "faculty-assignments";
 interface Data {
   cards?: Array<{ title: string; value: number | string }>;
 }
@@ -89,9 +112,10 @@ const navigationItems = [
   { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
   { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
   { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
-  { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
-  { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
-  { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+{ id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
+{ id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
+{ id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+{ id: "faculty-assignments" as TabType, label: "Faculty Assignments", icon: Briefcase },
 ];
 
 export default function HODDashboard() {
@@ -268,9 +292,10 @@ export default function HODDashboard() {
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "exam-halls" && <ExamHalls />}
         {activeTab === "hall-allocation" && <HallAllocation />}
-        {activeTab === "audit-logs" && <AuditLogs />}
-        {activeTab === "manage-bookings" && <BookingManagement />}
-        {activeTab === "manage-resources" && <ResourceManagement />}
+{activeTab === "audit-logs" && <AuditLogs />}
+{activeTab === "manage-bookings" && <BookingManagement />}
+{activeTab === "manage-resources" && <ResourceManagement />}
+{activeTab === "faculty-assignments" && <FacultyAssignment />}
       </>
     );
   };
@@ -378,9 +403,7 @@ export default function HODDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-              <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
-                <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-              </button>
+              <NotificationBell />
               <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-semibold">
                 {profileInitials || "H"}
               </div>

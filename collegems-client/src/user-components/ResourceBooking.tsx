@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { Search, Calendar, Clock, PlusCircle } from "lucide-react";
 
 interface Resource {
@@ -46,9 +46,7 @@ const ResourceBooking: React.FC = () => {
 
   const fetchMyBookings = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/bookings/my", {
-        withCredentials: true,
-      });
+      const { data } = await api.get("/bookings/my");
       setMyBookings(data);
     } catch (error) {
       console.error("Error fetching my bookings:", error);
@@ -64,10 +62,10 @@ const ResourceBooking: React.FC = () => {
       const startDateTime = new Date(`${date}T${startTime}:00`).toISOString();
       const endDateTime = new Date(`${date}T${endTime}:00`).toISOString();
 
-      let url = `http://localhost:5000/api/bookings/available?startTime=${startDateTime}&endTime=${endDateTime}`;
+      let url = `/bookings/available?startTime=${startDateTime}&endTime=${endDateTime}`;
       if (resourceType) url += `&type=${resourceType}`;
 
-      const { data } = await axios.get(url, { withCredentials: true });
+      const { data } = await api.get(url);
       setAvailableResources(data);
     } catch (error: any) {
       alert(error.response?.data?.message || "Failed to check availability");
@@ -84,15 +82,14 @@ const ResourceBooking: React.FC = () => {
       const startDateTime = new Date(`${date}T${startTime}:00`).toISOString();
       const endDateTime = new Date(`${date}T${endTime}:00`).toISOString();
 
-      await axios.post(
-        "http://localhost:5000/api/bookings",
+      await api.post(
+        "/bookings",
         {
           resource: selectedResource,
           purpose,
           startTime: startDateTime,
           endTime: endDateTime,
-        },
-        { withCredentials: true }
+        }
       );
 
       alert("Booking request submitted successfully!");
@@ -108,7 +105,7 @@ const ResourceBooking: React.FC = () => {
   const cancelBooking = async (id: string) => {
     if (!window.confirm("Are you sure you want to cancel this booking?")) return;
     try {
-      await axios.put(`http://localhost:5000/api/bookings/${id}/cancel`, {}, { withCredentials: true });
+      await api.put(`/bookings/${id}/cancel`);
       fetchMyBookings();
     } catch (error: any) {
       alert(error.response?.data?.message || "Failed to cancel booking");

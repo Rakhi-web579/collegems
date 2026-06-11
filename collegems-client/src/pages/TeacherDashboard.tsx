@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import MyAssignments from "../teacher-components/MyAssignments";
 import api from "../api/axios";
 import {
   Users, BarChart3, FileText, Clock, Bell, Search, LayoutDashboard,
   CheckSquare, ClipboardList, BookMarked, Book, Coins, Menu, X,
   ChevronRight, Calendar, LogOut, Settings, GraduationCap, CalendarDays,
   Percent, Moon, Sun, ClipboardCheck, Trophy,
+  Briefcase,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
@@ -39,11 +41,6 @@ export default function TeacherDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
-  const [notifications] = useState<any[]>([
-    { id: 1, type: "assignment", message: "New assignment submission from Student A", time: "2 hours ago" },
-    { id: 2, type: "announcement", message: "Department meeting scheduled", time: "1 day ago" },
-    { id: 3, type: "attendance", message: "Attendance report ready", time: "2 days ago" },
-  ]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -80,6 +77,7 @@ export default function TeacherDashboard() {
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
+      { id: "my-assignments", label: "My Assignments", icon: Briefcase },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
     { id: "leave-approvals", label: "Leave Approvals", icon: ClipboardCheck },
@@ -216,10 +214,7 @@ export default function TeacherDashboard() {
                 <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                   {darkMode ? <Sun className="w-5 h-5 text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600" />}
                 </button>
-                <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
-                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
-                </button>
+                <NotificationBell />
                 <button onClick={fetchDashboardData} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Refresh">
                   <Clock className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </button>
@@ -322,26 +317,6 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
 
-                  {/* Notifications */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h2>
-                      <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">3 new</span>
-                    </div>
-                    <div className="space-y-3">
-                      {notifications.map((notification) => (
-                        <div key={notification.id} className="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors">
-                          <div className={`p-2 rounded-lg ${getNotificationColor(notification.type)}`}>
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-900 dark:text-white">{notification.message}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -367,6 +342,7 @@ export default function TeacherDashboard() {
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}
+          {activeTab === "my-assignments" && <MyAssignments />}
           {activeTab === "book-resources" && <ResourceBooking />}
         </main>
       </div>

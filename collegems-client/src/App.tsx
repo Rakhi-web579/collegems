@@ -33,7 +33,7 @@ import AuditLogs from "./hod-components/AuditLogs";
 import ResourceBooking from "./user-components/ResourceBooking";
 import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
-
+import FacultyAssignment from "./hod-components/FacultyAssignment";
 export default function App() {
   return (
     <BrowserRouter>
