@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
 import { logAction } from "../utils/auditService.js";
+import calculateProfileCompletion from "../utils/profileCompletion.js";
 
 const normalizeSettings = (settings) => {
   const safeSettings = settings || {};
@@ -17,6 +18,20 @@ const normalizeSettings = (settings) => {
       inApp: true,
       ...(safeSettings.notifications || {}),
     },
+  };
+};
+
+const calculateProfileCompletion = (user) => {
+  const fields = ['name', 'email', 'phone', 'department', 'studentId', 'course', 'semester'];
+  let filled = 0;
+  const missingFields = [];
+  fields.forEach(field => {
+    if (user[field]) filled++;
+    else missingFields.push(field);
+  });
+  return {
+    percentage: Math.round((filled / fields.length) * 100),
+    missingFields
   };
 };
 

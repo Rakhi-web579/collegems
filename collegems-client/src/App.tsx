@@ -31,7 +31,8 @@ import AuditLogs from "./hod-components/AuditLogs";
 import ResourceBooking from "./user-components/ResourceBooking";
 import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
-
+import AnnouncementForm from "./common-components-management/AnnouncementForm";
+import AnnouncementManage from "./common-components-management/AnnouncementManage";
 export default function App() {
   return (
     <BrowserRouter>
@@ -59,7 +60,6 @@ export default function App() {
           <Route path="/library" element={ <Library /> } />
 
         </Route>
-
         <Route
           path="/student/dashboard"
           element={
@@ -97,6 +97,14 @@ export default function App() {
           element={
             <RoleRoute role="teacher">
               <TeacherDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/teacher/announcements"
+          element={
+            <RoleRoute role="teacher">
+              <TeacherDashboard initialTab="announcements" />
             </RoleRoute>
           }
         />
@@ -170,6 +178,23 @@ export default function App() {
             <RoleRoute role="hod">
               <ResourceManagement />
             </RoleRoute>
+          }
+        />
+        <Route
+          path="/announcements/create"
+          element={
+            <RoleRoute role="teacher">
+              <AnnouncementForm />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/announcements"
+          element={
+            <ProtectedRoute>
+              <AnnouncementManage />
+            </ProtectedRoute>
           }
         />
       </Routes>

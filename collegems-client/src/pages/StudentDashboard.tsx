@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Users } from "lucide-react";
 import {
   AwardIcon,
   Bell,
@@ -17,7 +18,6 @@ import {
   MessageSquare,
   Moon,
   Search,
-
   Settings,
   Sun,
   Trophy,
@@ -26,6 +26,7 @@ import {
   AlertCircle,
   TrendingUp,
   Briefcase,
+  GraduationCap,
   Users,
   IdCard,
 } from "lucide-react";
@@ -47,15 +48,18 @@ import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import PlacementEligibility from "../user-components/PlacementEligibility";
+
 import Scholarships from "../common-components-management/Scholarships";
-import IDCard from "../user-components/IDCard";
+// import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
 
-
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import ResourceBooking from "../user-components/ResourceBooking";
+import AnnouncementsView from "../user-components/AnnouncementsView";
 
 type TabType =
   | "overview"
@@ -68,6 +72,7 @@ type TabType =
   | "events"
   | "results"
   | "achievements"
+  | "announcements"
   | "leave"
   | "library"
   | "exam-form"
@@ -78,11 +83,14 @@ type TabType =
   | "id-card"
   | "feedback"
   | "bus-routes"
+  | "settings"
+  | "faculty"
   | "book-resources"
   | "settings";
 
 const navigationItems = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
+  { id: "announcements" as TabType, label: "Announcements", icon: Bell },
   { id: "attendance" as TabType, label: "Attendance", icon: CalendarCheck },
   { id: "assignments" as TabType, label: "Assignments", icon: FileText },
   { id: "fees" as TabType, label: "Fees", icon: Wallet },
@@ -97,10 +105,11 @@ const navigationItems = [
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
-  { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
+  //{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "placement" as TabType, label: "Placement", icon: Briefcase },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
+  { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
 
@@ -221,11 +230,13 @@ export default function StudentDashboard() {
         {activeTab === "events" && <EventsStudent />}
         {activeTab === "results" && <StudentResults />}
         {activeTab === "achievements" && <StudentAchievements />}
+        {activeTab === "announcements" && <AnnouncementsView />}
         {activeTab === "leave" && <LeaveRequest />}
         {activeTab === "library" && <Library />}
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
+        {activeTab === "faculty" && <FacultyView />}
         {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "placement" && <PlacementEligibility />}
         {activeTab === "scholarships" && <Scholarships />}
@@ -334,7 +345,7 @@ export default function StudentDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-600" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-              <Bell className="w-5 h-5 text-gray-600" />
+              <NotificationBell />
             </div>
           </div>
         </header>
@@ -347,31 +358,16 @@ export default function StudentDashboard() {
             <p className="text-gray-500 mt-1">Here's what's happening with your academic progress.</p>
           </div>
 
-          {/* Notifications Section */}
-          {data?.notifications && data.notifications.length > 0 && (
-            <div className="mb-8 space-y-4">
-              {data.notifications.map((notif: any, idx: number) => (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-red-800">{notif.title}</h3>
-                    <p className="text-sm text-red-700 mt-1">{notif.message}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Content Area */}
           {activeTab === "overview" ? (
             <div className="space-y-8">
               {/* Profile Completion */}
-{profileData?.profileCompletion && (
-  <ProfileCompletionCard
-    percentage={profileData.profileCompletion.percentage}
-    missingFields={profileData.profileCompletion.missingFields}
-  />
-)}
+              {profileData?.profileCompletion && (
+                <ProfileCompletionCard
+                  percentage={profileData.profileCompletion.percentage}
+                  missingFields={profileData.profileCompletion.missingFields}
+                />
+              )}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -594,8 +590,6 @@ export default function StudentDashboard() {
               {activeTab === "exam-form" && <ExaminationForm />}
               
               {activeTab === "feedback" && <StudentFeedback />}
-              
-              {activeTab === "feedback"          && <StudentFeedback />}
 
               {activeTab === "bus-routes" && <BusRoutes />}
               {activeTab === "book-resources" && <ResourceBooking />}
@@ -608,7 +602,6 @@ export default function StudentDashboard() {
           )}
 
           {/* Footer */}
-          {renderTab()}
           <footer className="mt-8 pt-6 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
               <p>Copyright {new Date().getFullYear()} Student Portal. All rights reserved.</p>

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import MyAssignments from "../teacher-components/MyAssignments";
 import api from "../api/axios";
 import {
   Users, BarChart3, FileText, Clock, Bell, Search, LayoutDashboard,
   CheckSquare, ClipboardList, BookMarked, Book, Coins, Menu, X,
   ChevronRight, Calendar, LogOut, Settings, GraduationCap, CalendarDays,
   Percent, Moon, Sun, ClipboardCheck, Trophy,
+  Briefcase,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
@@ -29,21 +31,22 @@ import AssessmentSettings from "../teacher-components/AssessmentSettings";
 import InternalMarksEntry from "../teacher-components/InternalMarksEntry";
 import OfficeHours from "../teacher-components/OfficeHours";
 import ResourceBooking from "../user-components/ResourceBooking";
+import AnnouncementForm from "../common-components-management/AnnouncementForm";
+import AnnouncementManage from "../common-components-management/AnnouncementManage";
 
-export default function TeacherDashboard() {
+interface TeacherDashboardProps {
+  initialTab?: string;
+}
+
+export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) {
   const navigate = useNavigate();
   const { darkMode, toggleTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [courses, setCourses] = useState<{ _id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
-  const [notifications] = useState<any[]>([
-    { id: 1, type: "assignment", message: "New assignment submission from Student A", time: "2 hours ago" },
-    { id: 2, type: "announcement", message: "Department meeting scheduled", time: "1 day ago" },
-    { id: 3, type: "attendance", message: "Attendance report ready", time: "2 days ago" },
-  ]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -77,9 +80,11 @@ export default function TeacherDashboard() {
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "announcements", label: "Announcements", icon: Bell },
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
+      { id: "my-assignments", label: "My Assignments", icon: Briefcase },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
     { id: "leave-approvals", label: "Leave Approvals", icon: ClipboardCheck },
@@ -216,7 +221,7 @@ export default function TeacherDashboard() {
                 <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                   {darkMode ? <Sun className="w-5 h-5 text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600" />}
                 </button>
-                <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative">
+                <button onClick={() => navigate("/teacher/announcements")} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative" title="Go to announcements">
                   <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
                 </button>
@@ -330,7 +335,7 @@ export default function TeacherDashboard() {
                     </div>
                     <div className="space-y-3">
                       {notifications.map((notification) => (
-                        <div key={notification.id} className="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors">
+                        <div key={notification.id} onClick={() => notification.type === "announcement" && navigate("/teacher/announcements")} className="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl cursor-pointer transition-colors">
                           <div className={`p-2 rounded-lg ${getNotificationColor(notification.type)}`}>
                             {getNotificationIcon(notification.type)}
                           </div>
@@ -367,7 +372,15 @@ export default function TeacherDashboard() {
           {activeTab === "events" && <OrganizeEvents />}
           {activeTab === "settings" && <TeacherSettings />}
           {activeTab === "library" && <Library />}
+          {activeTab === "my-assignments" && <MyAssignments />}
           {activeTab === "book-resources" && <ResourceBooking />}
+          {activeTab === "announcements" && (
+            <div className="space-y-8">
+              <AnnouncementForm />
+              <hr className="border-gray-200 dark:border-gray-700" />
+              <AnnouncementManage />
+            </div>
+          )}
         </main>
       </div>
     </div>
