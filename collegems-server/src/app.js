@@ -35,6 +35,7 @@ import leaveRoutes from "./routes/leave.routes.js";
 import scholarshipRoutes from "./routes/scholarship.routes.js";
 import idCardRoutes from "./routes/idcard.routes.js";
 import { verifyStudent } from "./controllers/idcard.controller.js";
+import announcementRoutes from "./routes/announcement.routes.js";  // announcement
 import busRouteRoutes from "./routes/busRoute.routes.js";
 import syllabusRoutes from "./routes/syllabus.route.js";
 import officeHoursRoutes from "./routes/officeHours.routes.js";
@@ -99,7 +100,7 @@ app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
 app.use("/api/mentorships", mentorshipRoutes);
 app.use("/api/complaints", complaintRoutes);
-app.use("/api/notifications", notificationRoutes);
+app.use("/api/announcements", announcementRoutes);  // aannouncements
 
 // Health check
 app.get("/", (_req, res) => {

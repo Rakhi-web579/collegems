@@ -31,15 +31,21 @@ import AssessmentSettings from "../teacher-components/AssessmentSettings";
 import InternalMarksEntry from "../teacher-components/InternalMarksEntry";
 import OfficeHours from "../teacher-components/OfficeHours";
 import ResourceBooking from "../user-components/ResourceBooking";
+import AnnouncementForm from "../common-components-management/AnnouncementForm";
+import AnnouncementManage from "../common-components-management/AnnouncementManage";
 
-export default function TeacherDashboard() {
+interface TeacherDashboardProps {
+  initialTab?: string;
+}
+
+export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) {
   const navigate = useNavigate();
   const { darkMode, toggleTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [courses, setCourses] = useState<{ _id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
 
   const handleSignOut = () => {
@@ -74,6 +80,7 @@ export default function TeacherDashboard() {
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "announcements", label: "Announcements", icon: Bell },
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
@@ -214,7 +221,10 @@ export default function TeacherDashboard() {
                 <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                   {darkMode ? <Sun className="w-5 h-5 text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600" />}
                 </button>
-                <NotificationBell />
+                <button onClick={() => navigate("/teacher/announcements")} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative" title="Go to announcements">
+                  <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
+                </button>
                 <button onClick={fetchDashboardData} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Refresh">
                   <Clock className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </button>
@@ -317,6 +327,26 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
 
+                  {/* Notifications */}
+                  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h2>
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">3 new</span>
+                    </div>
+                    <div className="space-y-3">
+                      {notifications.map((notification) => (
+                        <div key={notification.id} onClick={() => notification.type === "announcement" && navigate("/teacher/announcements")} className="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl cursor-pointer transition-colors">
+                          <div className={`p-2 rounded-lg ${getNotificationColor(notification.type)}`}>
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-900 dark:text-white">{notification.message}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -344,6 +374,13 @@ export default function TeacherDashboard() {
           {activeTab === "library" && <Library />}
           {activeTab === "my-assignments" && <MyAssignments />}
           {activeTab === "book-resources" && <ResourceBooking />}
+          {activeTab === "announcements" && (
+            <div className="space-y-8">
+              <AnnouncementForm />
+              <hr className="border-gray-200 dark:border-gray-700" />
+              <AnnouncementManage />
+            </div>
+          )}
         </main>
       </div>
     </div>
