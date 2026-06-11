@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import FacultyView from "../user-components/FacultyView";
 import {
   AwardIcon,
   Bell,
@@ -17,7 +18,6 @@ import {
   MessageSquare,
   Moon,
   Search,
-
   Settings,
   Sun,
   Trophy,
@@ -25,6 +25,7 @@ import {
   Wallet,
   X,
   AlertCircle,
+  GraduationCap,
   Users,
   IdCard,
 } from "lucide-react";
@@ -45,17 +46,14 @@ import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import Scholarships from "../common-components-management/Scholarships";
-import IDCard from "../user-components/IDCard";
+// import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
-import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
-
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import ResourceBooking from "../user-components/ResourceBooking";
-import NotificationBell from "../common-components-management/NotificationBell";
-import { formatDistanceToNow } from "date-fns";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 
 type TabType =
   | "overview"
@@ -74,6 +72,8 @@ type TabType =
   | "my-seat"
   | "feedback"
   | "bus-routes"
+  | "settings"
+  | "faculty"
   | "book-resources"
   | "settings";
 
@@ -93,9 +93,10 @@ const navigationItems = [
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
-  { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
+{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
+  { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
 
@@ -154,6 +155,78 @@ export default function StudentDashboard() {
     if (hour < 12) return "Good morning";
     if (hour < 18) return "Good afternoon";
     return "Good evening";
+  };
+
+
+  const renderTab = () => {
+    if (activeTab === "overview") {
+      return (
+        <div className="space-y-8">
+          {data?.notifications && data.notifications.length > 0 && (
+            <div className="space-y-4">
+              {data.notifications.map((notif: any, idx: number) => (
+                <div key={idx} className={`flex items-start gap-4 p-4 rounded-xl border ${notif.type === 'danger' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+                  <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${notif.type === 'danger' ? 'text-red-600' : 'text-amber-600'}`} />
+                  <div>
+                    <h3 className="font-semibold">{notif.title}</h3>
+                    <p className="text-sm mt-1">{notif.message}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Attendance", value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%", icon: CalendarCheck, color: "bg-blue-50 text-blue-700" },
+              { title: "Pending Assignments", value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0", icon: FileText, color: "bg-amber-50 text-amber-700" },
+              { title: "Fee Due", value: `Rs ${data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"}`, icon: Wallet, color: "bg-emerald-50 text-emerald-700" },
+              { title: "Courses", value: "Active", icon: BookOpen, color: "bg-purple-50 text-purple-700" },
+            ].map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.title} className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
+                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${stat.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <AssignmentReminder />
+          <UpcomingExamsWidget />
+          <StudentAchievements />
+        </div>
+      );
+    }
+
+    return (
+      <div className={activeTab === "leave" || activeTab === "achievements" || activeTab === "my-seat" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
+        {activeTab === "attendance" && <Attendance />}
+        {activeTab === "assignments" && <Assignment />}
+        {activeTab === "fees" && <Fees />}
+        {activeTab === "courses" && <Courses />}
+        {activeTab === "examschedule" && <ExamSchedule />}
+        {activeTab === "my-seat" && <StudentSeatView />}
+        {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
+        {activeTab === "events" && <EventsStudent />}
+        {activeTab === "results" && <StudentResults />}
+        {activeTab === "achievements" && <StudentAchievements />}
+        {activeTab === "leave" && <LeaveRequest />}
+        {activeTab === "library" && <Library />}
+        {activeTab === "exam-form" && <ExaminationForm />}
+        {activeTab === "feedback" && <StudentFeedback />}
+        {activeTab === "bus-routes" && <BusRoutes />}
+        {activeTab === "faculty" && <FacultyView />}
+        {activeTab === "book-resources" && <ResourceBooking />}
+        {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
+      </div>
+    );
   };
 
   if (loading) {

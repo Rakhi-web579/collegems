@@ -22,7 +22,8 @@ import eventRoute from "./routes/event.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
 import libraryRoutes from "./routes/library.routes.js";
 import assessmentRoutes from "./routes/assessment.routes.js";
-
+import mentorshipRoutes from "./routes/mentorship.routes.js";
+import complaintRoutes from "./routes/complaint.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
@@ -41,8 +42,7 @@ import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
 import auditLogRoutes from "./routes/auditLog.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
-import mentorshipRoutes from "./routes/mentorship.routes.js";
-import complaintRoutes from "./routes/complaint.routes.js";
+import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 
 const app = express();
@@ -60,7 +60,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // Routes
 app.use("/api/auth",      authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/faculty-assignments", facultyAssignmentRoutes);
 app.use("/api/attendance",        authenticate, attendanceRoutes);
 app.use("/api/assignment",        authenticate, assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
@@ -86,7 +86,8 @@ app.use("/api/exam-forms", examFormRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);
 app.use("/api/syllabus", authenticate, syllabusRoutes);
 app.use("/api/reports",         reportRoutes);
-app.use("/api/feedback",        authenticate, feedbackRoutes);
+app.use("/api/feedback", authenticate, feedbackRoutes);
+app.use("/api/reports", reportRoutes);
 app.use("/api/student/idcard", idCardRoutes);
 app.get("/api/verify/student/:studentId", verifyStudent);
 app.use("/api/bus-routes", authenticate, busRouteRoutes);
