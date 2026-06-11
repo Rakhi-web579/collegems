@@ -21,11 +21,13 @@ import {
   Settings,
   Sun,
   Trophy,
-  TrendingUp,
   Wallet,
   X,
   AlertCircle,
   TrendingUp,
+  Briefcase,
+  Users,
+  IdCard,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -43,6 +45,8 @@ import Fees from "../user-components/Fee";
 import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+import PlacementEligibility from "../user-components/PlacementEligibility";
 import Scholarships from "../common-components-management/Scholarships";
 import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
@@ -68,6 +72,10 @@ type TabType =
   | "library"
   | "exam-form"
   | "my-seat"
+  | "placement"
+  | "faculty"
+  | "scholarships"
+  | "id-card"
   | "feedback"
   | "bus-routes"
   | "book-resources"
@@ -91,6 +99,7 @@ const navigationItems = [
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
   { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
+  { id: "placement" as TabType, label: "Placement", icon: Briefcase },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
@@ -218,6 +227,10 @@ export default function StudentDashboard() {
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "book-resources" && <ResourceBooking />}
+        {activeTab === "placement" && <PlacementEligibility />}
+        {activeTab === "scholarships" && <Scholarships />}
+        {activeTab === "id-card" && <IDCard student={student} />}
+        {activeTab === "faculty" && <Teachers />}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>
     );
