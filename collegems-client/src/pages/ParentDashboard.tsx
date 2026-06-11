@@ -27,6 +27,10 @@ import Attendance from "../user-components/Attendance";
 import Fees from "../user-components/Fee";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
+import ResourceBooking from "../user-components/ResourceBooking";
+import NotificationBell from "../common-components-management/NotificationBell";
+import { useNotifications } from "../hooks/useNotifications";
+import { formatDistanceToNow } from "date-fns";
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
@@ -35,6 +39,7 @@ export default function ParentDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { darkMode, toggleTheme } = useTheme();
+  const { notifications, unreadCount, markAsRead } = useNotifications();
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -277,10 +282,7 @@ export default function ParentDashboard() {
                 >
                   {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
-                <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg relative text-gray-600 dark:text-gray-300">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-purple-600 rounded-full"></span>
-                </button>
+                <NotificationBell />
                 <div className="flex items-center gap-2 px-3 py-2 border-l border-gray-200 dark:border-gray-800">
                   <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold text-sm">
                     {parent?.name?.charAt(0) || "P"}
@@ -327,14 +329,20 @@ export default function ParentDashboard() {
           </div>
 
           {/* Warnings Section */}
-          {data?.notifications && data.notifications.length > 0 && (
+          {notifications.length > 0 && (
             <div className="mb-8 space-y-4">
-              {data.notifications.map((notif: any, idx: number) => (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30">
-                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+              {notifications.map((notif) => (
+                <div 
+                  key={notif._id} 
+                  onClick={() => !notif.isRead && markAsRead(notif._id)}
+                  className={`flex items-start gap-4 p-4 rounded-xl cursor-pointer ${notif.type === 'danger' ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30' : 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30'} ${!notif.isRead ? 'border shadow-sm' : 'opacity-80'}`}
+                >
+                  <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${notif.type === 'danger' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`} />
                   <div>
-                    <h3 className="font-semibold text-red-800 dark:text-red-400">{notif.title}</h3>
-                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">{notif.message}</p>
+                    <h3 className={`font-semibold ${notif.type === 'danger' ? 'text-red-800 dark:text-red-400' : 'text-blue-800 dark:text-blue-400'}`}>{notif.message}</h3>
+                    <p className={`text-sm mt-1 ${notif.type === 'danger' ? 'text-red-700 dark:text-red-300' : 'text-blue-700 dark:text-blue-300'}`}>
+                      {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+                    </p>
                   </div>
                 </div>
               ))}

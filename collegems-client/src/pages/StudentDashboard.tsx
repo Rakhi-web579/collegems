@@ -51,6 +51,7 @@ import Teachers from "../hod-components/Teachers";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import ResourceBooking from "../user-components/ResourceBooking";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 
@@ -326,7 +327,7 @@ export default function StudentDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-600" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-              <Bell className="w-5 h-5 text-gray-600" />
+              <NotificationBell />
             </div>
           </div>
         </header>
@@ -338,21 +339,6 @@ export default function StudentDashboard() {
             </h1>
             <p className="text-gray-500 mt-1">Here's what's happening with your academic progress.</p>
           </div>
-
-          {/* Notifications Section */}
-          {data?.notifications && data.notifications.length > 0 && (
-            <div className="mb-8 space-y-4">
-              {data.notifications.map((notif: any, idx: number) => (
-                <div key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-red-800">{notif.title}</h3>
-                    <p className="text-sm text-red-700 mt-1">{notif.message}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Content Area */}
           {activeTab === "overview" ? (
@@ -586,8 +572,6 @@ export default function StudentDashboard() {
               {activeTab === "exam-form" && <ExaminationForm />}
               
               {activeTab === "feedback" && <StudentFeedback />}
-              
-              {activeTab === "feedback"          && <StudentFeedback />}
 
               {activeTab === "bus-routes" && <BusRoutes />}
               {activeTab === "book-resources" && <ResourceBooking />}
@@ -600,7 +584,6 @@ export default function StudentDashboard() {
           )}
 
           {/* Footer */}
-          {renderTab()}
           <footer className="mt-8 pt-6 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
               <p>Copyright {new Date().getFullYear()} Student Portal. All rights reserved.</p>
