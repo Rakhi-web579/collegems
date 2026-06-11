@@ -1,7 +1,7 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import { logAction } from "../utils/auditService.js";
 const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || "";
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
@@ -126,6 +126,9 @@ export const register = async (req, res) => {
       accessToken,
       user: { id: user._id, name: user.name, role: user.role },
     });
+
+    // Log the action
+    await logAction(user._id, "REGISTER", "Auth", user._id, { role: user.role, email: user.email });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -185,6 +188,9 @@ export const login = async (req, res) => {
         childId: user.childId,
       },
     });
+
+    // Log the login
+    await logAction(user._id, "LOGIN", "Auth", user._id, { role: user.role, email: user.email });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });

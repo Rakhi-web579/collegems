@@ -5,7 +5,7 @@ import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.j
 import log from "../utils/logger.js";
 import Fee from "../models/Fee.model.js";
 import User from "../models/User.model.js";
-
+import { logAction } from "../utils/auditService.js";
 const router = express.Router();
 
 // Set fee for student

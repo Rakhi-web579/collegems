@@ -14,7 +14,7 @@ import {
   AlertCircle,
   Eye,
   CheckCircle,
-  Download
+  Download,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -555,6 +555,7 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                       >
                         {isActive ? "Active" : "Closed"}
                       </span>
+
                       <button 
                         onClick={() => fetchSubmissions(assignment._id)}
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1 text-sm font-medium"
@@ -595,12 +596,16 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                   Total Submissions: {viewingSubmissions.submissions?.length || 0}
                 </p>
               </div>
-              <button
-                onClick={() => setViewingSubmissions(null)}
-                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
+              
+              <div className="flex items-center gap-3">
+
+                <button
+                  onClick={() => setViewingSubmissions(null)}
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
             </div>
             
             {/* Submissions List */}
@@ -689,7 +694,7 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                           {gradingId === sub.student?._id ? (
                             <><RefreshCw className="w-3 h-3 animate-spin" /> Saving...</>
                           ) : "Save Grade"}
-                        </button>
+                        </button> 
                       </div>
                     </div>
                   ))}
@@ -699,8 +704,9 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
             </>
             )}
           </div>
+          
         </div>
-      )}
+      )} 
     </div>
   );
 }

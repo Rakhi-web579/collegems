@@ -22,7 +22,8 @@ import eventRoute from "./routes/event.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
 import libraryRoutes from "./routes/library.routes.js";
 import assessmentRoutes from "./routes/assessment.routes.js";
-
+import mentorshipRoutes from "./routes/mentorship.routes.js";
+import complaintRoutes from "./routes/complaint.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
@@ -39,7 +40,10 @@ import syllabusRoutes from "./routes/syllabus.route.js";
 import officeHoursRoutes from "./routes/officeHours.routes.js";
 import examHallRoutes from "./routes/examHall.routes.js";
 import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
-
+import auditLogRoutes from "./routes/auditLog.routes.js";
+import resourceRoutes from "./routes/resource.routes.js";
+import bookingRoutes from "./routes/booking.routes.js";
+import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import log from "./utils/logger.js";
@@ -59,7 +63,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // Routes
 app.use("/api/auth",      authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/faculty-assignments", facultyAssignmentRoutes);
 app.use("/api/attendance",        authenticate, attendanceRoutes);
 app.use("/api/assignment",        authenticate, assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
@@ -67,6 +71,9 @@ app.use("/api/events",            eventRoute);
 app.use("/api/results",           authenticate, resultsRoutes);
 app.use("/api/library",           libraryRoutes);
 app.use("/api/assessments", authenticate, assessmentRoutes);
+
+app.use("/api/resources", authenticate, resourceRoutes);
+app.use("/api/bookings", authenticate, bookingRoutes);
 
 app.use("/api/courses",  courseRoutes);
 app.use("/api/classes",  classRoutes);
@@ -90,6 +97,9 @@ app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
+app.use("/api/mentorships", mentorshipRoutes);
+app.use("/api/complaints", complaintRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Health check
 app.get("/", (_req, res) => {
