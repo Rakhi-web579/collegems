@@ -45,50 +45,60 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+
+        <Route
+          path="/examschedule"
+          element={
+            <ProtectedRoute>
+              <ExamSchedule />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/results"
+          element={
+            <ProtectedRoute>
+              <StudentResults />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <EventsStudent />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/verify/student/:studentId"
           element={<VerifyStudent />}
         />
-
-        {/* Dashboard Layout */}
-        <Route element={<DashboardLayout />}>
-
-          {/* Student/User Pages */}
-          <Route path="/examschedule" element={<ExamSchedule />} />
-          <Route path="/results" element={<StudentResults />} />
-          <Route path="/events" element={<EventsStudent />} />
-
-          <Route
-            path="/courses"
-            element={
-              <ProtectedRoute>
-                <Courses />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/faculty"
-            element={
-              <ProtectedRoute>
-                <Teachers />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="/quickaccess" element={<QuickAccessAll />} />
-
-          {/* Your Added Feature */}
-          <Route path="/lost-found" element={<LostFoundPortal />} />
-
-          <Route path="/timetable" element={<TimeTable />} />
-
-          {/* Existing Project Features */}
-          <Route path="/library" element={<Library />} />
-
-        </Route>
-
-        {/* Student Routes */}
+        <Route
+          path="/timetable"
+          element={
+            <ProtectedRoute>
+              <div>Timetable Page</div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty"
+          element={
+            <ProtectedRoute>
+              <Teachers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quickaccess"
+          element={
+            <ProtectedRoute>
+              <QuickAccessAll />
+            </ProtectedRoute>
+          }
+        />
+       
         <Route
           path="/student/dashboard"
           element={

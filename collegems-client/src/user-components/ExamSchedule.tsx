@@ -25,7 +25,6 @@ const ExamSchedule: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  useTheme();
 
   useEffect(() => {
     fetchExamSchedules();
