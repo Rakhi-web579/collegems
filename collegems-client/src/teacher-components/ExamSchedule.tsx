@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
 import {
   Calendar, Clock, MapPin, BookOpen, Search, Filter, ChevronDown,
   Plus, RefreshCw, Edit, Trash2, X, CheckCircle, AlertCircle,
