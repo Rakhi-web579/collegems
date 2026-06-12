@@ -44,8 +44,6 @@ import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
 import auditLogRoutes from "./routes/auditLog.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
-import mentorshipRoutes from "./routes/mentorship.routes.js";
-import complaintRoutes from "./routes/complaint.routes.js";
 import placementRoutes from "./routes/placement.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
@@ -97,7 +95,7 @@ app.use("/api/feedback",        authenticate, feedbackRoutes);
 app.use("/api/placements",      authenticate, placementRoutes);
 app.use("/api/achievements",    authenticate, achievementRoutes); // ← NEW
 app.use("/api/student/idcard", idCardRoutes);
-app.get("/api/verify/student/:studentId", verifyStudent);
+app.get("/api/verify/student/:studentId", authenticate, verifyStudent);
 app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
