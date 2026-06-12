@@ -44,6 +44,9 @@ import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
 import auditLogRoutes from "./routes/auditLog.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
+import mentorshipRoutes from "./routes/mentorship.routes.js";
+import complaintRoutes from "./routes/complaint.routes.js";
+import placementRoutes from "./routes/placement.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
@@ -75,7 +78,7 @@ app.use("/api/assessments", authenticate, assessmentRoutes);
 
 app.use("/api/resources", authenticate, resourceRoutes);
 app.use("/api/bookings", authenticate, bookingRoutes);
-
+app.use("/api/mentorships", authenticate, mentorshipRoutes);
 app.use("/api/courses",  courseRoutes);
 app.use("/api/classes",  classRoutes);
 
@@ -91,6 +94,7 @@ app.use("/api/academic-calendar", academicCalendarRoutes);
 app.use("/api/syllabus", authenticate, syllabusRoutes);
 app.use("/api/reports",         reportRoutes);
 app.use("/api/feedback",        authenticate, feedbackRoutes);
+app.use("/api/placements",      authenticate, placementRoutes);
 app.use("/api/achievements",    authenticate, achievementRoutes); // ← NEW
 app.use("/api/student/idcard", idCardRoutes);
 app.get("/api/verify/student/:studentId", verifyStudent);

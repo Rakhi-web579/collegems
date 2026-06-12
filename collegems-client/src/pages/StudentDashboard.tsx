@@ -24,6 +24,8 @@ import {
   Wallet,
   X,
   AlertCircle,
+  TrendingUp,
+  Briefcase,
   GraduationCap,
   Users,
   IdCard,
@@ -44,6 +46,8 @@ import Fees from "../user-components/Fee";
 import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+import PlacementEligibility from "../user-components/PlacementEligibility";
 
 import Scholarships from "../common-components-management/Scholarships";
 // import IDCard from "../user-components/IDCard";
@@ -73,6 +77,10 @@ type TabType =
   | "library"
   | "exam-form"
   | "my-seat"
+  | "placement"
+  | "faculty"
+  | "scholarships"
+  | "id-card"
   | "feedback"
   | "bus-routes"
   | "settings"
@@ -99,6 +107,7 @@ const navigationItems = [
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
   //{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
+  { id: "placement" as TabType, label: "Placement", icon: Briefcase },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
@@ -229,6 +238,10 @@ export default function StudentDashboard() {
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "faculty" && <FacultyView />}
         {activeTab === "book-resources" && <ResourceBooking />}
+        {activeTab === "placement" && <PlacementEligibility />}
+        {activeTab === "scholarships" && <Scholarships />}
+        {activeTab === "id-card" && <IDCard student={student} />}
+        {activeTab === "faculty" && <Teachers />}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>
     );
