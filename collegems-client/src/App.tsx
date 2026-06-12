@@ -35,24 +35,30 @@ import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Public Routes */}
-        <Route path="/" element={<MainDashboard />} />
+        {/* <Route path="/" element={<MainDashboard />} /> */}
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route
-          path="/verify/student/:studentId"
-          element={<VerifyStudent />}
-        />
+        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
 
         {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>
-
           {/* Student/User Pages */}
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
@@ -85,7 +91,6 @@ export default function App() {
 
           {/* Existing Project Features */}
           <Route path="/library" element={<Library />} />
-
         </Route>
 
         {/* Student Routes */}
@@ -225,7 +230,6 @@ export default function App() {
             </RoleRoute>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );
