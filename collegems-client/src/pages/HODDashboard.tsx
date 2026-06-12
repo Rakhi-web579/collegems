@@ -1,65 +1,186 @@
-  import { useEffect, useMemo, useState } from "react";
-  import { useNavigate } from "react-router-dom";
-  import {
-    LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
-    Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
-    Bell, Search, LogOut, Settings, CalendarDays,
-    Moon, Sun, Award, MessageSquare, Bus, ShieldAlert
-  } from "lucide-react";
-  import { useTheme } from "../context/ThemeContext";
-  import api from "../api/axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
+import {
+  LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
+  Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
+  Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
+  Moon, Sun,
+} from "lucide-react";
+import api from "../api/axios";
+import Students from "../common-components-management/Students";
+import HODSalary from "../hod-components/Salary";
+import HODTeacherAttendance from "../hod-components/TeacherAttendance";
+import AcademicCalendar from "../common-components-management/AcademicCalendar";
+import Teachers from "../hod-components/Teachers";
+import Library from "../common-components-management/Library";
+import HODSettings from "../hod-components/Settings";
+import HODCourses from "../hod-components/Courses";
+import HODExamForms from "../hod-components/ExamForms";
 
-  import AcademicCalendar from "../common-components-management/AcademicCalendar";
-  import BusRoutes from "../common-components-management/BusRoutes";
-  import Library from "../common-components-management/Library";
-  import Students from "../common-components-management/Students";
+type TabType =
+  | "overview"
+  | "teachers"
+  | "teachers-attendance"
+  | "students"
+  | "courses"
+  | "classes"
+  | "syllabus"
+  | "fees"
+  | "salary"
+  | "examSchedule"
+  | "events"
+  | "academic-calendar"
+  | "library"
+  | "settings"
+  | "reports"
+  | "exam-forms";
 
-  import FeedbackManagement from "../hod-components/FeedbackManagement";
-  import ExamForms from "../hod-components/ExamForms";
-  import ExamHalls from "../hod-components/ExamHalls";
-  import HallAllocation from "../hod-components/HallAllocation";
-  import MentorAssignment from "../hod-components/MentorAssignment";
-  import HODCourses from "../hod-components/Courses";
-  import HODSalary from "../hod-components/Salary";
-  import HODSettings from "../hod-components/Settings";
-  import HODTeacherAttendance from "../hod-components/TeacherAttendance";
-  import Teachers from "../hod-components/Teachers";
-  import AuditLogs from "../hod-components/AuditLogs";
-  import BookingManagement from "../hod-components/BookingManagement";
-  import ResourceManagement from "../hod-components/ResourceManagement";
-  import AnnouncementForm from "../common-components-management/AnnouncementForm";
-  import AnnouncementManage from "../common-components-management/AnnouncementManage";
-  import Scholarships from "../common-components-management/Scholarships";
-  type TabType =
-    | "overview"
-    | "teachers"
-    | "teachers-attendance"
-    | "students"
-    | "courses"
-    | "classes"
-    | "syllabus"
-    | "fees"
-    | "salary"
-    | "examSchedule"
-    | "events"
-    | "academic-calendar"
-    | "library"
-    | "settings"
-    | "reports"
-    | "feedback"
-    | "exam-forms"
-    | "scholarships"
-    | "bus-routes"
-    | "exam-halls"
-    | "hall-allocation"
-    | "audit-logs"
-    | "manage-bookings"
-    | "manage-resources"
-    | "announcements";
+interface Data {
+  cards: Array<{ title: string; value: number }>;
+  totalStudents: number;
+  totalTeachers: number;
+  totalCourses: number;
+  totalClassess: number;
+}
 
-  interface Data {
-    cards?: Array<{ title: string; value: number | string }>;
-  }
+interface ProfileData {
+  name: string; email: string; phone?: string;
+  department?: string; departmentCode?: string;
+  role: string; avatarUrl?: string;
+}
+
+export default function HODDashboard() {
+  const navigate = useNavigate();
+  const { darkMode, toggleTheme } = useTheme();
+  const [data, setData] = useState<Data | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileRefreshing, setProfileRefreshing] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState<Date | null>(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [searchData, setSearchData] = useState({
+    students: [],
+    teachers: [],
+    courses: [],
+  });
+
+  const [searchResults, setSearchResults] = useState({
+    students: [],
+    teachers: [],
+    courses: [],
+  });
+
+  useEffect(() => {
+    fetchDashboardData();
+    fetchProfileData();
+    fetchSearchData();
+    const refreshProfile = () => fetchProfileData(true);
+    const profileInterval = window.setInterval(refreshProfile, 15000);
+    window.addEventListener("focus", refreshProfile);
+    return () => {
+      window.clearInterval(profileInterval);
+      window.removeEventListener("focus", refreshProfile);
+    };
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/dashboard");
+      setData(res.data);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProfileData = async (silent = false) => {
+    try {
+      if (silent) setProfileRefreshing(true);
+      else setProfileLoading(true);
+      const res = await api.get("/users/me");
+      const user = res.data;
+      if (user?.role !== "hod") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userData");
+        navigate("/login", { replace: true });
+        return;
+      }
+      setProfile({
+        name: user.name || "", email: user.email || "",
+        phone: user.phone || "", department: user.department || "",
+        departmentCode: user.departmentCode || "", role: user.role || "hod",
+        avatarUrl: user.avatarUrl || user.profilePicture || user.photo,
+      });
+      setProfileError(null);
+      setProfileUpdatedAt(new Date());
+    } catch (error: any) {
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userData");
+        navigate("/login", { replace: true });
+        return;
+      }
+      setProfileError(error?.response?.data?.message || "Unable to load HOD profile.");
+    } finally {
+      setProfileLoading(false);
+      setProfileRefreshing(false);
+    }
+  };
+
+  const fetchSearchData = async () => {
+    try {
+      const [studentsRes, teachersRes, coursesRes] = await Promise.all([
+        api.get("/users/students"),
+        api.get("/users/teachers"),
+        api.get("/courses/all"),
+      ]);
+
+      setSearchData({
+        students: studentsRes.data || [],
+        teachers: teachersRes.data || [],
+        courses: coursesRes.data || [],
+      });
+    } catch (error) {
+      console.error("Error loading search data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults({
+        students: [],
+        teachers: [],
+        courses: [],
+      });
+      return;
+    }
+
+    const query = searchTerm.toLowerCase();
+
+    setSearchResults({
+      students: searchData.students.filter(
+        (student: any) =>
+          student.name?.toLowerCase().includes(query) ||
+          student.email?.toLowerCase().includes(query)
+      ),
+
+      teachers: searchData.teachers.filter(
+        (teacher: any) =>
+          teacher.name?.toLowerCase().includes(query) ||
+          teacher.email?.toLowerCase().includes(query)
+      ),
 
   
 
