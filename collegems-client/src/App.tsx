@@ -26,9 +26,30 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
 
-        <Route path="/examschedule" element={<ExamSchedule />} />
-        <Route path="/results" element={<StudentResults />} />
-        <Route path="/events" element={<EventsStudent />} />
+        <Route
+          path="/examschedule"
+          element={
+            <ProtectedRoute>
+              <ExamSchedule />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/results"
+          element={
+            <ProtectedRoute>
+              <StudentResults />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <EventsStudent />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/courses"
           element={
@@ -37,9 +58,30 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/timetable" element={<div>Timetable Page</div>} />
-        <Route path="/faculty" element={<Teachers />} />
-          <Route path="/quickaccess" element={<QuickAccessAll />} />
+        <Route
+          path="/timetable"
+          element={
+            <ProtectedRoute>
+              <div>Timetable Page</div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty"
+          element={
+            <ProtectedRoute>
+              <Teachers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quickaccess"
+          element={
+            <ProtectedRoute>
+              <QuickAccessAll />
+            </ProtectedRoute>
+          }
+        />
        
         <Route
           path="/student/dashboard"

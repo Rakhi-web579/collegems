@@ -28,7 +28,6 @@ const Courses: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  useTheme();
 
   useEffect(() => {
     const fetchCourses = async () => {

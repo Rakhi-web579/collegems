@@ -20,8 +20,6 @@ interface ExamSchedule {
 }
 
 const ExamSchedule: React.FC = () => {
-  useTheme();
-
   const [examName, setExamName] = useState("");
   const [course, setCourse] = useState("");
   const [examDate, setExamDate] = useState("");
