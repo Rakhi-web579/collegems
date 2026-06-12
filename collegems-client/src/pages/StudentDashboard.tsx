@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import FacultyView from "../user-components/FacultyView";
+import { Users } from "lucide-react";
 import {
   AwardIcon,
   Bell,
@@ -21,7 +21,6 @@ import {
   Settings,
   Sun,
   Trophy,
-  TrendingUp,
   Wallet,
   X,
   AlertCircle,
@@ -45,15 +44,18 @@ import Fees from "../user-components/Fee";
 import StudentFeedback from "../user-components/Feedback";
 import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
+
 import Scholarships from "../common-components-management/Scholarships";
 // import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
+
+import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import ResourceBooking from "../user-components/ResourceBooking";
-import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+import AnnouncementsView from "../user-components/AnnouncementsView";
 
 type TabType =
   | "overview"
@@ -66,6 +68,7 @@ type TabType =
   | "events"
   | "results"
   | "achievements"
+  | "announcements"
   | "leave"
   | "library"
   | "exam-form"
@@ -79,6 +82,7 @@ type TabType =
 
 const navigationItems = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
+  { id: "announcements" as TabType, label: "Announcements", icon: Bell },
   { id: "attendance" as TabType, label: "Attendance", icon: CalendarCheck },
   { id: "assignments" as TabType, label: "Assignments", icon: FileText },
   { id: "fees" as TabType, label: "Fees", icon: Wallet },
@@ -93,7 +97,7 @@ const navigationItems = [
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
-{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
+  //{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
@@ -217,6 +221,7 @@ export default function StudentDashboard() {
         {activeTab === "events" && <EventsStudent />}
         {activeTab === "results" && <StudentResults />}
         {activeTab === "achievements" && <StudentAchievements />}
+        {activeTab === "announcements" && <AnnouncementsView />}
         {activeTab === "leave" && <LeaveRequest />}
         {activeTab === "library" && <Library />}
         {activeTab === "exam-form" && <ExaminationForm />}
@@ -344,12 +349,12 @@ export default function StudentDashboard() {
           {activeTab === "overview" ? (
             <div className="space-y-8">
               {/* Profile Completion */}
-{profileData?.profileCompletion && (
-  <ProfileCompletionCard
-    percentage={profileData.profileCompletion.percentage}
-    missingFields={profileData.profileCompletion.missingFields}
-  />
-)}
+              {profileData?.profileCompletion && (
+                <ProfileCompletionCard
+                  percentage={profileData.profileCompletion.percentage}
+                  missingFields={profileData.profileCompletion.missingFields}
+                />
+              )}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

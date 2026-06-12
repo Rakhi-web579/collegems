@@ -35,6 +35,7 @@ import leaveRoutes from "./routes/leave.routes.js";
 import scholarshipRoutes from "./routes/scholarship.routes.js";
 import idCardRoutes from "./routes/idcard.routes.js";
 import { verifyStudent } from "./controllers/idcard.controller.js";
+import announcementRoutes from "./routes/announcement.routes.js";  // announcement
 import busRouteRoutes from "./routes/busRoute.routes.js";
 import syllabusRoutes from "./routes/syllabus.route.js";
 import officeHoursRoutes from "./routes/officeHours.routes.js";
@@ -45,6 +46,8 @@ import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
+import { errorHandler } from "./middlewares/errorHandler.middleware.js";
+import log from "./utils/logger.js";
 
 const app = express();
 
@@ -97,9 +100,24 @@ app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
 app.use("/api/mentorships", mentorshipRoutes);
 app.use("/api/complaints", complaintRoutes);
-app.use("/api/notifications", notificationRoutes);
+app.use("/api/announcements", announcementRoutes);  // aannouncements
 
 // Health check
-app.get("/", (_req, res) => res.send("SCMS Backend Running 🚀"));
+app.get("/", (_req, res) => {
+  log.request("GET", "/", "health-check");
+  res.send("SCMS Backend Running");
+});
+
+// 404 handler
+app.use((_req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    errorCode: "ROUTE_NOT_FOUND",
+  });
+});
+
+// Global error handler (must be last)
+app.use(errorHandler);
 
 export default app;

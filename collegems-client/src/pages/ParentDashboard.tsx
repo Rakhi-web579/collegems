@@ -27,10 +27,18 @@ import Attendance from "../user-components/Attendance";
 import Fees from "../user-components/Fee";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
-import ResourceBooking from "../user-components/ResourceBooking";
-import NotificationBell from "../common-components-management/NotificationBell";
-import { useNotifications } from "../hooks/useNotifications";
-import { formatDistanceToNow } from "date-fns";
+import AnnouncementsView from "../user-components/AnnouncementsView";
+
+
+type TabType =
+  | "overview"
+  | "attendance"
+  | "results"
+  | "fees"
+  | "events"
+  | "bus-routes"
+  | "announcements";   
+
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
@@ -78,6 +86,7 @@ export default function ParentDashboard() {
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutGrid },
+    { id: "announcements", label: "Announcements", icon: Bell },
     { id: "attendance", label: "Child's Attendance", icon: CalendarCheck },
     { id: "results", label: "Child's Results", icon: AwardIcon },
     { id: "fees", label: "Child's Fees", icon: Wallet },
@@ -452,6 +461,7 @@ export default function ParentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "bus-routes" && <BusRoutes />}
+              {activeTab === "announcements" && <AnnouncementsView />}
             </div>
           )}
 
