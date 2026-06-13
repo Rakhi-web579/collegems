@@ -9,6 +9,7 @@ import {
   getPreferences,
   updatePreferences,
   getStudentProfile,
+  getStudents,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -34,18 +35,12 @@ router.put(
   updatePreferences,
 );
 
-// Teacher fetches all students
+// Teacher fetches all students (Paginated)
 router.get(
   "/students",
   protect,
   authorize("teacher", "hod"),
-  async (req, res) => {
-    const students = await User.find({ role: "student" }).select(
-      "name email role studentId course semester",
-    );
-
-    res.json(students);
-  },
+  getStudents
 );
 
 router.get(
