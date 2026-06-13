@@ -8,6 +8,7 @@ import { startFeeCronJobs } from "./src/utils/cronJobs.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import { initializeStudyGroupSockets } from "./src/socket/studyGroupSocket.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -66,6 +67,8 @@ io.on("connection", (socket) => {
     if (userId) console.log(`User disconnected from socket: ${userId}`);
   });
 });
+
+initializeStudyGroupSockets(io);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -46,6 +46,7 @@ import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import placementRoutes from "./routes/placement.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
+import studyGroupRoutes from "./routes/studyGroup.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import log from "./utils/logger.js";
@@ -103,6 +104,7 @@ app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
 app.use("/api/mentorships", mentorshipRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/announcements", announcementRoutes);  // aannouncements
+app.use("/api/study-groups", studyGroupRoutes);
 
 // Health check
 app.get("/", (_req, res) => {
