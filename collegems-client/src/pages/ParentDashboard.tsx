@@ -29,7 +29,8 @@ import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
 import AnnouncementsView from "../user-components/AnnouncementsView";
 import { extractArray } from "../utils/apiHelpers";
-import { useNotifications } from "../hooks/useNotifications"; // ✅ ADD THIS
+import NotificationBell from "../common-components-management/NotificationBell";
+import { useNotifications } from "../hooks/useNotifications"; 
 import { formatDistanceToNow } from "date-fns";
 
 type TabType =

@@ -14,6 +14,7 @@ import {
   Printer,
 } from "lucide-react";
 import axios from "../api/axios";
+import { extractArray } from "../utils/apiHelpers";
 
 
 interface Course {
