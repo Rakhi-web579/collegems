@@ -35,6 +35,8 @@ import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
+import StudyGroupList from "./pages/StudyGroups/StudyGroupList";
+import StudyRoom from "./pages/StudyGroups/StudyRoom";
 
 export default function App() {
   return (
@@ -91,6 +93,24 @@ export default function App() {
 
           {/* Existing Project Features */}
           <Route path="/library" element={<Library />} />
+          
+          {/* Real-time Collaboration Features */}
+          <Route
+            path="/study-groups"
+            element={
+              <ProtectedRoute>
+                <StudyGroupList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/study-groups/:id"
+            element={
+              <ProtectedRoute>
+                <StudyRoom />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Student Routes */}

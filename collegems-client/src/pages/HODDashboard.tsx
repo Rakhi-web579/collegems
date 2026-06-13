@@ -31,6 +31,8 @@ const ResourceManagement = () => <div>ResourceManagement</div>;
 
 type TabType =
   | "overview"
+  | "analytics"
+  | "announcements"
   | "teachers"
   | "teachers-attendance"
   | "students"
@@ -65,9 +67,13 @@ interface Data {
 }
 
 interface ProfileData {
-  name: string; email: string; phone?: string;
-  department?: string; departmentCode?: string;
-  role: string; avatarUrl?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  department?: string;
+  departmentCode?: string;
+  role: string;
+  avatarUrl?: string;
 }
 
 export default function HODDashboard() {
