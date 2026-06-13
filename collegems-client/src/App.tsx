@@ -41,8 +41,6 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        {/* <Route path="/" element={<MainDashboard />} /> */}
-
         <Route
           path="/"
           element={
