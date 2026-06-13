@@ -48,6 +48,7 @@ import bookingRoutes from "./routes/booking.routes.js";
 import placementRoutes from "./routes/placement.routes.js";
 import alumniRoutes from "./routes/alumni.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
+import studyGroupRoutes from "./routes/studyGroup.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import log from "./utils/logger.js";
