@@ -99,7 +99,12 @@ const FacultyAssignment: React.FC = () => {
       const params: Record<string, string> = { academicYear: filterYear };
       if (filterSemester) params.semester = filterSemester;
       const res = await api.get("/faculty-assignments/all", { params });
-      setAssignments(res.data);
+      
+      // Safety Check
+      if (Array.isArray(res.data)) setAssignments(res.data);
+      else if (res.data?.data && Array.isArray(res.data.data)) setAssignments(res.data.data);
+      else setAssignments([]);
+
     } catch {
       showToast("error", "Failed to load assignments");
     } finally {
@@ -112,7 +117,7 @@ const FacultyAssignment: React.FC = () => {
       const res = await api.get("/faculty-assignments/workload", {
         params: { academicYear: filterYear },
       });
-      setWorkload(res.data.workload);
+      setWorkload(Array.isArray(res.data?.workload) ? res.data.workload : []);
     } catch {
       showToast("error", "Failed to load workload data");
     }
@@ -124,8 +129,21 @@ const FacultyAssignment: React.FC = () => {
         api.get("/users/teachers"),
         api.get("/courses/all"),
       ]);
-      setTeachers(tRes.data);
-      setCourses(cRes.data);
+      
+      // Safety Checks for Teachers
+      const fetchedTeachers = tRes.data;
+      if (Array.isArray(fetchedTeachers)) setTeachers(fetchedTeachers);
+      else if (fetchedTeachers?.data && Array.isArray(fetchedTeachers.data)) setTeachers(fetchedTeachers.data);
+      else if (fetchedTeachers?.teachers && Array.isArray(fetchedTeachers.teachers)) setTeachers(fetchedTeachers.teachers);
+      else setTeachers([]);
+
+      // Safety Checks for Courses
+      const fetchedCourses = cRes.data;
+      if (Array.isArray(fetchedCourses)) setCourses(fetchedCourses);
+      else if (fetchedCourses?.data && Array.isArray(fetchedCourses.data)) setCourses(fetchedCourses.data);
+      else if (fetchedCourses?.courses && Array.isArray(fetchedCourses.courses)) setCourses(fetchedCourses.courses);
+      else setCourses([]);
+
     } catch {
       showToast("error", "Failed to load form data");
     }
@@ -164,7 +182,8 @@ const FacultyAssignment: React.FC = () => {
   };
 
   const handleCourseChange = (courseId: string) => {
-    const course = courses.find((c) => c._id === courseId);
+    const safeCourses = Array.isArray(courses) ? courses : [];
+    const course = safeCourses.find((c) => c._id === courseId);
     setForm((f) => ({
       ...f,
       course: courseId,
@@ -212,18 +231,20 @@ const FacultyAssignment: React.FC = () => {
   };
 
   // ─── Filtering ──────────────────────────────────────────────────────────────
-  const filtered = assignments.filter((a) => {
+  const safeAssignments = Array.isArray(assignments) ? assignments : [];
+  const filtered = safeAssignments.filter((a) => {
     const q = search.toLowerCase();
     return (
-      a.faculty.name.toLowerCase().includes(q) ||
-      a.course.name.toLowerCase().includes(q) ||
-      a.course.code.toLowerCase().includes(q) ||
-      a.section.toLowerCase().includes(q)
+      a.faculty?.name?.toLowerCase().includes(q) ||
+      a.course?.name?.toLowerCase().includes(q) ||
+      a.course?.code?.toLowerCase().includes(q) ||
+      a.section?.toLowerCase().includes(q)
     );
   });
 
   // ─── Stats ──────────────────────────────────────────────────────────────────
-  const overloadedCount = workload.filter((w) => w.isOverloaded).length;
+  const safeWorkload = Array.isArray(workload) ? workload : [];
+  const overloadedCount = safeWorkload.filter((w) => w.isOverloaded).length;
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -272,19 +293,19 @@ const FacultyAssignment: React.FC = () => {
         {[
           {
             label: "Total Assignments",
-            value: assignments.length,
+            value: safeAssignments.length,
             icon: <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
             bg: "bg-blue-50 dark:bg-blue-900/30",
           },
           {
             label: "Faculty Assigned",
-            value: new Set(assignments.map((a) => a.faculty._id)).size,
+            value: new Set(safeAssignments.filter(a => a.faculty?._id).map((a) => a.faculty._id)).size,
             icon: <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
             bg: "bg-emerald-50 dark:bg-emerald-900/30",
           },
           {
             label: "Sections Covered",
-            value: new Set(assignments.map((a) => a.section)).size,
+            value: new Set(safeAssignments.filter(a => a.section).map((a) => a.section)).size,
             icon: <UserCheck className="w-5 h-5 text-purple-600 dark:text-purple-400" />,
             bg: "bg-purple-50 dark:bg-purple-900/30",
           },
@@ -408,14 +429,14 @@ const FacultyAssignment: React.FC = () => {
                       <tr key={a._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                         <td className="px-4 py-3">
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white">{a.faculty.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{a.faculty.teacherId}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{a.faculty?.name || "Unknown"}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{a.faculty?.teacherId || "N/A"}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white">{a.course.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{a.course.code}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{a.course?.name || "Unknown"}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{a.course?.code || "N/A"}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -449,7 +470,7 @@ const FacultyAssignment: React.FC = () => {
                 </table>
               </div>
               <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
-                Showing {filtered.length} of {assignments.length} assignments
+                Showing {filtered.length} of {safeAssignments.length} assignments
               </div>
             </div>
           )}
@@ -469,7 +490,7 @@ const FacultyAssignment: React.FC = () => {
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {workload.map((w) => {
+            {safeWorkload.map((w) => {
               const pct = Math.min((w.assignmentCount / w.workloadLimit) * 100, 100);
               const color =
                 w.isOverloaded
@@ -507,7 +528,7 @@ const FacultyAssignment: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {w.sections.map((sec) => (
+                    {(Array.isArray(w.sections) ? w.sections : []).map((sec) => (
                       <span key={sec} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded">
                         Sec {sec}
                       </span>
@@ -516,7 +537,7 @@ const FacultyAssignment: React.FC = () => {
                 </div>
               );
             })}
-            {workload.length === 0 && (
+            {safeWorkload.length === 0 && (
               <div className="col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
                 <BarChart2 className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                 <p className="text-gray-500 dark:text-gray-400">No workload data for {filterYear}</p>
@@ -558,7 +579,7 @@ const FacultyAssignment: React.FC = () => {
                     onChange={(e) => setForm((f) => ({ ...f, faculty: e.target.value }))}
                   >
                     <option value="">Select faculty…</option>
-                    {teachers.map((t) => (
+                    {(Array.isArray(teachers) ? teachers : []).map((t) => (
                       <option key={t._id} value={t._id}>
                         {t.name} ({t.teacherId})
                       </option>
@@ -575,7 +596,7 @@ const FacultyAssignment: React.FC = () => {
                     onChange={(e) => handleCourseChange(e.target.value)}
                   >
                     <option value="">Select course…</option>
-                    {courses.map((c) => (
+                    {(Array.isArray(courses) ? courses : []).map((c) => (
                       <option key={c._id} value={c._id}>
                         {c.name} ({c.code})
                       </option>

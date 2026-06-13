@@ -1,6 +1,4 @@
 // FILE: collegems-server/src/app.js
-// WHAT CHANGED: added 2 lines for feedback routes (marked ← NEW)
-// Everything else is identical to your original file.
 
 import express from "express";
 import cors from "cors";
@@ -22,20 +20,19 @@ import eventRoute from "./routes/event.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
 import libraryRoutes from "./routes/library.routes.js";
 import assessmentRoutes from "./routes/assessment.routes.js";
-import mentorshipRoutes from "./routes/mentorship.routes.js";
-import complaintRoutes from "./routes/complaint.routes.js";
+
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
 import reportRoutes from "./routes/report.routes.js";
-import feedbackRoutes from "./routes/feedback.routes.js"; // ← NEW
-import achievementRoutes from "./routes/achievement.routes.js"; // ← NEW
+import feedbackRoutes from "./routes/feedback.routes.js"; 
+import achievementRoutes from "./routes/achievement.routes.js"; 
 import examFormRoutes from "./routes/examForm.routes.js";
 import leaveRoutes from "./routes/leave.routes.js";
 import scholarshipRoutes from "./routes/scholarship.routes.js";
 import idCardRoutes from "./routes/idcard.routes.js";
 import { verifyStudent } from "./controllers/idcard.controller.js";
-import announcementRoutes from "./routes/announcement.routes.js";  // announcement
+import announcementRoutes from "./routes/announcement.routes.js";  
 import busRouteRoutes from "./routes/busRoute.routes.js";
 import syllabusRoutes from "./routes/syllabus.route.js";
 import officeHoursRoutes from "./routes/officeHours.routes.js";
@@ -48,6 +45,10 @@ import mentorshipRoutes from "./routes/mentorship.routes.js";
 import complaintRoutes from "./routes/complaint.routes.js";
 import placementRoutes from "./routes/placement.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
+
+// ← NEW NOTIFICATION ROUTE IMPORT
+import notificationRoutes from "./routes/notification.routes.js"; 
+
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import log from "./utils/logger.js";
@@ -95,7 +96,7 @@ app.use("/api/syllabus", authenticate, syllabusRoutes);
 app.use("/api/reports",         reportRoutes);
 app.use("/api/feedback",        authenticate, feedbackRoutes);
 app.use("/api/placements",      authenticate, placementRoutes);
-app.use("/api/achievements",    authenticate, achievementRoutes); // ← NEW
+app.use("/api/achievements",    authenticate, achievementRoutes); 
 app.use("/api/student/idcard", idCardRoutes);
 app.get("/api/verify/student/:studentId", verifyStudent);
 app.use("/api/bus-routes", authenticate, busRouteRoutes);
@@ -104,7 +105,10 @@ app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
 app.use("/api/mentorships", mentorshipRoutes);
 app.use("/api/complaints", complaintRoutes);
-app.use("/api/announcements", announcementRoutes);  // aannouncements
+app.use("/api/announcements", announcementRoutes);  
+
+// ← NEW NOTIFICATION ROUTE REGISTRATION
+app.use("/api/notifications", authenticate, notificationRoutes);
 
 // Health check
 app.get("/", (_req, res) => {

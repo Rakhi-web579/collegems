@@ -45,8 +45,9 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
   const [courses, setCourses] = useState<{ _id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
+const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -60,12 +61,25 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [dashboardRes, coursesRes] = await Promise.all([
+     const [dashboardRes, coursesRes] = await Promise.all([
         api.get("/dashboard"),
         api.get("/courses/all"),
       ]);
       setData(dashboardRes.data);
-      setCourses(coursesRes.data);
+      
+      // --- NEW SAFTEY CHECK FOR COURSES ---
+      const fetchedCourses = coursesRes.data;
+      if (Array.isArray(fetchedCourses)) {
+        setCourses(fetchedCourses);
+      } else if (fetchedCourses && Array.isArray(fetchedCourses.data)) {
+        setCourses(fetchedCourses.data);
+      } else if (fetchedCourses && Array.isArray(fetchedCourses.courses)) {
+        setCourses(fetchedCourses.courses);
+      } else {
+        setCourses([]); // Fallback to an empty array to prevent crashes
+      }
+      // ------------------------------------
+
       setUpcomingClasses([
         { id: 1, course: "Mathematics 101", time: "10:00 AM", room: "Room 301", status: "upcoming", students: 28 },
         { id: 2, course: "Physics 201", time: "2:00 PM", room: "Lab 204", status: "upcoming", students: 24 },

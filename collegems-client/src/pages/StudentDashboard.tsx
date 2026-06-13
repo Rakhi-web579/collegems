@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Users } from "lucide-react";
 import {
   AwardIcon,
   Bell,
@@ -32,10 +31,16 @@ import {
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
+
+// Common Components
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
 import AssignmentReminder from "../common-components-management/AssignmentReminder";
 import BusRoutes from "../common-components-management/BusRoutes";
 import Library from "../common-components-management/Library";
+import Scholarships from "../common-components-management/Scholarships";
+import Teachers from "../hod-components/Teachers";
+
+// Student Components
 import Assignment from "../user-components/Assignment";
 import Attendance from "../user-components/Attendance";
 import Courses from "../user-components/Courses";
@@ -48,18 +53,12 @@ import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import PlacementEligibility from "../user-components/PlacementEligibility";
-
-import Scholarships from "../common-components-management/Scholarships";
-// import IDCard from "../user-components/IDCard";
-import Teachers from "../hod-components/Teachers";
-
-import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
-import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import ResourceBooking from "../user-components/ResourceBooking";
 import AnnouncementsView from "../user-components/AnnouncementsView";
+// import IDCard from "../user-components/IDCard";
 
 type TabType =
   | "overview"
@@ -83,8 +82,6 @@ type TabType =
   | "id-card"
   | "feedback"
   | "bus-routes"
-  | "settings"
-  | "faculty"
   | "book-resources"
   | "settings";
 
@@ -105,11 +102,10 @@ const navigationItems = [
   { id: "library" as TabType, label: "Library", icon: BookOpen },
   { id: "exam-form" as TabType, label: "Examination Form", icon: FileText },
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
-  //{ id: "id-card" as TabType, label: "ID Card", icon: IdCard },
+  // { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
   { id: "placement" as TabType, label: "Placement", icon: Briefcase },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
-  { id: "faculty" as TabType, label: "Subject Faculty", icon: GraduationCap },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
 ];
 
@@ -119,14 +115,14 @@ export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [, setShowScheduleModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchProfile();
   }, []);
-    useEffect(() => {
+
   const fetchProfile = async () => {
     try {
       const res = await api.get("/users/me");
@@ -135,9 +131,6 @@ export default function StudentDashboard() {
       console.error("Profile fetch error:", err);
     }
   };
-  fetchProfile();
-}, []);
- 
 
   const fetchDashboardData = async () => {
     try {
@@ -170,11 +163,11 @@ export default function StudentDashboard() {
     return "Good evening";
   };
 
-
   const renderTab = () => {
     if (activeTab === "overview") {
       return (
         <div className="space-y-8">
+          {/* Notifications Alerts */}
           {data?.notifications && data.notifications.length > 0 && (
             <div className="space-y-4">
               {data.notifications.map((notif: any, idx: number) => (
@@ -188,38 +181,183 @@ export default function StudentDashboard() {
               ))}
             </div>
           )}
+
+          {/* Profile Completion */}
+          {profileData?.profileCompletion && (
+            <ProfileCompletionCard
+              percentage={profileData.profileCompletion.percentage}
+              missingFields={profileData.profileCompletion.missingFields}
+            />
+          )}
+
+          {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: "Attendance", value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%", icon: CalendarCheck, color: "bg-blue-50 text-blue-700" },
-              { title: "Pending Assignments", value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0", icon: FileText, color: "bg-amber-50 text-amber-700" },
-              { title: "Fee Due", value: `Rs ${data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"}`, icon: Wallet, color: "bg-emerald-50 text-emerald-700" },
-              { title: "Courses", value: "Active", icon: BookOpen, color: "bg-purple-50 text-purple-700" },
-            ].map((stat) => {
+              {
+                title: "Attendance",
+                value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%",
+                icon: CalendarCheck,
+                color: "blue",
+                trend: "Overall",
+              },
+              {
+                title: "Pending Assignments",
+                value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0",
+                icon: FileText,
+                color: "amber",
+                trend: "Current",
+              },
+              {
+                title: "Fee Due",
+                value: "₹" + (data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"),
+                icon: Wallet,
+                color: "emerald",
+                trend: "Total",
+              },
+              {
+                title: "Courses",
+                value: "Active",
+                icon: BookOpen,
+                color: "purple",
+                trend: "Active",
+              },
+            ].map((stat, index) => {
               const Icon = stat.icon;
+              const colorClasses = {
+                blue: "bg-blue-50 text-blue-700",
+                amber: "bg-amber-50 text-amber-700",
+                emerald: "bg-emerald-50 text-emerald-700",
+                purple: "bg-purple-50 text-purple-700",
+              }[stat.color as string];
+
               return (
-                <div key={stat.title} className="bg-white rounded-xl border border-gray-200 p-6">
+                <div key={index} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
                       <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${stat.color}`}>
+                    <div className={`p-3 rounded-lg ${colorClasses}`}>
                       <Icon className="w-5 h-5" />
                     </div>
+                  </div>
+                  <div className="mt-4 flex items-center gap-1 text-sm">
+                    <TrendingUp className={`w-4 h-4 ${stat.title === "Fee Due" && stat.value !== "₹0" ? "text-amber-600" : "text-green-600"}`} />
+                    <span className={`font-medium ${stat.title === "Fee Due" && stat.value !== "₹0" ? "text-amber-600" : "text-green-600"}`}>
+                      {stat.trend}
+                    </span>
+                    <span className="text-gray-500 ml-1">status</span>
                   </div>
                 </div>
               );
             })}
           </div>
+
           <AssignmentReminder />
+
+          {/* Quick Actions */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                {
+                  label: "Submit Assignment",
+                  description: "You have pending assignments",
+                  icon: FileText,
+                  color: "blue",
+                  onClick: () => setActiveTab("assignments"),
+                },
+                {
+                  label: "Pay Fees",
+                  description: "Check pending fee amounts",
+                  icon: Wallet,
+                  color: "amber",
+                  onClick: () => setActiveTab("fees"),
+                },
+                {
+                  label: "Submit Feedback",
+                  description: "Share your thoughts on courses",
+                  icon: MessageSquare,
+                  color: "emerald",
+                  onClick: () => setActiveTab("feedback"),
+                },
+              ].map((action, index) => {
+                const Icon = action.icon;
+                const colorClasses = {
+                  blue: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+                  amber: "bg-amber-50 text-amber-700 hover:bg-amber-100",
+                  emerald: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+                }[action.color];
+
+                return (
+                  <button key={index} onClick={action.onClick} className={`flex items-start gap-4 p-4 rounded-lg border border-gray-200 transition-colors text-left ${colorClasses}`}>
+                    <div className="p-2 rounded-lg bg-white">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{action.label}</p>
+                      <p className="text-sm text-gray-500 mt-1">{action.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Today's Schedule */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
+              <button onClick={() => setActiveTab("courses")} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                View all
+              </button>
+            </div>
+            <div className="space-y-4">
+              {data?.todayClasses && data.todayClasses.length > 0 ? (
+                data.todayClasses.slice(0, 3).map((class_: any, index: number) => {
+                  const parseTime = (timeStr: string) => {
+                    const [time, modifier] = timeStr.split(" ");
+                    let [hours, minutes] = time.split(":");
+                    if (hours === "12") hours = "00";
+                    if (modifier.toUpperCase() === "PM") hours = String(parseInt(hours, 10) + 12);
+                    return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+                  };
+                  const now = new Date();
+                  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                  const isUpcoming = data.todayClasses.findIndex((c: any) => parseTime(c.time) >= currentMinutes) === index;
+
+                  return (
+                    <div key={class_.id || index} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isUpcoming ? "bg-blue-50 border border-blue-200 shadow-sm" : "bg-gray-50 border border-transparent"}`}>
+                      <div className={`w-16 text-sm font-medium ${isUpcoming ? "text-blue-700" : "text-gray-700"}`}>{class_.time}</div>
+                      <div className="flex-1">
+                        <p className={`font-medium ${isUpcoming ? "text-blue-900" : "text-gray-900"}`}>{class_.subject}</p>
+                        <p className={`text-sm ${isUpcoming ? "text-blue-600" : "text-gray-500"}`}>{class_.faculty} • {class_.room} • {class_.type}</p>
+                      </div>
+                      {isUpcoming && <span className="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full animate-pulse">Next</span>}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-6 text-center text-gray-500">
+                  <Calendar className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p>No classes scheduled for today.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           <UpcomingExamsWidget />
           <StudentAchievements />
         </div>
       );
     }
 
+    // Other Tabs Logic
+    const fullWidthTabs = ["leave", "achievements", "my-seat"];
+    const containerClass = fullWidthTabs.includes(activeTab) ? "" : "bg-white rounded-xl border border-gray-200 p-6";
+
     return (
-      <div className={activeTab === "leave" || activeTab === "achievements" || activeTab === "my-seat" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
+      <div className={containerClass}>
         {activeTab === "attendance" && <Attendance />}
         {activeTab === "assignments" && <Assignment />}
         {activeTab === "fees" && <Fees />}
@@ -236,12 +374,11 @@ export default function StudentDashboard() {
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
-        {activeTab === "faculty" && <FacultyView />}
+        {activeTab === "faculty" && <Teachers />}
         {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "placement" && <PlacementEligibility />}
         {activeTab === "scholarships" && <Scholarships />}
-        {activeTab === "id-card" && <IDCard student={student} />}
-        {activeTab === "faculty" && <Teachers />}
+        {/* {activeTab === "id-card" && <IDCard student={student} />} */}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>
     );
@@ -262,7 +399,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
-          <Bell className="w-12 h-12 text-red-600 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Unable to load dashboard</h3>
           <p className="text-gray-600 mb-6">There was an error loading your dashboard. Please try again.</p>
           <button onClick={fetchDashboardData} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -345,7 +482,10 @@ export default function StudentDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-600" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-              <NotificationBell />
+              <button onClick={() => setActiveTab("announcements")} className="p-2 hover:bg-gray-100 rounded-lg relative">
+                <Bell className="w-5 h-5 text-gray-600" />
+                {data?.notifications?.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />}
+              </button>
             </div>
           </div>
         </header>
@@ -358,248 +498,8 @@ export default function StudentDashboard() {
             <p className="text-gray-500 mt-1">Here's what's happening with your academic progress.</p>
           </div>
 
-          {/* Content Area */}
-          {activeTab === "overview" ? (
-            <div className="space-y-8">
-              {/* Profile Completion */}
-              {profileData?.profileCompletion && (
-                <ProfileCompletionCard
-                  percentage={profileData.profileCompletion.percentage}
-                  missingFields={profileData.profileCompletion.missingFields}
-                />
-              )}
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  {
-                    title: "Attendance",
-                    value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%",
-                    icon: CalendarCheck,
-                    color: "blue",
-                    trend: "Overall",
-                  },
-                  {
-                    title: "Pending Assignments",
-                    value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0",
-                    icon: FileText,
-                    color: "amber",
-                    trend: "Current",
-                  },
-                  {
-                    title: "Fee Due",
-                    value: "₹" + (data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"),
-                    icon: Wallet,
-                    color: "emerald",
-                    trend: "Total",
-                  },
-                  {
-                    title: "Courses",
-                    value: "Active",
-                    icon: BookOpen,
-                    color: "purple",
-                    trend: "Active",
-                  },
-                ].map((stat, index) => {
-                  const Icon = stat.icon;
-                  const colorClasses = {
-                    blue: "bg-blue-50 text-blue-700",
-                    amber: "bg-amber-50 text-amber-700",
-                    emerald: "bg-emerald-50 text-emerald-700",
-                    purple: "bg-purple-50 text-purple-700",
-                  }[stat.color];
-
-                  return (
-                    <div
-                      key={index}
-                      className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
-                          <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                        </div>
-                        <div className={`p-3 rounded-lg ${colorClasses}`}>
-                          <Icon className="w-5 h-5" />
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center gap-1 text-sm">
-                        <TrendingUp
-                          className={`w-4 h-4 ${
-                            stat.title === "Fee Due" && stat.value !== "₹0"
-                              ? "text-amber-600"
-                              : "text-green-600"
-                          }`}
-                        />
-                        <span
-                          className={`font-medium ${
-                            stat.title === "Fee Due" && stat.value !== "₹0"
-                              ? "text-amber-600"
-                              : "text-green-600"
-                          }`}
-                        >
-                          {stat.trend}
-                        </span>
-                        <span className="text-gray-500 ml-1">status</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Assignment Reminders widget */}
-              <AssignmentReminder />
-
-              {/* Quick Actions */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    {
-                      label: "Submit Assignment",
-                      description: "You have 2 pending assignments",
-                      icon: FileText,
-                      color: "blue",
-                      onClick: () => setActiveTab("assignments"),
-                    },
-                    {
-                      label: "Pay Fees",
-                      description: "Due date: March 15, 2024",
-                      icon: Wallet,
-                      color: "amber",
-                      onClick: () => setActiveTab("fees"),
-                    },
-                    {
-                      label: "Submit Feedback",
-                      description: "Share your thoughts on courses and campus",
-                      icon: MessageSquare,
-                      color: "emerald",
-                      onClick: () => setActiveTab("feedback"),
-                    },
-                  ].map((action, index) => {
-                    const Icon = action.icon;
-                    const colorClasses = {
-                      blue: "bg-blue-50 text-blue-700 hover:bg-blue-100",
-                      amber: "bg-amber-50 text-amber-700 hover:bg-amber-100",
-                      emerald: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
-                    }[action.color];
-
-                    return (
-                      <button
-                        key={index}
-                        onClick={action.onClick}
-                        className={`flex items-start gap-4 p-4 rounded-lg border border-gray-200
-                          transition-colors text-left ${colorClasses}`}
-                      >
-                        <div className="p-2 rounded-lg bg-white">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{action.label}</p>
-                          <p className="text-sm text-gray-500 mt-1">{action.description}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Today's Schedule */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
-                  <button
-                    onClick={() => {}}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    View all
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {data?.todayClasses && data.todayClasses.length > 0 ? (
-                    data.todayClasses.slice(0, 3).map((class_: any, index: number) => {
-                      const parseTime = (timeStr: string) => {
-                        const [time, modifier] = timeStr.split(" ");
-                        let [hours, minutes] = time.split(":");
-                        if (hours === "12") hours = "00";
-                        if (modifier.toUpperCase() === "PM")
-                          hours = String(parseInt(hours, 10) + 12);
-                        return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
-                      };
-                      const now = new Date();
-                      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-                      const isUpcoming =
-                        data.todayClasses.findIndex(
-                          (c: any) => parseTime(c.time) >= currentMinutes
-                        ) === index;
-
-                      return (
-                        <div
-                          key={class_.id || index}
-                          className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                            isUpcoming
-                              ? "bg-blue-50 border border-blue-200 shadow-sm"
-                              : "bg-gray-50 border border-transparent"
-                          }`}
-                        >
-                          <div className={`w-16 text-sm font-medium ${isUpcoming ? "text-blue-700" : "text-gray-700"}`}>
-                            {class_.time}
-                          </div>
-                          <div className="flex-1">
-                            <p className={`font-medium ${isUpcoming ? "text-blue-900" : "text-gray-900"}`}>
-                              {class_.subject}
-                            </p>
-                            <p className={`text-sm ${isUpcoming ? "text-blue-600" : "text-gray-500"}`}>
-                              {class_.faculty} • {class_.room} • {class_.type}
-                            </p>
-                          </div>
-                          {isUpcoming && (
-                            <span className="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full animate-pulse">
-                              Next
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="py-6 text-center text-gray-500">
-                      <Calendar className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                      <p>No classes scheduled for today.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-        <UpcomingExamsWidget />
-          <StudentAchievements />
-            </div>
-          ) : (
-            <div className={activeTab === "leave" || activeTab === "achievements" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
-              {activeTab === "attendance" && <Attendance />}
-              {activeTab === "assignments" && <Assignment />}
-              {activeTab === "fees" && <Fees />}
-              {activeTab === "courses" && <Courses />}
-              {activeTab === "examschedule" && <ExamSchedule />}
-              {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
-              {activeTab === "events" && <EventsStudent />}
-              
-              {activeTab === "results" && <StudentResults />}
-              {activeTab === "achievements" && <StudentAchievements />}
-              {activeTab === "leave" && <LeaveRequest />}
-              {activeTab === "library" && <Library />}
-              {activeTab === "exam-form" && <ExaminationForm />}
-              
-              {activeTab === "feedback" && <StudentFeedback />}
-
-              {activeTab === "bus-routes" && <BusRoutes />}
-              {activeTab === "book-resources" && <ResourceBooking />}
-              {activeTab === "settings"          && (
-                <div className="text-sm text-gray-600">
-                  Settings are not available yet for student accounts.
-                </div>
-              )}
-            </div>
-          )}
+          {/* Render Tab Content */}
+          {renderTab()}
 
           {/* Footer */}
           <footer className="mt-8 pt-6 border-t border-gray-200">
