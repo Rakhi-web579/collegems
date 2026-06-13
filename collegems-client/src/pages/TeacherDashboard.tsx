@@ -34,6 +34,8 @@ import ResourceBooking from "../user-components/ResourceBooking";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
 import AnnouncementManage from "../common-components-management/AnnouncementManage";
 import Clubs from "../common-components-management/Clubs";
+import { useNotifications } from "../hooks/useNotifications";
+
 interface TeacherDashboardProps {
   initialTab?: string;
 }
@@ -45,9 +47,9 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
   const [courses, setCourses] = useState<{ _id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
+  const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
+  const { notifications } = useNotifications();
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -61,7 +63,7 @@ const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-     const [dashboardRes, coursesRes] = await Promise.all([
+      const [dashboardRes, coursesRes] = await Promise.all([
         api.get("/dashboard"),
         api.get("/courses/all"),
       ]);
@@ -98,7 +100,7 @@ const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
-      { id: "my-assignments", label: "My Assignments", icon: Briefcase },
+    { id: "my-assignments", label: "My Assignments", icon: Briefcase },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
     { id: "leave-approvals", label: "Leave Approvals", icon: ClipboardCheck },
@@ -301,7 +303,7 @@ const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
                       </button>
                     </div>
                     <div className="space-y-3">
-                      {courses.slice(0, 3).map((course, index) => (
+                      {(Array.isArray(courses) ? courses : []).slice(0, 3).map((course, index) => (
                         <div key={course._id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-blue-100 rounded-lg">
@@ -349,7 +351,7 @@ const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
                       <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">3 new</span>
                     </div>
                     <div className="space-y-3">
-                      {notifications.map((notification) => (
+                      {notifications.map((notification: any) => (
                         <div key={notification.id} onClick={() => notification.type === "announcement" && navigate("/teacher/announcements")} className="flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl cursor-pointer transition-colors">
                           <div className={`p-2 rounded-lg ${getNotificationColor(notification.type)}`}>
                             {getNotificationIcon(notification.type)}

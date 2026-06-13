@@ -35,71 +35,85 @@ import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
+import StudyGroupList from "./pages/StudyGroups/StudyGroupList";
+import StudyRoom from "./pages/StudyGroups/StudyRoom";
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Public Routes */}
-        <Route path="/" element={<MainDashboard />} />
+        {/* <Route path="/" element={<MainDashboard />} /> */}
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
 
-        <Route
-          path="/examschedule"
-          element={
-            <ProtectedRoute>
-              <ExamSchedule />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/results"
-          element={
-            <ProtectedRoute>
-              <StudentResults />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/clubs" element={<Clubs />} />
-        <Route
-          path="/events"
-          element={
-            <ProtectedRoute>
-              <EventsStudent />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/verify/student/:studentId"
-          element={<VerifyStudent />}
-        />
-        <Route
-          path="/timetable"
-          element={
-            <ProtectedRoute>
-              <div>Timetable Page</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty"
-          element={
-            <ProtectedRoute>
-              <Teachers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/quickaccess"
-          element={
-            <ProtectedRoute>
-              <QuickAccessAll />
-            </ProtectedRoute>
-          }
-        />
-       
+        {/* Dashboard Layout */}
+        <Route element={<DashboardLayout />}>
+          {/* Student/User Pages */}
+          <Route path="/examschedule" element={<ExamSchedule />} />
+          <Route path="/results" element={<StudentResults />} />
+          <Route path="/events" element={<EventsStudent />} />
+
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <Courses />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/faculty"
+            element={
+              <ProtectedRoute>
+                <Teachers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/quickaccess" element={<QuickAccessAll />} />
+
+          {/* Clubs Feature */}
+          <Route path="/clubs" element={<Clubs />} />
+
+          {/* Existing Project Features */}
+          <Route path="/lost-found" element={<LostFoundPortal />} />
+          <Route path="/timetable" element={<TimeTable />} />
+          <Route path="/library" element={<Library />} />
+          
+          {/* Real-time Collaboration Features */}
+          <Route
+            path="/study-groups"
+            element={
+              <ProtectedRoute>
+                <StudyGroupList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/study-groups/:id"
+            element={
+              <ProtectedRoute>
+                <StudyRoom />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        {/* Student Routes */}
         <Route
           path="/student/dashboard"
           element={
@@ -236,7 +250,6 @@ export default function App() {
             </RoleRoute>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );

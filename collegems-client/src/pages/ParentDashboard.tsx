@@ -28,10 +28,10 @@ import Fees from "../user-components/Fee";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
 import AnnouncementsView from "../user-components/AnnouncementsView";
-// Add these at the top of your file
-import { formatDistanceToNow } from "date-fns";
+import { extractArray } from "../utils/apiHelpers";
+import NotificationBell from "../common-components-management/NotificationBell";
 import { useNotifications } from "../hooks/useNotifications";
-import NotificationBell from "../common-components-management/NotificationBell"; // Adjust path if needed
+import { formatDistanceToNow } from "date-fns";
 
 type TabType =
   | "overview"
@@ -40,8 +40,7 @@ type TabType =
   | "fees"
   | "events"
   | "bus-routes"
-  | "announcements";   
-
+  | "announcements";
 
 export default function ParentDashboard() {
   const navigate = useNavigate();
@@ -85,8 +84,6 @@ export default function ParentDashboard() {
   const parent = data?.user;
   const child = data?.child;
 
-
-
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutGrid },
     { id: "announcements", label: "Announcements", icon: Bell },
@@ -102,7 +99,9 @@ export default function ParentDashboard() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center transition-colors">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading parent portal...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading parent portal...
+          </p>
         </div>
       </div>
     );
@@ -292,7 +291,11 @@ export default function ParentDashboard() {
                   onClick={toggleTheme}
                   className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-600 dark:text-gray-300"
                 >
-                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  {darkMode ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
                 </button>
                 <NotificationBell />
                 <div className="flex items-center gap-2 px-3 py-2 border-l border-gray-200 dark:border-gray-800">
@@ -303,9 +306,7 @@ export default function ParentDashboard() {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {parent?.name || "Parent"}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      Parent Account
-                    </p>
+                    <p className="text-xs text-gray-500">Parent Account</p>
                   </div>
                 </div>
               </div>
@@ -323,7 +324,11 @@ export default function ParentDashboard() {
                   {getGreeting()}, {parent?.name?.split(" ")[0] || "Parent"}!
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">
-                  Monitoring academic progress for <span className="font-semibold text-purple-600 dark:text-purple-400">{child?.name}</span>.
+                  Monitoring academic progress for{" "}
+                  <span className="font-semibold text-purple-600 dark:text-purple-400">
+                    {child?.name}
+                  </span>
+                  .
                 </p>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-950/30 border border-purple-100/55 dark:border-purple-900/20 rounded-xl w-fit">
@@ -343,17 +348,27 @@ export default function ParentDashboard() {
           {/* Warnings Section */}
           {notifications.length > 0 && (
             <div className="mb-8 space-y-4">
-             {notifications.map((notif: any) => (
-                <div 
-                  key={notif._id} 
+              {notifications.map((notif: any) => (
+                <div
+                  key={notif._id}
                   onClick={() => !notif.isRead && markAsRead(notif._id)}
-                  className={`flex items-start gap-4 p-4 rounded-xl cursor-pointer ${notif.type === 'danger' ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30' : 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30'} ${!notif.isRead ? 'border shadow-sm' : 'opacity-80'}`}
+                  className={`flex items-start gap-4 p-4 rounded-xl cursor-pointer ${notif.type === "danger" ? "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30" : "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/30"} ${!notif.isRead ? "border shadow-sm" : "opacity-80"}`}
                 >
-                  <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${notif.type === 'danger' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`} />
+                  <AlertCircle
+                    className={`w-5 h-5 mt-0.5 shrink-0 ${notif.type === "danger" ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"}`}
+                  />
                   <div>
-                    <h3 className={`font-semibold ${notif.type === 'danger' ? 'text-red-800 dark:text-red-400' : 'text-blue-800 dark:text-blue-400'}`}>{notif.message}</h3>
-                    <p className={`text-sm mt-1 ${notif.type === 'danger' ? 'text-red-700 dark:text-red-300' : 'text-blue-700 dark:text-blue-300'}`}>
-                      {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+                    <h3
+                      className={`font-semibold ${notif.type === "danger" ? "text-red-800 dark:text-red-400" : "text-blue-800 dark:text-blue-400"}`}
+                    >
+                      {notif.message}
+                    </h3>
+                    <p
+                      className={`text-sm mt-1 ${notif.type === "danger" ? "text-red-700 dark:text-red-300" : "text-blue-700 dark:text-blue-300"}`}
+                    >
+                      {formatDistanceToNow(new Date(notif.createdAt), {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                 </div>
@@ -369,21 +384,29 @@ export default function ParentDashboard() {
                 {[
                   {
                     title: "Child Attendance",
-                    value: data?.cards?.find((c: any) => c.title === "Attendance")?.value || "0%",
+                    value:
+                      data?.cards?.find((c: any) => c.title === "Attendance")
+                        ?.value || "0%",
                     icon: CalendarCheck,
                     color: "purple",
                     subtitle: "Target: > 75%",
                   },
                   {
                     title: "Pending Assignments",
-                    value: data?.cards?.find((c: any) => c.title === "Pending Assignments")?.value || "0",
+                    value:
+                      data?.cards?.find(
+                        (c: any) => c.title === "Pending Assignments",
+                      )?.value || "0",
                     icon: AwardIcon,
                     color: "amber",
                     subtitle: "Awaiting submission",
                   },
                   {
                     title: "Fee Outstanding",
-                    value: "₹" + (data?.cards?.find((c: any) => c.title === "Fee Due")?.value || "0"),
+                    value:
+                      "₹" +
+                      (data?.cards?.find((c: any) => c.title === "Fee Due")
+                        ?.value || "0"),
                     icon: Wallet,
                     color: "red",
                     subtitle: "Term fees dues",
@@ -391,8 +414,10 @@ export default function ParentDashboard() {
                 ].map((stat, index) => {
                   const Icon = stat.icon;
                   const colorClasses = {
-                    purple: "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30",
-                    amber: "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30",
+                    purple:
+                      "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30",
+                    amber:
+                      "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30",
                     red: "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30",
                   }[stat.color];
 
@@ -443,7 +468,8 @@ export default function ParentDashboard() {
                             {class_.subject}
                           </p>
                           <p className="text-sm text-gray-500 truncate">
-                            Faculty: {class_.faculty} • Room: {class_.room} • {class_.type}
+                            Faculty: {class_.faculty} • Room: {class_.room} •{" "}
+                            {class_.type}
                           </p>
                         </div>
                       </div>
@@ -471,11 +497,28 @@ export default function ParentDashboard() {
           {/* Footer */}
           <footer className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-              <p>© {new Date().getFullYear()} Parent Portal. All rights reserved.</p>
+              <p>
+                © {new Date().getFullYear()} Parent Portal. All rights reserved.
+              </p>
               <div className="flex items-center gap-4">
-                <a href="#" className="hover:text-gray-950 dark:hover:text-white">Help</a>
-                <Link to="/privacy" className="hover:text-gray-950 dark:hover:text-white">Privacy</Link>
-                <a href="#" className="hover:text-gray-950 dark:hover:text-white">Terms</a>
+                <a
+                  href="#"
+                  className="hover:text-gray-950 dark:hover:text-white"
+                >
+                  Help
+                </a>
+                <Link
+                  to="/privacy"
+                  className="hover:text-gray-950 dark:hover:text-white"
+                >
+                  Privacy
+                </Link>
+                <a
+                  href="#"
+                  className="hover:text-gray-950 dark:hover:text-white"
+                >
+                  Terms
+                </a>
               </div>
             </div>
           </footer>

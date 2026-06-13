@@ -5,6 +5,7 @@ import {
   ChevronDown, Filter, UserCheck, Briefcase,
 } from "lucide-react";
 import api from "../api/axios";
+import { extractArray } from "../utils/apiHelpers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Teacher {
@@ -100,11 +101,7 @@ const FacultyAssignment: React.FC = () => {
       if (filterSemester) params.semester = filterSemester;
       const res = await api.get("/faculty-assignments/all", { params });
       
-      // Safety Check
-      if (Array.isArray(res.data)) setAssignments(res.data);
-      else if (res.data?.data && Array.isArray(res.data.data)) setAssignments(res.data.data);
-      else setAssignments([]);
-
+      setAssignments(extractArray(res.data));
     } catch {
       showToast("error", "Failed to load assignments");
     } finally {
@@ -130,20 +127,8 @@ const FacultyAssignment: React.FC = () => {
         api.get("/courses/all"),
       ]);
       
-      // Safety Checks for Teachers
-      const fetchedTeachers = tRes.data;
-      if (Array.isArray(fetchedTeachers)) setTeachers(fetchedTeachers);
-      else if (fetchedTeachers?.data && Array.isArray(fetchedTeachers.data)) setTeachers(fetchedTeachers.data);
-      else if (fetchedTeachers?.teachers && Array.isArray(fetchedTeachers.teachers)) setTeachers(fetchedTeachers.teachers);
-      else setTeachers([]);
-
-      // Safety Checks for Courses
-      const fetchedCourses = cRes.data;
-      if (Array.isArray(fetchedCourses)) setCourses(fetchedCourses);
-      else if (fetchedCourses?.data && Array.isArray(fetchedCourses.data)) setCourses(fetchedCourses.data);
-      else if (fetchedCourses?.courses && Array.isArray(fetchedCourses.courses)) setCourses(fetchedCourses.courses);
-      else setCourses([]);
-
+      setTeachers(extractArray(tRes.data));
+      setCourses(extractArray(cRes.data));
     } catch {
       showToast("error", "Failed to load form data");
     }

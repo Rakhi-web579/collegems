@@ -16,7 +16,6 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
-import HODExamForms from "../hod-components/ExamForms";
 import ResourceManagement from "../hod-components/ResourceManagement";
 import BookingManagement from "../hod-components/BookingManagement";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
@@ -30,8 +29,10 @@ import FeedbackManagement from "../hod-components/FeedbackManagement";
 import HallAllocation from "../hod-components/HallAllocation";
 import FacultyAssignment from "../hod-components/FacultyAssignment";
 import Clubs from "../common-components-management/Clubs";
+
 type TabType =
   | "overview"
+  | "analytics"
   | "announcements"
   | "teachers"
   | "teachers-attendance"
@@ -57,7 +58,7 @@ type TabType =
   | "manage-bookings"
   | "manage-resources" 
   | "faculty-assignment"
-  | "clubs" ;
+  | "clubs";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -68,9 +69,13 @@ interface Data {
 }
 
 interface ProfileData {
-  name: string; email: string; phone?: string;
-  department?: string; departmentCode?: string;
-  role: string; avatarUrl?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  department?: string;
+  departmentCode?: string;
+  role: string;
+  avatarUrl?: string;
 }
 
 export default function HODDashboard() {
@@ -124,7 +129,7 @@ export default function HODDashboard() {
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
     { id: "faculty-assignment" as TabType, label: "Faculty Assignments", icon: Users },
-     { id: "clubs" as TabType, label: "Clubs & Organizations", icon: Users },
+    { id: "clubs" as TabType, label: "Clubs & Organizations", icon: Users },
   ];
 
   useEffect(() => {
@@ -201,7 +206,7 @@ export default function HODDashboard() {
       ]);
 
       setSearchData({
-        students: studentsRes.data || [],
+        students: studentsRes.data?.data || studentsRes.data || [],
         teachers: teachersRes.data || [],
         courses: coursesRes.data || [],
       });
