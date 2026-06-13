@@ -28,7 +28,10 @@ import Fees from "../user-components/Fee";
 import StudentResults from "../user-components/StudentResults";
 import EventsStudent from "../user-components/EventsStudent";
 import AnnouncementsView from "../user-components/AnnouncementsView";
-
+// Add these at the top of your file
+import { formatDistanceToNow } from "date-fns";
+import { useNotifications } from "../hooks/useNotifications";
+import NotificationBell from "../common-components-management/NotificationBell"; // Adjust path if needed
 
 type TabType =
   | "overview"
@@ -340,7 +343,7 @@ export default function ParentDashboard() {
           {/* Warnings Section */}
           {notifications.length > 0 && (
             <div className="mb-8 space-y-4">
-              {notifications.map((notif) => (
+             {notifications.map((notif: any) => (
                 <div 
                   key={notif._id} 
                   onClick={() => !notif.isRead && markAsRead(notif._id)}

@@ -20,7 +20,7 @@ import eventRoute from "./routes/event.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
 import libraryRoutes from "./routes/library.routes.js";
 import assessmentRoutes from "./routes/assessment.routes.js";
-
+import clubRoutes from "./routes/clubs.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
@@ -76,7 +76,7 @@ app.use("/api/events",            eventRoute);
 app.use("/api/results",           authenticate, resultsRoutes);
 app.use("/api/library",           libraryRoutes);
 app.use("/api/assessments", authenticate, assessmentRoutes);
-
+app.use("/api/clubs", authenticate, clubRoutes);
 app.use("/api/resources", authenticate, resourceRoutes);
 app.use("/api/bookings", authenticate, bookingRoutes);
 app.use("/api/mentorships", authenticate, mentorshipRoutes);

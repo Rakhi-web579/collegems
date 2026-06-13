@@ -29,6 +29,7 @@ import ExamHalls from "../hod-components/ExamHalls";
 import FeedbackManagement from "../hod-components/FeedbackManagement";
 import HallAllocation from "../hod-components/HallAllocation";
 import FacultyAssignment from "../hod-components/FacultyAssignment";
+import Clubs from "../common-components-management/Clubs";
 type TabType =
   | "overview"
   | "announcements"
@@ -55,7 +56,8 @@ type TabType =
   | "audit-logs"
   | "manage-bookings"
   | "manage-resources" 
-  | "faculty-assignment";
+  | "faculty-assignment"
+  | "clubs" ;
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -122,6 +124,7 @@ export default function HODDashboard() {
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
     { id: "faculty-assignment" as TabType, label: "Faculty Assignments", icon: Users },
+     { id: "clubs" as TabType, label: "Clubs & Organizations", icon: Users },
   ];
 
   useEffect(() => {
@@ -318,6 +321,7 @@ export default function HODDashboard() {
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
         {activeTab === "faculty-assignment" && <FacultyAssignment />}
+        {activeTab === "clubs" && <Clubs />}
       </>
     );
   };

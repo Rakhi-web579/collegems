@@ -11,7 +11,7 @@ import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
-
+import Clubs from "./common-components-management/Clubs";
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
 import Teachers from "./hod-components/Teachers";
@@ -62,6 +62,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/clubs" element={<Clubs />} />
         <Route
           path="/events"
           element={

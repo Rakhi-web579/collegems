@@ -39,7 +39,7 @@ import BusRoutes from "../common-components-management/BusRoutes";
 import Library from "../common-components-management/Library";
 import Scholarships from "../common-components-management/Scholarships";
 import Teachers from "../hod-components/Teachers";
-
+import Clubs from "../common-components-management/Clubs";
 // Student Components
 import Assignment from "../user-components/Assignment";
 import Attendance from "../user-components/Attendance";
@@ -83,7 +83,8 @@ type TabType =
   | "feedback"
   | "bus-routes"
   | "book-resources"
-  | "settings";
+  | "settings" 
+  |  "clubs";
 
 const navigationItems = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
@@ -107,6 +108,7 @@ const navigationItems = [
   { id: "placement" as TabType, label: "Placement", icon: Briefcase },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
+  { id: "clubs" as TabType, label: "Clubs & Organizations", icon: Users },
 ];
 
 export default function StudentDashboard() {
@@ -378,6 +380,7 @@ export default function StudentDashboard() {
         {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "placement" && <PlacementEligibility />}
         {activeTab === "scholarships" && <Scholarships />}
+        {activeTab === "clubs" && <Clubs />}
         {/* {activeTab === "id-card" && <IDCard student={student} />} */}
         {activeTab === "settings" && <div className="text-sm text-gray-600">Settings are not available yet for student accounts.</div>}
       </div>

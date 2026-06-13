@@ -33,7 +33,7 @@ import OfficeHours from "../teacher-components/OfficeHours";
 import ResourceBooking from "../user-components/ResourceBooking";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
 import AnnouncementManage from "../common-components-management/AnnouncementManage";
-
+import Clubs from "../common-components-management/Clubs";
 interface TeacherDashboardProps {
   initialTab?: string;
 }
@@ -116,6 +116,7 @@ const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
     { id: "events", label: "Organize Events", icon: CalendarDays },
     { id: "library", label: "Library Catalog", icon: Book },
     { id: "book-resources", label: "Book Resources", icon: CalendarDays },
+    { id: "clubs", label: "Clubs & Organizations", icon: Users },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -388,6 +389,7 @@ const [activeTab, setActiveTab] = useState(initialTab ?? "overview");
           {activeTab === "library" && <Library />}
           {activeTab === "my-assignments" && <MyAssignments />}
           {activeTab === "book-resources" && <ResourceBooking />}
+          {activeTab === "clubs" && <Clubs />}
           {activeTab === "announcements" && (
             <div className="space-y-8">
               <AnnouncementForm />
