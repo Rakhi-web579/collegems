@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
 import { logAction } from "../utils/auditService.js";
+import { getPaginatedData } from "../utils/pagination.util.js";
 // import calculateProfileCompletion from "../utils/profileCompletion.js";
 
 const normalizeSettings = (settings) => {
@@ -18,20 +19,6 @@ const normalizeSettings = (settings) => {
       inApp: true,
       ...(safeSettings.notifications || {}),
     },
-  };
-};
-
-const calculateProfileCompletion = (user) => {
-  const fields = ['name', 'email', 'phone', 'department', 'studentId', 'course', 'semester'];
-  let filled = 0;
-  const missingFields = [];
-  fields.forEach(field => {
-    if (user[field]) filled++;
-    else missingFields.push(field);
-  });
-  return {
-    percentage: Math.round((filled / fields.length) * 100),
-    missingFields
   };
 };
 
@@ -184,5 +171,21 @@ export const getStudentProfile = async (req, res) => {
   } catch (error) {
     console.error("Error fetching student profile:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getStudents = async (req, res) => {
+  try {
+    const result = await getPaginatedData(User, req.query, {
+      baseFilter: { role: "student" },
+      searchFields: ["name", "email", "studentId"],
+      select: "name email role studentId course semester joinedAt lastUpdated",
+      defaultSort: { name: 1 },
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({ message: "Server error fetching students" });
   }
 };

@@ -36,6 +36,7 @@ import scholarshipRoutes from "./routes/scholarship.routes.js";
 import idCardRoutes from "./routes/idcard.routes.js";
 import { verifyStudent } from "./controllers/idcard.controller.js";
 import announcementRoutes from "./routes/announcement.routes.js";  // announcement
+import notificationRoutes from "./routes/notification.routes.js";
 import busRouteRoutes from "./routes/busRoute.routes.js";
 import syllabusRoutes from "./routes/syllabus.route.js";
 import officeHoursRoutes from "./routes/officeHours.routes.js";
@@ -45,7 +46,10 @@ import auditLogRoutes from "./routes/auditLog.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import placementRoutes from "./routes/placement.routes.js";
+import alumniRoutes from "./routes/alumni.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
+import studyGroupRoutes from "./routes/studyGroup.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import log from "./utils/logger.js";
@@ -95,14 +99,15 @@ app.use("/api/feedback",        authenticate, feedbackRoutes);
 app.use("/api/placements",      authenticate, placementRoutes);
 app.use("/api/achievements",    authenticate, achievementRoutes); // ← NEW
 app.use("/api/student/idcard", idCardRoutes);
-app.get("/api/verify/student/:studentId", verifyStudent);
+app.get("/api/verify/student/:studentId", authenticate, verifyStudent);
 app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
-app.use("/api/mentorships", mentorshipRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/announcements", announcementRoutes);  // aannouncements
+app.use("/api/study-groups", studyGroupRoutes);
+app.use("/api/analytics", authenticate, analyticsRoutes);
 
 // Health check
 app.get("/", (_req, res) => {
