@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Users } from "lucide-react";
 import {
   AwardIcon,
   Bell,
@@ -48,16 +47,17 @@ import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import PlacementEligibility from "../user-components/PlacementEligibility";
+import NotificationBell from "../common-components-management/NotificationBell";
 
 import Scholarships from "../common-components-management/Scholarships";
 // import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
 
-import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
-import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
+
 import ResourceBooking from "../user-components/ResourceBooking";
 import AnnouncementsView from "../user-components/AnnouncementsView";
 

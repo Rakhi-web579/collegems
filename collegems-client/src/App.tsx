@@ -35,70 +35,65 @@ import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Public Routes */}
-        <Route path="/" element={<MainDashboard />} />
+        {/* <Route path="/" element={<MainDashboard />} /> */}
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
 
-        <Route
-          path="/examschedule"
-          element={
-            <ProtectedRoute>
-              <ExamSchedule />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/results"
-          element={
-            <ProtectedRoute>
-              <StudentResults />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/events"
-          element={
-            <ProtectedRoute>
-              <EventsStudent />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/verify/student/:studentId"
-          element={<VerifyStudent />}
-        />
-        <Route
-          path="/timetable"
-          element={
-            <ProtectedRoute>
-              <div>Timetable Page</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty"
-          element={
-            <ProtectedRoute>
-              <Teachers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/quickaccess"
-          element={
-            <ProtectedRoute>
-              <QuickAccessAll />
-            </ProtectedRoute>
-          }
-        />
-       
+        {/* Dashboard Layout */}
+        <Route element={<DashboardLayout />}>
+          {/* Student/User Pages */}
+          <Route path="/examschedule" element={<ExamSchedule />} />
+          <Route path="/results" element={<StudentResults />} />
+          <Route path="/events" element={<EventsStudent />} />
+
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <Courses />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/faculty"
+            element={
+              <ProtectedRoute>
+                <Teachers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/quickaccess" element={<QuickAccessAll />} />
+
+          {/* Your Added Feature */}
+          <Route path="/lost-found" element={<LostFoundPortal />} />
+
+          <Route path="/timetable" element={<TimeTable />} />
+
+          {/* Existing Project Features */}
+          <Route path="/library" element={<Library />} />
+        </Route>
+
+        {/* Student Routes */}
         <Route
           path="/student/dashboard"
           element={
@@ -235,7 +230,6 @@ export default function App() {
             </RoleRoute>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );
