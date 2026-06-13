@@ -95,7 +95,7 @@ app.use("/api/feedback",        authenticate, feedbackRoutes);
 app.use("/api/placements",      authenticate, placementRoutes);
 app.use("/api/achievements",    authenticate, achievementRoutes); // ← NEW
 app.use("/api/student/idcard", idCardRoutes);
-app.get("/api/verify/student/:studentId", verifyStudent);
+app.get("/api/verify/student/:studentId", authenticate, verifyStudent);
 app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
