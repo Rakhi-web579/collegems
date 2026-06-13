@@ -48,9 +48,8 @@ import StudentAchievements from "../user-components/StudentAchievements";
 import ProfileCompletionCard from "../user-components/ProfileCompletionCard";
 import PlacementEligibility from "../user-components/PlacementEligibility";
 import NotificationBell from "../common-components-management/NotificationBell";
-
 import Scholarships from "../common-components-management/Scholarships";
-// import IDCard from "../user-components/IDCard";
+import IDCard from "../user-components/IDCard";
 import Teachers from "../hod-components/Teachers";
 
 
@@ -60,7 +59,8 @@ import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
 
 import ResourceBooking from "../user-components/ResourceBooking";
 import AnnouncementsView from "../user-components/AnnouncementsView";
-
+import NotificationBell from "../common-components-management/NotificationBell";
+import { extractArray } from "../utils/apiHelpers";
 type TabType =
   | "overview"
   | "attendance"
@@ -126,18 +126,18 @@ export default function StudentDashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-    useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const res = await api.get("/users/me");
-      setProfileData(res.data);
-    } catch (err) {
-      console.error("Profile fetch error:", err);
-    }
-  };
-  fetchProfile();
-}, []);
- 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get("/users/me");
+        setProfileData(res.data);
+      } catch (err) {
+        console.error("Profile fetch error:", err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
 
   const fetchDashboardData = async () => {
     try {
@@ -236,7 +236,7 @@ export default function StudentDashboard() {
         {activeTab === "exam-form" && <ExaminationForm />}
         {activeTab === "feedback" && <StudentFeedback />}
         {activeTab === "bus-routes" && <BusRoutes />}
-        {activeTab === "faculty" && <FacultyView />}
+
         {activeTab === "book-resources" && <ResourceBooking />}
         {activeTab === "placement" && <PlacementEligibility />}
         {activeTab === "scholarships" && <Scholarships />}
@@ -425,18 +425,16 @@ export default function StudentDashboard() {
                       </div>
                       <div className="mt-4 flex items-center gap-1 text-sm">
                         <TrendingUp
-                          className={`w-4 h-4 ${
-                            stat.title === "Fee Due" && stat.value !== "₹0"
+                          className={`w-4 h-4 ${stat.title === "Fee Due" && stat.value !== "₹0"
                               ? "text-amber-600"
                               : "text-green-600"
-                          }`}
+                            }`}
                         />
                         <span
-                          className={`font-medium ${
-                            stat.title === "Fee Due" && stat.value !== "₹0"
+                          className={`font-medium ${stat.title === "Fee Due" && stat.value !== "₹0"
                               ? "text-amber-600"
                               : "text-green-600"
-                          }`}
+                            }`}
                         >
                           {stat.trend}
                         </span>
@@ -509,7 +507,7 @@ export default function StudentDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">Today's Schedule</h2>
                   <button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     View all
@@ -536,11 +534,10 @@ export default function StudentDashboard() {
                       return (
                         <div
                           key={class_.id || index}
-                          className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                            isUpcoming
+                          className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isUpcoming
                               ? "bg-blue-50 border border-blue-200 shadow-sm"
                               : "bg-gray-50 border border-transparent"
-                          }`}
+                            }`}
                         >
                           <div className={`w-16 text-sm font-medium ${isUpcoming ? "text-blue-700" : "text-gray-700"}`}>
                             {class_.time}
@@ -570,8 +567,8 @@ export default function StudentDashboard() {
                 </div>
               </div>
 
-        <UpcomingExamsWidget />
-          <StudentAchievements />
+              <UpcomingExamsWidget />
+              <StudentAchievements />
             </div>
           ) : (
             <div className={activeTab === "leave" || activeTab === "achievements" ? "" : "bg-white rounded-xl border border-gray-200 p-6"}>
@@ -582,18 +579,18 @@ export default function StudentDashboard() {
               {activeTab === "examschedule" && <ExamSchedule />}
               {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
               {activeTab === "events" && <EventsStudent />}
-              
+
               {activeTab === "results" && <StudentResults />}
               {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
-              
+
               {activeTab === "feedback" && <StudentFeedback />}
 
               {activeTab === "bus-routes" && <BusRoutes />}
               {activeTab === "book-resources" && <ResourceBooking />}
-              {activeTab === "settings"          && (
+              {activeTab === "settings" && (
                 <div className="text-sm text-gray-600">
                   Settings are not available yet for student accounts.
                 </div>

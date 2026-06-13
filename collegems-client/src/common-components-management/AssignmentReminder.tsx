@@ -14,6 +14,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import api from "../api/axios";
+import { extractArray } from "../utils/apiHelpers";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -190,7 +191,7 @@ export default function AssignmentReminder() {
     setError("");
     try {
       const res = await api.get("/assignment/reminders");
-      setAssignments(res.data);
+      setAssignments(extractArray(res.data));
     } catch (err: any) {
       console.error("AssignmentReminder fetch error:", err);
       setError("Could not load assignment reminders.");

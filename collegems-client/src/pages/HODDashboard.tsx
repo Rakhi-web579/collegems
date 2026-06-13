@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun,
+  Moon, Sun, MessageSquare, Award, Bus
 } from "lucide-react";
 import api from "../api/axios";
 import Students from "../common-components-management/Students";
@@ -16,10 +16,22 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
-import HODExamForms from "../hod-components/ExamForms";
+import ExamForms from "../hod-components/ExamForms";
+import AnnouncementForm from "../common-components-management/AnnouncementForm";
+import AnnouncementManage from "../common-components-management/AnnouncementManage";
+import FeedbackManagement from "../hod-components/FeedbackManagement";
+import Scholarships from "../common-components-management/Scholarships";
+import BusRoutes from "../common-components-management/BusRoutes";
+import ExamHalls from "../hod-components/ExamHalls";
+import HallAllocation from "../hod-components/HallAllocation";
+import AuditLogs from "../hod-components/AuditLogs";
+import BookingManagement from "../hod-components/BookingManagement";
+import ResourceManagement from "../hod-components/ResourceManagement";
+import { extractArray } from "../utils/apiHelpers";
 
 type TabType =
   | "overview"
+  | "announcements"
   | "teachers"
   | "teachers-attendance"
   | "students"
@@ -34,7 +46,15 @@ type TabType =
   | "library"
   | "settings"
   | "reports"
-  | "exam-forms";
+  | "feedback"
+  | "exam-forms"
+  | "scholarships"
+  | "bus-routes"
+  | "exam-halls"
+  | "hall-allocation"
+  | "audit-logs"
+  | "manage-bookings"
+  | "manage-resources";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -45,181 +65,41 @@ interface Data {
 }
 
 interface ProfileData {
-  name: string; email: string; phone?: string;
-  department?: string; departmentCode?: string;
-  role: string; avatarUrl?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  department?: string;
+  departmentCode?: string;
+  role: string;
+  avatarUrl?: string;
 }
 
-export default function HODDashboard() {
-  const navigate = useNavigate();
-  const { darkMode, toggleTheme } = useTheme();
-  const [data, setData] = useState<Data | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
-  const [profileRefreshing, setProfileRefreshing] = useState(false);
-  const [profileError, setProfileError] = useState<string | null>(null);
-  const [profileUpdatedAt, setProfileUpdatedAt] = useState<Date | null>(null);
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const [searchData, setSearchData] = useState({
-    students: [],
-    teachers: [],
-    courses: [],
-  });
-
-  const [searchResults, setSearchResults] = useState({
-    students: [],
-    teachers: [],
-    courses: [],
-  });
-
-  useEffect(() => {
-    fetchDashboardData();
-    fetchProfileData();
-    fetchSearchData();
-    const refreshProfile = () => fetchProfileData(true);
-    const profileInterval = window.setInterval(refreshProfile, 15000);
-    window.addEventListener("focus", refreshProfile);
-    return () => {
-      window.clearInterval(profileInterval);
-      window.removeEventListener("focus", refreshProfile);
-    };
-  }, []);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get("/dashboard");
-      setData(res.data);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchProfileData = async (silent = false) => {
-    try {
-      if (silent) setProfileRefreshing(true);
-      else setProfileLoading(true);
-      const res = await api.get("/users/me");
-      const user = res.data;
-      if (user?.role !== "hod") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("userData");
-        navigate("/login", { replace: true });
-        return;
-      }
-      setProfile({
-        name: user.name || "", email: user.email || "",
-        phone: user.phone || "", department: user.department || "",
-        departmentCode: user.departmentCode || "", role: user.role || "hod",
-        avatarUrl: user.avatarUrl || user.profilePicture || user.photo,
-      });
-      setProfileError(null);
-      setProfileUpdatedAt(new Date());
-    } catch (error: any) {
-      const status = error?.response?.status;
-      if (status === 401 || status === 403) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("userData");
-        navigate("/login", { replace: true });
-        return;
-      }
-      setProfileError(error?.response?.data?.message || "Unable to load HOD profile.");
-    } finally {
-      setProfileLoading(false);
-      setProfileRefreshing(false);
-    }
-  };
-
-  const fetchSearchData = async () => {
-    try {
-      const [studentsRes, teachersRes, coursesRes] = await Promise.all([
-        api.get("/users/students"),
-        api.get("/users/teachers"),
-        api.get("/courses/all"),
-      ]);
-
-      setSearchData({
-        students: studentsRes.data || [],
-        teachers: teachersRes.data || [],
-        courses: coursesRes.data || [],
-      });
-    } catch (error) {
-      console.error("Error loading search data:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setSearchResults({
-        students: [],
-        teachers: [],
-        courses: [],
-      });
-      return;
-    }
-
-    const query = searchTerm.toLowerCase();
-
-    setSearchResults({
-      students: searchData.students.filter(
-        (student: any) =>
-          student.name?.toLowerCase().includes(query) ||
-          student.email?.toLowerCase().includes(query)
-      ),
-
-      teachers: searchData.teachers.filter(
-        (teacher: any) =>
-          teacher.name?.toLowerCase().includes(query) ||
-          teacher.email?.toLowerCase().includes(query)
-      ),
-
-  
-
-  interface ProfileData {
-    name: string;
-    email: string;
-    phone?: string;
-    department?: string;
-    departmentCode?: string;
-    role: string;
-    avatarUrl?: string;
-  }
-
-  const navigationItems = [
-    { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
-    { id: "announcements", label: "Announcements", icon: Bell },
-    { id: "teachers" as TabType, label: "Teachers", icon: Users },
-    { id: "teachers-attendance" as TabType, label: "Teachers Attendance", icon: Users },
-    { id: "students" as TabType, label: "Students", icon: GraduationCap },
-    { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: Calendar },
-    { id: "courses" as TabType, label: "Courses", icon: BookOpen },
-    { id: "classes" as TabType, label: "Classes", icon: Building2 },
-    { id: "syllabus" as TabType, label: "Syllabus", icon: FileText },
-    { id: "fees" as TabType, label: "Fees", icon: Wallet },
-    { id: "salary" as TabType, label: "Salary", icon: DollarSign },
-    { id: "examSchedule" as TabType, label: "Exam Schedule", icon: Calendar },
-    { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
-    { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
-    { id: "reports" as TabType, label: "Report Generator", icon: FileText },
-    { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
-    { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
-    { id: "scholarships" as TabType, label: "Scholarship Approvals", icon: Award },
-    { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
-    { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
-    { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
-    { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
-    { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
-    { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
-  ];
+const navigationItems = [
+  { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
+  { id: "announcements", label: "Announcements", icon: Bell },
+  { id: "teachers" as TabType, label: "Teachers", icon: Users },
+  { id: "teachers-attendance" as TabType, label: "Teachers Attendance", icon: Users },
+  { id: "students" as TabType, label: "Students", icon: GraduationCap },
+  { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: Calendar },
+  { id: "courses" as TabType, label: "Courses", icon: BookOpen },
+  { id: "classes" as TabType, label: "Classes", icon: Building2 },
+  { id: "syllabus" as TabType, label: "Syllabus", icon: FileText },
+  { id: "fees" as TabType, label: "Fees", icon: Wallet },
+  { id: "salary" as TabType, label: "Salary", icon: DollarSign },
+  { id: "examSchedule" as TabType, label: "Exam Schedule", icon: Calendar },
+  { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
+  { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
+  { id: "reports" as TabType, label: "Report Generator", icon: FileText },
+  { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
+  { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
+  { id: "scholarships" as TabType, label: "Scholarship Approvals", icon: Award },
+  { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
+  { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
+  { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
+  { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
+  { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
+  { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+];
 
   export default function HODDashboard() {
     const navigate = useNavigate();
@@ -449,6 +329,8 @@ export default function HODDashboard() {
                     <button
                       key={item.id}
                       onClick={() => {
+                        setActiveTab(item.id as TabType);
+                        setSidebarOpen(false);
                         if (item.id === ("reports" as TabType)) {
                           navigate("/hod/reports");
                         }
