@@ -49,6 +49,7 @@ import placementRoutes from "./routes/placement.routes.js";
 import alumniRoutes from "./routes/alumni.routes.js";
 import facultyAssignmentRoutes from "./routes/facultyAssignment.routes.js";
 import studyGroupRoutes from "./routes/studyGroup.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import log from "./utils/logger.js";
@@ -105,8 +106,8 @@ app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/announcements", announcementRoutes);  // aannouncements
-app.use("/api/notifications", authenticate, notificationRoutes);
-app.use("/api/alumni", authenticate, alumniRoutes);
+app.use("/api/study-groups", studyGroupRoutes);
+app.use("/api/analytics", authenticate, analyticsRoutes);
 
 // Health check
 app.get("/", (_req, res) => {
