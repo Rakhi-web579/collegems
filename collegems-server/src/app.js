@@ -51,6 +51,8 @@ import mentorshipRoutes from "./routes/mentorship.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import complaintRoutes from "./routes/complaint.routes.js";
+import searchRoutes from './routes/search.routes.js'; 
+import timetableRoutes from './routes/timetable.routes.js'
 import log from "./utils/logger.js";
 
 const app = express();
@@ -67,6 +69,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
 app.use("/api/auth",      authRoutes);
+app.use("/api/search",    searchRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/faculty-assignments", facultyAssignmentRoutes);
 app.use("/api/attendance",        authenticate, attendanceRoutes);
@@ -109,6 +112,7 @@ app.use("/api/announcements", announcementRoutes);
 app.use("/api/notifications", authenticate, notificationRoutes);
 app.use("/api/study-groups", studyGroupRoutes);
 app.use("/api/analytics", authenticate, analyticsRoutes);
+app.use("/api/timetable", authenticate, timetableRoutes);
 
 // Health check
 app.get("/", (_req, res) => {
