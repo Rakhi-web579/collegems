@@ -5,7 +5,7 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun, MessageSquare, Award, Bus
+  Moon, Sun, MessageSquare, Award, Bus,
 } from "lucide-react";
 import api from "../api/axios";
 import Students from "../common-components-management/Students";
@@ -317,7 +317,7 @@ export default function HODDashboard() {
         {activeTab === "courses" && <HODCourses />}
         {activeTab === "settings" && <HODSettings />}
         {activeTab === "feedback" && <FeedbackManagement />}
-        {activeTab === "exam-forms" && <ExamForms />}
+        {activeTab === "exam-forms" && <HODExamForms />}
         {activeTab === "scholarships" && <Scholarships />}
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "exam-halls" && <ExamHalls />}

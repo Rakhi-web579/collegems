@@ -27,7 +27,6 @@ import {
   Briefcase,
   GraduationCap,
   Users,
-  IdCard,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
@@ -92,7 +91,12 @@ type TabType =
   | "alumni-directory"
   | "clubs";
 
-const navigationItems = [
+// Fixed: Added explicit type and fixed subject-faculty item
+const navigationItems: {
+  id: TabType;
+  label: string;
+  icon: any;
+}[] = [
   { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
   { id: "announcements" as TabType, label: "Announcements", icon: Bell },
   { id: "attendance" as TabType, label: "Attendance", icon: CalendarCheck },
@@ -100,7 +104,11 @@ const navigationItems = [
   { id: "fees" as TabType, label: "Fees", icon: Wallet },
   { id: "courses" as TabType, label: "Courses", icon: BookOpen },
   { id: "examschedule" as TabType, label: "Exam Schedule", icon: Calendar },
-  { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: CalendarDays },
+  {
+    id: "academic-calendar" as TabType,
+    label: "Academic Calendar",
+    icon: CalendarDays,
+  },
   { id: "events" as TabType, label: "Events", icon: CalendarDays },
   { id: "faculty" as TabType, label: "Faculty", icon: Users },
   { id: "results" as TabType, label: "Results", icon: AwardIcon },
@@ -111,7 +119,6 @@ const navigationItems = [
   { id: "scholarships" as TabType, label: "Scholarships", icon: AwardIcon },
   { id: "id-card" as TabType, label: "ID Card", icon: IdCard },
   { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
-  { id: "alumni-directory" as TabType, label: "Alumni Directory", icon: Users },
   { id: "placement" as TabType, label: "Placement", icon: Briefcase },
   { id: "bus-routes" as TabType, label: "Bus Tracking", icon: Bus },
   { id: "book-resources" as TabType, label: "Book Resources", icon: CalendarDays },
@@ -396,10 +403,12 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
-          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading your dashboard...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading your dashboard...
+          </p>
         </div>
       </div>
     );
@@ -407,7 +416,7 @@ export default function StudentDashboard() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Unable to load dashboard</h3>
@@ -421,10 +430,17 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-      {sidebarOpen && <div className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+      >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -477,11 +493,14 @@ export default function StudentDashboard() {
       </aside>
 
       <div className="flex-1 min-w-0">
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
           <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              >
+                <Menu className="w-5 h-5 text-gray-600" />
               </button>
               <div className="relative hidden sm:block">
                 <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -503,7 +522,9 @@ export default function StudentDashboard() {
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {activeTab === "overview" ? `${getGreeting()}, ${student?.name?.split(" ")[0] || "Student"}!` : navigationItems.find((item) => item.id === activeTab)?.label}
+              {activeTab === "overview"
+                ? `${getGreeting()}, ${student?.name?.split(" ")[0] || "Student"}!`
+                : navigationItems.find((item) => item.id === activeTab)?.label}
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">Here's what's happening with your academic progress.</p>
           </div>
