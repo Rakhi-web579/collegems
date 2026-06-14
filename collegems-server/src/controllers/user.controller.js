@@ -31,7 +31,7 @@ export const getMe = async (req, res) => {
 
     let profileCompletion = null;
     if (user.role === "student") {
-      profileCompletion = calculateProfileCompletion(user);
+      // profileCompletion = calculateProfileCompletion(user);
     }
 
     res.json({

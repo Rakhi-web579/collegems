@@ -33,6 +33,7 @@ import OfficeHours from "../teacher-components/OfficeHours";
 import ResourceBooking from "../user-components/ResourceBooking";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
 import AnnouncementManage from "../common-components-management/AnnouncementManage";
+import Clubs from "../common-components-management/Clubs";
 import { useNotifications } from "../hooks/useNotifications";
 
 interface TeacherDashboardProps {
@@ -67,7 +68,20 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
         api.get("/courses/all"),
       ]);
       setData(dashboardRes.data);
-      setCourses(Array.isArray(coursesRes.data) ? coursesRes.data : (coursesRes.data?.courses || []));
+      
+      // --- NEW SAFTEY CHECK FOR COURSES ---
+      const fetchedCourses = coursesRes.data;
+      if (Array.isArray(fetchedCourses)) {
+        setCourses(fetchedCourses);
+      } else if (fetchedCourses && Array.isArray(fetchedCourses.data)) {
+        setCourses(fetchedCourses.data);
+      } else if (fetchedCourses && Array.isArray(fetchedCourses.courses)) {
+        setCourses(fetchedCourses.courses);
+      } else {
+        setCourses([]); // Fallback to an empty array to prevent crashes
+      }
+      // ------------------------------------
+
       setUpcomingClasses([
         { id: 1, course: "Mathematics 101", time: "10:00 AM", room: "Room 301", status: "upcoming", students: 28 },
         { id: 2, course: "Physics 201", time: "2:00 PM", room: "Lab 204", status: "upcoming", students: 24 },
@@ -86,7 +100,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "officehours", label: "Office Hours", icon: Clock },
     { id: "courses", label: "My Courses", icon: BookMarked },
-      { id: "my-assignments", label: "My Assignments", icon: Briefcase },
+    { id: "my-assignments", label: "My Assignments", icon: Briefcase },
     { id: "assignments", label: "Assignments", icon: CheckSquare },
     { id: "attendance", label: "Attendance", icon: ClipboardList },
     { id: "leave-approvals", label: "Leave Approvals", icon: ClipboardCheck },
@@ -104,6 +118,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
     { id: "events", label: "Organize Events", icon: CalendarDays },
     { id: "library", label: "Library Catalog", icon: Book },
     { id: "book-resources", label: "Book Resources", icon: CalendarDays },
+    { id: "clubs", label: "Clubs & Organizations", icon: Users },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -376,6 +391,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
           {activeTab === "library" && <Library />}
           {activeTab === "my-assignments" && <MyAssignments />}
           {activeTab === "book-resources" && <ResourceBooking />}
+          {activeTab === "clubs" && <Clubs />}
           {activeTab === "announcements" && (
             <div className="space-y-8">
               <AnnouncementForm />

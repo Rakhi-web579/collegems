@@ -16,17 +16,19 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
-import HODExamForms from "../hod-components/ExamForms";
+import ResourceManagement from "../hod-components/ResourceManagement";
+import BookingManagement from "../hod-components/BookingManagement";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
 import AnnouncementManage from "../common-components-management/AnnouncementManage";
-import FeedbackManagement from "../hod-components/FeedbackManagement";
-import Scholarships from "../common-components-management/Scholarships";
 import BusRoutes from "../common-components-management/BusRoutes";
-import ExamHalls from "../hod-components/ExamHalls";
-import HallAllocation from "../hod-components/HallAllocation";
+import Scholarships from "../common-components-management/Scholarships";
 import AuditLogs from "../hod-components/AuditLogs";
-import BookingManagement from "../hod-components/BookingManagement";
-import ResourceManagement from "../hod-components/ResourceManagement";
+import ExamForms from "../hod-components/ExamForms";
+import ExamHalls from "../hod-components/ExamHalls";
+import FeedbackManagement from "../hod-components/FeedbackManagement";
+import HallAllocation from "../hod-components/HallAllocation";
+import FacultyAssignment from "../hod-components/FacultyAssignment";
+import Clubs from "../common-components-management/Clubs";
 
 type TabType =
   | "overview"
@@ -54,7 +56,9 @@ type TabType =
   | "hall-allocation"
   | "audit-logs"
   | "manage-bookings"
-  | "manage-resources";
+  | "manage-resources" 
+  | "faculty-assignment"
+  | "clubs";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -77,42 +81,78 @@ interface ProfileData {
 export default function HODDashboard() {
   const navigate = useNavigate();
   const { darkMode, toggleTheme } = useTheme();
+  
+  // Dashboard states
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Profile states
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileRefreshing, setProfileRefreshing] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profileUpdatedAt, setProfileUpdatedAt] = useState<Date | null>(null);
 
+  // Search states
   const [searchTerm, setSearchTerm] = useState("");
-
   const [searchData, setSearchData] = useState({
     students: [],
     teachers: [],
     courses: [],
   });
 
-  const [searchResults, setSearchResults] = useState({
-    students: [],
-    teachers: [],
-    courses: [],
-  });
+  const navigationItems = [
+    { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
+    { id: "announcements" as TabType, label: "Announcements", icon: Bell },
+    { id: "teachers" as TabType, label: "Teachers", icon: Users },
+    { id: "teachers-attendance" as TabType, label: "Teachers Attendance", icon: Users },
+    { id: "students" as TabType, label: "Students", icon: GraduationCap },
+    { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: Calendar },
+    { id: "courses" as TabType, label: "Courses", icon: BookOpen },
+    { id: "classes" as TabType, label: "Classes", icon: Building2 },
+    { id: "syllabus" as TabType, label: "Syllabus", icon: FileText },
+    { id: "fees" as TabType, label: "Fees", icon: Wallet },
+    { id: "salary" as TabType, label: "Salary", icon: DollarSign },
+    { id: "examSchedule" as TabType, label: "Exam Schedule", icon: Calendar },
+    { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
+    { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
+    { id: "reports" as TabType, label: "Report Generator", icon: FileText },
+    { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
+    { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
+    { id: "scholarships" as TabType, label: "Scholarship Approvals", icon: Award },
+    { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
+    { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
+    { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
+    { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
+    { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
+    { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+    { id: "faculty-assignment" as TabType, label: "Faculty Assignments", icon: Users },
+    { id: "clubs" as TabType, label: "Clubs & Organizations", icon: Users },
+  ];
 
   useEffect(() => {
     fetchDashboardData();
     fetchProfileData();
     fetchSearchData();
+    
     const refreshProfile = () => fetchProfileData(true);
     const profileInterval = window.setInterval(refreshProfile, 15000);
     window.addEventListener("focus", refreshProfile);
+    
     return () => {
       window.clearInterval(profileInterval);
       window.removeEventListener("focus", refreshProfile);
     };
   }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userData");
+    navigate("/login", { replace: true });
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -133,10 +173,7 @@ export default function HODDashboard() {
       const res = await api.get("/users/me");
       const user = res.data;
       if (user?.role !== "hod") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("userData");
-        navigate("/login", { replace: true });
+        handleSignOut();
         return;
       }
       setProfile({
@@ -150,10 +187,7 @@ export default function HODDashboard() {
     } catch (error: any) {
       const status = error?.response?.status;
       if (status === 401 || status === 403) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("userData");
-        navigate("/login", { replace: true });
+        handleSignOut();
         return;
       }
       setProfileError(error?.response?.data?.message || "Unable to load HOD profile.");
@@ -181,19 +215,11 @@ export default function HODDashboard() {
     }
   };
 
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setSearchResults({
-        students: [],
-        teachers: [],
-        courses: [],
-      });
-      return;
-    }
-
-    const query = searchTerm.toLowerCase();
-
-    setSearchResults({
+  const searchResults = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return { students: [], teachers: [], courses: [] };
+    
+    return {
       students: searchData.students.filter(
         (student: any) =>
           student.name?.toLowerCase().includes(query) ||
@@ -210,42 +236,8 @@ export default function HODDashboard() {
           course.code?.toLowerCase().includes(query) ||
           course.department?.toLowerCase().includes(query)
       ),
-    });
-  }, [searchData, searchTerm]);
-
-  const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userData");
-    navigate("/login", { replace: true });
-  };
-
-  const navigationItems = [
-    { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
-    { id: "announcements" as TabType, label: "Announcements", icon: Bell },
-    { id: "teachers" as TabType, label: "Teachers", icon: Users },
-    { id: "teachers-attendance" as TabType, label: "Teachers Attendance", icon: Users },
-    { id: "students" as TabType, label: "Students", icon: GraduationCap },
-    { id: "academic-calendar" as TabType, label: "Academic Calendar", icon: Calendar },
-    { id: "courses" as TabType, label: "Courses", icon: BookOpen },
-    { id: "classes" as TabType, label: "Classes", icon: Building2 },
-    { id: "syllabus" as TabType, label: "Syllabus", icon: FileText },
-    { id: "fees" as TabType, label: "Fees", icon: Wallet },
-    { id: "salary" as TabType, label: "Salary", icon: DollarSign },
-    { id: "examSchedule" as TabType, label: "Exam Schedule", icon: Calendar },
-    { id: "events" as TabType, label: "Organize Events", icon: CalendarDays },
-    { id: "library" as TabType, label: "Library Catalog", icon: BookOpen },
-    { id: "reports" as TabType, label: "Report Generator", icon: FileText },
-    { id: "feedback" as TabType, label: "Feedback", icon: MessageSquare },
-    { id: "exam-forms" as TabType, label: "Exam Forms", icon: FileText },
-    { id: "scholarships" as TabType, label: "Scholarship Approvals", icon: Award },
-    { id: "bus-routes" as TabType, label: "Bus Routes Management", icon: Bus },
-    { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
-    { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
-    { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
-    { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
-    { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
-  ];
+    };
+  }, [searchTerm, searchData]);
 
   const statsCards = (data?.cards || []).map((card, index) => ({
     ...card,
@@ -333,6 +325,8 @@ export default function HODDashboard() {
         {activeTab === "audit-logs" && <AuditLogs />}
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
+        {activeTab === "faculty-assignment" && <FacultyAssignment />}
+        {activeTab === "clubs" && <Clubs />}
       </>
     );
   };
@@ -442,7 +436,7 @@ export default function HODDashboard() {
               <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                 {darkMode ? <Sun className="w-5 h-5 text-gray-300" /> : <Moon className="w-5 h-5 text-gray-600" />}
               </button>
-             <button
+              <button
                 onClick={() => navigate("/announcements")}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative"
               >
