@@ -43,11 +43,29 @@ import { TimetableGrid } from "./common-components-management/timetable/Timetabl
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          {/* <Route path="/" element={<MainDashboard />} /> */}
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
+
+        {/* Dashboard Layout */}
+        <Route element={<DashboardLayout />}>
+          {/* Student/User Pages */}
+          <Route path="/examschedule" element={<ExamSchedule />} />
+          <Route path="/results" element={<StudentResults />} />
+          <Route path="/events" element={<EventsStudent />} />
 
           <Route
             path="/"
