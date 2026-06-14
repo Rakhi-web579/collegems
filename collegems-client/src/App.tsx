@@ -12,7 +12,7 @@ import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
-
+import Clubs from "./common-components-management/Clubs";
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
 import Teachers from "./hod-components/Teachers";
@@ -75,6 +75,27 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/faculty"
+            element={
+              <ProtectedRoute>
+                <Teachers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/quickaccess" element={<QuickAccessAll />} />
+
+          {/* Clubs Feature */}
+          <Route path="/clubs" element={<Clubs />} />
+
+          {/* Existing Project Features */}
+          <Route path="/lost-found" element={<LostFoundPortal />} />
+          <Route path="/timetable" element={<TimeTable />} />
+          <Route path="/library" element={<Library />} />
+          
+          {/* Real-time Collaboration Features */}
           <Route
             path="/study-groups"
             element={

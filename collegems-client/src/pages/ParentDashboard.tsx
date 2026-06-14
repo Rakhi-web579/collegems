@@ -30,7 +30,7 @@ import EventsStudent from "../user-components/EventsStudent";
 import AnnouncementsView from "../user-components/AnnouncementsView";
 import { extractArray } from "../utils/apiHelpers";
 import NotificationBell from "../common-components-management/NotificationBell";
-import { useNotifications } from "../hooks/useNotifications"; 
+import { useNotifications } from "../hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 
 type TabType =
@@ -348,7 +348,7 @@ export default function ParentDashboard() {
           {/* Warnings Section */}
           {notifications.length > 0 && (
             <div className="mb-8 space-y-4">
-              {notifications.map((notif) => (
+              {notifications.map((notif: any) => (
                 <div
                   key={notif._id}
                   onClick={() => !notif.isRead && markAsRead(notif._id)}
