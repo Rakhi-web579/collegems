@@ -1,12 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
-import { Link } from 'react-router-dom';
 import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun, MessageSquare, Award, Bus, ShieldAlert
+  Moon, Sun, MessageSquare, Award, Bus
 } from "lucide-react";
 import api from "../api/axios";
 import Students from "../common-components-management/Students";
@@ -17,20 +16,17 @@ import Teachers from "../hod-components/Teachers";
 import Library from "../common-components-management/Library";
 import HODSettings from "../hod-components/Settings";
 import HODCourses from "../hod-components/Courses";
-import ResourceManagement from "../hod-components/ResourceManagement";
-import BookingManagement from "../hod-components/BookingManagement";
+import HODExamForms from "../hod-components/ExamForms";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
 import AnnouncementManage from "../common-components-management/AnnouncementManage";
-import BusRoutes from "../common-components-management/BusRoutes";
+import FeedbackManagement from "../common-components-management/FeedbackManagement";
 import Scholarships from "../common-components-management/Scholarships";
-import AuditLogs from "../hod-components/AuditLogs";
-import ExamForms from "../hod-components/ExamForms";
-import ExamHalls from "../hod-components/ExamHalls";
-import FeedbackManagement from "../hod-components/FeedbackManagement";
-import HallAllocation from "../hod-components/HallAllocation";
-import FacultyAssignment from "../hod-components/FacultyAssignment";
-import Clubs from "../common-components-management/Clubs";
-import HODLeaveDashboard from "../hod-components/HODLeaveDashboard";
+import BusRoutes from "../common-components-management/BusRoutes";
+import ExamHalls from "../common-components-management/ExamHalls";
+import HallAllocation from "../common-components-management/HallAllocation";
+import AuditLogs from "../common-components-management/AuditLogs";
+import BookingManagement from "../common-components-management/BookingManagement";
+import ResourceManagement from "../common-components-management/ResourceManagement";
 
 
 type TabType =
@@ -59,10 +55,7 @@ type TabType =
   | "hall-allocation"
   | "audit-logs"
   | "manage-bookings"
-  | "manage-resources" 
-  | "faculty-assignment"
-  | "clubs"
-  | "leave-oversight";
+  | "manage-resources";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -85,19 +78,17 @@ interface ProfileData {
 export default function HODDashboard() {
   const navigate = useNavigate();
   const { darkMode, toggleTheme } = useTheme();
-  
+
   // Dashboard states
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   // Profile states
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [profileRefreshing, setProfileRefreshing] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
-  const [profileUpdatedAt, setProfileUpdatedAt] = useState<Date | null>(null);
 
   // Search states
   const [searchTerm, setSearchTerm] = useState("");
@@ -107,6 +98,7 @@ export default function HODDashboard() {
     courses: [],
   });
 
+  // Navigation items
   const navigationItems = [
     { id: "overview" as TabType, label: "Overview", icon: LayoutGrid },
     { id: "announcements" as TabType, label: "Announcements", icon: Bell },
@@ -132,24 +124,13 @@ export default function HODDashboard() {
     { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
-    { id: "faculty-assignment" as TabType, label: "Faculty Assignments", icon: Users },
-    { id: "clubs" as TabType, label: "Clubs & Organizations", icon: Users },
-    { id: "leave-oversight" as TabType, label: "Leave Oversight", icon: ShieldAlert },
   ];
 
+  // Fetch data on mount
   useEffect(() => {
     fetchDashboardData();
     fetchProfileData();
     fetchSearchData();
-    
-    const refreshProfile = () => fetchProfileData(true);
-    const profileInterval = window.setInterval(refreshProfile, 15000);
-    window.addEventListener("focus", refreshProfile);
-    
-    return () => {
-      window.clearInterval(profileInterval);
-      window.removeEventListener("focus", refreshProfile);
-    };
   }, []);
 
   const handleSignOut = () => {
@@ -171,10 +152,9 @@ export default function HODDashboard() {
     }
   };
 
-  const fetchProfileData = async (silent = false) => {
+  const fetchProfileData = async () => {
     try {
-      if (silent) setProfileRefreshing(true);
-      else setProfileLoading(true);
+      setProfileLoading(true);
       const res = await api.get("/users/me");
       const user = res.data;
       if (user?.role !== "hod") {
@@ -182,13 +162,15 @@ export default function HODDashboard() {
         return;
       }
       setProfile({
-        name: user.name || "", email: user.email || "",
-        phone: user.phone || "", department: user.department || "",
-        departmentCode: user.departmentCode || "", role: user.role || "hod",
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        department: user.department || "",
+        departmentCode: user.departmentCode || "",
+        role: user.role || "hod",
         avatarUrl: user.avatarUrl || user.profilePicture || user.photo,
       });
       setProfileError(null);
-      setProfileUpdatedAt(new Date());
     } catch (error: any) {
       const status = error?.response?.status;
       if (status === 401 || status === 403) {
@@ -198,7 +180,6 @@ export default function HODDashboard() {
       setProfileError(error?.response?.data?.message || "Unable to load HOD profile.");
     } finally {
       setProfileLoading(false);
-      setProfileRefreshing(false);
     }
   };
 
@@ -209,9 +190,8 @@ export default function HODDashboard() {
         api.get("/users/teachers"),
         api.get("/courses/all"),
       ]);
-
       setSearchData({
-        students: studentsRes.data?.data || studentsRes.data || [],
+        students: studentsRes.data || [],
         teachers: teachersRes.data || [],
         courses: coursesRes.data || [],
       });
@@ -223,7 +203,6 @@ export default function HODDashboard() {
   const searchResults = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     if (!query) return { students: [], teachers: [], courses: [] };
-    
     return {
       students: searchData.students.filter(
         (student: any) =>
@@ -242,12 +221,18 @@ export default function HODDashboard() {
           course.department?.toLowerCase().includes(query)
       ),
     };
-  }, [searchTerm, searchData]);
+  }, [searchData, searchTerm]);
 
+  // Stats cards
   const statsCards = (data?.cards || []).map((card, index) => ({
     ...card,
     icon: [Users, GraduationCap, BookOpen, Building2][index % 4],
-    color: ["bg-blue-50 text-blue-700", "bg-amber-50 text-amber-700", "bg-emerald-50 text-emerald-700", "bg-purple-50 text-purple-700"][index % 4],
+    color: [
+      "bg-blue-50 text-blue-700",
+      "bg-amber-50 text-amber-700",
+      "bg-emerald-50 text-emerald-700",
+      "bg-purple-50 text-purple-700"
+    ][index % 4],
   }));
 
   const activeLabel = navigationItems.find((item) => item.id === activeTab)?.label || "Overview";
@@ -257,8 +242,9 @@ export default function HODDashboard() {
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
-    .join("");
+    .join("") || "H";
 
+  // Render tab content
   const renderTab = () => {
     if (activeTab === "overview") {
       return (
@@ -322,7 +308,7 @@ export default function HODDashboard() {
         {activeTab === "courses" && <HODCourses />}
         {activeTab === "settings" && <HODSettings />}
         {activeTab === "feedback" && <FeedbackManagement />}
-        {activeTab === "exam-forms" && <ExamForms />}
+        {activeTab === "exam-forms" && <HODExamForms />}
         {activeTab === "scholarships" && <Scholarships />}
         {activeTab === "bus-routes" && <BusRoutes />}
         {activeTab === "exam-halls" && <ExamHalls />}
@@ -330,13 +316,11 @@ export default function HODDashboard() {
         {activeTab === "audit-logs" && <AuditLogs />}
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
-        {activeTab === "faculty-assignment" && <FacultyAssignment />}
-        {activeTab === "clubs" && <Clubs />}
-        {activeTab === "leave-oversight" && <HODLeaveDashboard />}
       </>
     );
   };
 
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
@@ -348,12 +332,15 @@ export default function HODDashboard() {
     );
   }
 
+  // Main render
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
+      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
+      {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -381,9 +368,14 @@ export default function HODDashboard() {
                         navigate("/hod/reports");
                       } else {
                         setActiveTab(item.id);
+                        setSidebarOpen(false);
                       }
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive 
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" 
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-500 dark:text-gray-400"}`} />
                     <span>{item.label}</span>
@@ -405,6 +397,7 @@ export default function HODDashboard() {
         </div>
       </aside>
 
+      {/* Main content */}
       <div className="flex-1 min-w-0">
         <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
           <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -426,11 +419,15 @@ export default function HODDashboard() {
                     {(["students", "teachers", "courses"] as const).map((group) => (
                       <div key={group} className="p-2">
                         <h4 className="font-bold text-blue-600 capitalize">{group}</h4>
-                        {searchResults[group].map((item: any) => (
-                          <div key={item._id} className="p-2 border-b border-gray-100 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200">
-                            {item.name || item.email || item.code}
-                          </div>
-                        ))}
+                        {searchResults[group].length > 0 ? (
+                          searchResults[group].map((item: any) => (
+                            <div key={item._id} className="p-2 border-b border-gray-100 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200">
+                              {item.name || item.email || item.code}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-gray-500 dark:text-gray-400">No results found</div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -449,7 +446,7 @@ export default function HODDashboard() {
                 <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
               <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-semibold">
-                {profileInitials || "H"}
+                {profileInitials}
               </div>
               <button onClick={fetchDashboardData} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Refresh">
                 <RefreshCw className="w-4 h-4 text-gray-600 dark:text-gray-300" />
