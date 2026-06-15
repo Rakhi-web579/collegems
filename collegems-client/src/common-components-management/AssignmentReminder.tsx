@@ -126,7 +126,7 @@ function AssignmentCard({ item }: { item: ReminderAssignment }) {
           w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
           ${cfg.iconBg} ${cfg.iconColor}
         `}
-      >
+      >     
         <Icon className="w-5 h-5" />
       </div>
 
