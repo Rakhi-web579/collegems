@@ -27,6 +27,7 @@ import {
   Briefcase,
   GraduationCap,
   Users,
+  IdCard, // <-- Added missing icon here!
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";

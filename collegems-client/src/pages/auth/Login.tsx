@@ -17,7 +17,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+  const [error, setError] = useState("");
   const handleLogin = async () => {
     if (!email || !password) {
       toast.warning("Please enter both email and password");

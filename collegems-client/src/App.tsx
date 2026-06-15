@@ -25,7 +25,7 @@ import ExaminationFormPage from "./pages/ExaminationFormPage";
 
 import LostFoundPortal from "./pages/LostFoundPortal";
 import VerifyStudent from "./pages/VerifyStudent";
-
+import HODLeaveDashboard from './hod-components/HODLeaveDashboard';
 import Library from "./common-components-management/Library";
 import ExamHalls from "./hod-components/ExamHalls";
 import HallAllocation from "./hod-components/HallAllocation";
@@ -43,30 +43,10 @@ import { TimetableGrid } from "./common-components-management/timetable/Timetabl
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
-
-        {/* Dashboard Layout */}
-        <Route element={<DashboardLayout />}>
-          {/* Student/User Pages */}
-          <Route path="/examschedule" element={<ExamSchedule />} />
-          <Route path="/results" element={<StudentResults />} />
-          <Route path="/events" element={<EventsStudent />} />
-
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
           <Route
             path="/"
             element={
@@ -76,198 +56,229 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/faculty"
-            element={
-              <ProtectedRoute>
-                <Teachers />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
 
-          <Route path="/quickaccess" element={<QuickAccessAll />} />
+          {/* Dashboard Layout */}
+          <Route element={<DashboardLayout />}>
+            {/* Student/User Pages */}
+            <Route path="/examschedule" element={<ExamSchedule />} />
+            <Route path="/results" element={<StudentResults />} />
+            <Route path="/events" element={<EventsStudent />} />
 
-          {/* Clubs Feature */}
-          <Route path="/clubs" element={<Clubs />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MainDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Existing Project Features */}
-          <Route path="/lost-found" element={<LostFoundPortal />} />
-          <Route path="/timetable" element={<TimeTable />} />
-          <Route path="/library" element={<Library />} />
-          
-          {/* Real-time Collaboration Features */}
-          <Route
-            path="/study-groups"
-            element={
-              <ProtectedRoute>
-                <StudyGroupList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/study-groups/:id"
-            element={
-              <ProtectedRoute>
-                <StudyRoom />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/faculty"
+              element={
+                <ProtectedRoute>
+                  <Teachers />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Student Routes */}
-          <Route
-            path="/student/dashboard"
-            element={
-              <RoleRoute role="student">
-                <StudentDashboard />
-              </RoleRoute>
-            }
-          />
+            <Route path="/quickaccess" element={<QuickAccessAll />} />
 
-          <Route
-            path="/student/exam-form"
-            element={
-              <RoleRoute role="student">
-                <ExaminationFormPage />
-              </RoleRoute>
-            }
-          />
+            {/* Clubs Feature */}
+            <Route path="/clubs" element={<Clubs />} />
 
-          <Route
-            path="/student/my-seat"
-            element={
-              <RoleRoute role="student">
-                <StudentSeatView />
-              </RoleRoute>
-            }
-          />
+            {/* Existing Project Features */}
+            <Route path="/lost-found" element={<LostFoundPortal />} />
+            <Route path="/timetable" element={<TimeTable />} />
+            <Route path="/library" element={<Library />} />
+            
+            {/* Real-time Collaboration Features */}
+            <Route
+              path="/study-groups"
+              element={
+                <ProtectedRoute>
+                  <StudyGroupList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/study-groups/:id"
+              element={
+                <ProtectedRoute>
+                  <StudyRoom />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/student/book-resources"
-            element={
-              <RoleRoute role="student">
-                <ResourceBooking />
-              </RoleRoute>
-            }
-          />
+            {/* Student Routes */}
+            <Route
+              path="/student/dashboard"
+              element={
+                <RoleRoute role="student">
+                  <StudentDashboard />
+                </RoleRoute>
+              }
+            />
 
-          {/* Teacher Routes */}
-          <Route
-            path="/teacher/dashboard"
-            element={
-              <RoleRoute role="teacher">
-                <TeacherDashboard />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/student/exam-form"
+              element={
+                <RoleRoute role="student">
+                  <ExaminationFormPage />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/teacher/announcements"
-            element={
-              <RoleRoute role="teacher">
-                <TeacherDashboard initialTab="announcements" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/teacher/book-resources"
-            element={
-              <RoleRoute role="teacher">
-                <ResourceBooking />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/student/my-seat"
+              element={
+                <RoleRoute role="student">
+                  <StudentSeatView />
+                </RoleRoute>
+              }
+            />
 
-          {/* HOD Routes */}
-          <Route
-            path="/hod/dashboard"
-            element={
-              <RoleRoute role="hod">
-                <HodDashboard />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/student/book-resources"
+              element={
+                <RoleRoute role="student">
+                  <ResourceBooking />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/reports"
-            element={
-              <RoleRoute role="hod">
-                <ReportGenerator />
-              </RoleRoute>
-            }
-          />
+            {/* Teacher Routes */}
+            <Route
+              path="/teacher/dashboard"
+              element={
+                <RoleRoute role="teacher">
+                  <TeacherDashboard />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/exam-halls"
-            element={
-              <RoleRoute role="hod">
-                <ExamHalls />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/teacher/announcements"
+              element={
+                <RoleRoute role="teacher">
+                  <TeacherDashboard initialTab="announcements" />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/teacher/book-resources"
+              element={
+                <RoleRoute role="teacher">
+                  <ResourceBooking />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/hall-allocation"
-            element={
-              <RoleRoute role="hod">
-                <HallAllocation />
-              </RoleRoute>
-            }
-          />
+            {/* HOD Routes */}
+            <Route
+              path="/hod/dashboard"
+              element={
+                <RoleRoute role="hod">
+                  <HodDashboard />
+                </RoleRoute>
+              }
+            />
+            
+            <Route
+              path="/hod/leaves"
+              element={
+                <RoleRoute role="hod">
+                  <HODLeaveDashboard />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/audit-logs"
-            element={
-              <RoleRoute role="hod">
-                <AuditLogs />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/hod/reports"
+              element={
+                <RoleRoute role="hod">
+                  <ReportGenerator />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/manage-bookings"
-            element={
-              <RoleRoute role="hod">
-                <BookingManagement />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/hod/exam-halls"
+              element={
+                <RoleRoute role="hod">
+                  <ExamHalls />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/manage-resources"
-            element={
-              <RoleRoute role="hod">
-                <ResourceManagement />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/hod/hall-allocation"
+              element={
+                <RoleRoute role="hod">
+                  <HallAllocation />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/hod/timetable-generator"
-            element={
-              <RoleRoute role="hod">
-                <TimetableGenerator />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/hod/audit-logs"
+              element={
+                <RoleRoute role="hod">
+                  <AuditLogs />
+                </RoleRoute>
+              }
+            />
 
-          <Route
-            path="/admin/timetable/:id"
-            element={
-              <RoleRoute role="hod">
-                <TimetableGrid />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/hod/manage-bookings"
+              element={
+                <RoleRoute role="hod">
+                  <BookingManagement />
+                </RoleRoute>
+              }
+            />
 
-          {/* Parent Routes */}
-          <Route
-            path="/parent/dashboard"
-            element={
-              <RoleRoute role="parent">
-                <ParentDashboard />
-              </RoleRoute>
-            }
-          />
+            <Route
+              path="/hod/manage-resources"
+              element={
+                <RoleRoute role="hod">
+                  <ResourceManagement />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/hod/timetable-generator"
+              element={
+                <RoleRoute role="hod">
+                  <TimetableGenerator />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/admin/timetable/:id"
+              element={
+                <RoleRoute role="hod">
+                  <TimetableGrid />
+                </RoleRoute>
+              }
+            />
+
+            {/* Parent Routes */}
+            <Route
+              path="/parent/dashboard"
+              element={
+                <RoleRoute role="parent">
+                  <ParentDashboard />
+                </RoleRoute>
+              }
+            />
+          </Route>
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>

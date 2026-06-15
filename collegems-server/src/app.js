@@ -51,6 +51,8 @@ import mentorshipRoutes from "./routes/mentorship.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import complaintRoutes from "./routes/complaint.routes.js";
+import searchRoutes from './routes/search.routes.js'; 
+import timetableRoutes from './routes/timetable.routes.js'
 import log from "./utils/logger.js";
 
 const app = express();
