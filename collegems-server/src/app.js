@@ -53,6 +53,7 @@ import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import complaintRoutes from "./routes/complaint.routes.js";
 import searchRoutes from './routes/search.routes.js'; 
 import timetableRoutes from './routes/timetable.routes.js'
+import plagiarismRoutes from "./routes/plagiarism.routes.js";
 import log from "./utils/logger.js";
 
 const app = express();
@@ -85,7 +86,7 @@ app.use("/api/bookings", authenticate, bookingRoutes);
 app.use("/api/mentorships", authenticate, mentorshipRoutes);
 app.use("/api/courses",  courseRoutes);
 app.use("/api/classes",  classRoutes);
-
+app.use("/api/plagiarism", authenticate, plagiarismRoutes);
 app.use("/api/fee",    authenticate, feeRoutes);
 app.use("/api/salary", authenticate, salaryRoutes);
 

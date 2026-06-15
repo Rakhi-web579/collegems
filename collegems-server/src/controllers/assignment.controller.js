@@ -234,3 +234,44 @@ const mySubmission = (assignment.submissions || []).find(
     res.status(500).json({ message: "Failed to fetch assignment reminders" });
   }
 };
+/**
+ * GET /api/assignment/teacher
+ * Returns all assignments created by the logged-in teacher.
+ */
+export const getTeacherAssignments = async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+
+    // Fetch all assignments created by this teacher
+    const assignments = await Assignment.find({ teacher: teacherId })
+      .populate("course", "name code")
+      .populate("submissions.student", "name email avatarUrl photo") // Important for viewing submissions!
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json(assignments);
+  } catch (error) {
+    console.error("GetTeacherAssignments Error:", error);
+    res.status(500).json({ message: "Failed to fetch teacher assignments" });
+  }
+};
+/**
+ * GET /api/assignment/teacher/submissions/:id
+ * Fetches a specific assignment and populates the student details for the teacher view.
+ */
+export const getAssignmentSubmissions = async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.id)
+      .populate("submissions.student", "name email avatarUrl photo") // Populates the student data!
+      .lean();
+
+    if (!assignment) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    res.json(assignment);
+  } catch (error) {
+    console.error("Get Submissions Error:", error);
+    res.status(500).json({ message: "Failed to fetch submissions" });
+  }
+};

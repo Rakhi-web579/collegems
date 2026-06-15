@@ -32,6 +32,7 @@ import FacultyAssignment from "../hod-components/FacultyAssignment";
 import Clubs from "../common-components-management/Clubs";
 import HODLeaveDashboard from "../hod-components/HODLeaveDashboard";
 
+
 type TabType =
   | "overview"
   | "analytics"
