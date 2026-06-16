@@ -92,6 +92,15 @@ export default function MainDashboard() {
       color: "emerald",
       route: "/library",
     },
+    {
+  id: 8,
+  title: "Academic Calendar",
+  description: "View academic events, exams and holidays",
+  icon: CalendarDays,
+  count: "Important Dates",
+  color: "blue",
+  route: "/calendar",
+},
   ];
   const filteredCards =dashboardCards.filter((card) =>
   card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -1,10 +1,11 @@
+import AcademicCalendar from "./common-components-management/AcademicCalendar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
 import TimeTable from "./user-components/TimeTable";
+
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
@@ -22,10 +23,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 import VerifyStudent from "./pages/VerifyStudent";
-import TimeTable from "./user-components/TimeTable";
-
 import DashboardLayout from "./layouts/DashboardLayout";
-import TimeTable from "./user-components/TimeTable";
+
 
 export default function App() {
   return (
@@ -41,11 +40,14 @@ export default function App() {
 
         {/* DASHBOARD LAYOUT WRAPPER */}
         <Route element={<DashboardLayout />}>
+        
 
           {/* student/user pages */}
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
           <Route path="/events" element={<EventsStudent />} />
+          {/* <Route path="/calendar" element={<AcademicCalendar />} /> */}
+          <Route path="/calendar" element={<AcademicCalendar />} />
           <Route
             path="/courses"
             element={
@@ -56,7 +58,7 @@ export default function App() {
           />
           <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-          {/* <Route path="/timetable" element={ <TimeTable /> } /> */}
+           <Route path="/timetable" element={ <TimeTable /> } /> 
 
         </Route>
 

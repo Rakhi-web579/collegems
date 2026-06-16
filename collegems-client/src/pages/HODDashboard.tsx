@@ -5,14 +5,13 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun, Award,
+  Moon, Sun, Award,Bus,MessageSquare
 } from "lucide-react";
 import api from "../api/axios";
 import Scholarships from "../common-components-management/Scholarships";
-  Moon, Sun, MessageSquare,
-  Moon, Sun, Bus,
-} from "lucide-react";
-import api from "../api/axios";
+import HODExamForms from "../hod-components/ExamForms";
+
+
 import BusRoutes from "../common-components-management/BusRoutes";
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
@@ -41,9 +40,8 @@ type TabType =
   | "settings"
   | "reports"
   | "exam-forms"
-  | "scholarships";
-  | "feedback";
-  | "exam-forms"
+  | "scholarships"
+  | "feedback"
   | "bus-routes";
 
 interface Data {
@@ -550,7 +548,7 @@ export default function HODDashboard() {
           {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
           {activeTab === "students" && <Students />}
           {activeTab === "salary" && <HODSalary />}
-          {activeTab === "academic-calendar" && <AcademicCalendar role="hod" />}
+          {activeTab === "academic-calendar" && <AcademicCalendar/>}
           {activeTab === "library" && <Library />}
           {activeTab === "courses" && <HODCourses />}
           {activeTab === "settings" && <HODSettings />}

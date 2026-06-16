@@ -48,17 +48,9 @@ import LeaveRequest from "../user-components/LeaveRequest";
 import StudentAchievements from "../user-components/StudentAchievements";
 
 
-import AcademicCalendar from "../common-components-management/AcademicCalendar";
-import Library from "../common-components-management/Library";
-import AssignmentReminder from "../common-components-management/AssignmentReminder";
-import ExaminationForm from "../user-components/ExaminationForm";
-import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
-import LeaveRequest from "../user-components/LeaveRequest";
-import AssignmentReminder from "../common-components-management/AssignmentReminder"; // ← your branch
-import ExaminationForm from "../user-components/ExaminationForm";                   // ← master
-import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";            // ← master
-import LeaveRequest from "../user-components/LeaveRequest";                         // ← master
-koimport Scholarships from "../common-components-management/Scholarships";
+
+
+import Scholarships from "../common-components-management/Scholarships";
 import IDCard from "../user-components/IDCard";
 
 export default function StudentDashboard() {
@@ -145,7 +137,7 @@ export default function StudentDashboard() {
     { id: "achievements", label: "Achievements", icon: Trophy },
     { id: "leave", label: "Leave Requests", icon: ClipboardList },
     { id: "library", label: "Library", icon: BookOpen },
-    { id: "exam-form", label: "Examination Form", icon: FileText }
+    { id: "exam-form", label: "Examination Form", icon: FileText },
     { id: "leave", label: "Leave Requests", icon: ClipboardList },
     { id: "library", label: "Library", icon: BookOpen },
     { id: "exam-form", label: "Examination Form", icon: FileText },
@@ -600,27 +592,25 @@ export default function StudentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "courses" && <Courses />}
               {activeTab === "examschedule" && <ExamSchedule />}
-              {activeTab === "academic-calendar" && <AcademicCalendar role="student" />}
+              {activeTab === "academic-calendar" && (
+                <AcademicCalendar role="student" />
+              )}
               {activeTab === "events" && <EventsStudent />}
               {activeTab === "results" && <StudentResults />}
               {activeTab === "achievements" && <StudentAchievements />}
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
+              {activeTab === "scholarships" && <Scholarships />}
+              {activeTab === "feedback" && <StudentFeedback />}
+              {activeTab === "id-card" && <IDCard student={student} />}
+              {activeTab === "bus-routes" && <BusRoutes />}
+
               {activeTab === "settings" && (
-              {activeTab === "events"            && <EventsStudent />}
-              {activeTab === "results"           && <StudentResults />}
-              {activeTab === "leave"             && <LeaveRequest />}
-              {activeTab === "library"           && <Library />}
-              {activeTab === "exam-form"         && <ExaminationForm />}
-              {activeTab === "scholarships"      && <Scholarships />}
-              {activeTab === "feedback"          && <StudentFeedback />}
-              {activeTab === "id-card"           && <IDCard student={student} />}
-              {activeTab === "settings"          && (
                 <div className="text-sm text-gray-600">
-                  Settings are not available yet for student accounts.
+                    Settings are not available yet for student accounts.
                 </div>
-              )}
+            )}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
               {activeTab === "bus-routes" && <BusRoutes />}
