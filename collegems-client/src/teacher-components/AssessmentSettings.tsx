@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, AlertCircle, CheckCircle, Loader2, Settings } from "lucide-react";
+import { Save, Plus, Trash2, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import api from "../api/axios";
+import { extractArray } from "../utils/apiHelpers";
 
 interface Course {
   _id: string;
@@ -18,7 +19,7 @@ export default function AssessmentSettings() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [components, setComponents] = useState<AssessmentComponent[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -39,7 +40,7 @@ export default function AssessmentSettings() {
     try {
       setLoading(true);
       const res = await api.get("/courses/all");
-      setCourses(res.data);
+      setCourses(extractArray(res.data));
     } catch (err) {
       console.error("Error fetching courses", err);
       setError("Failed to load courses");

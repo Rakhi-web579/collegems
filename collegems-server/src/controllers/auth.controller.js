@@ -1,8 +1,8 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-const COLLEGE_DOMAIN = "@college.edu";
+import { logAction } from "../utils/auditService.js";
+const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || "";
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
 
@@ -17,9 +17,19 @@ const verifyPassword = async (plainPassword, storedPassword) => {
 };
 
 const generateAccessToken = (user) =>
-  jwt.sign({ id: String(user._id), role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "2h",
-  });
+  jwt.sign(
+    {
+      id: String(user._id),
+      role: user.role,
+      course: user.course || null,
+      semester: user.semester || null,
+      department: user.department || null,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "2h",
+    }
+  );
 
 const generateRefreshToken = (user) =>
   jwt.sign(
@@ -67,8 +77,13 @@ export const register = async (req, res) => {
           .status(400)
           .json({ message: "Semester and course required for student" });
       }
+      if (!course) {
+        return res
+          .status(400)
+          .json({ message: "Course required for student" });
+      }
 
-      userData = { ...userData, studentId, semester, course };
+      userData = { ...userData, studentId, semester, course};
     }
 
     if (role === "teacher") {
@@ -82,7 +97,7 @@ export const register = async (req, res) => {
     }
 
     if (role === "hod") {
-      if (!email.endsWith(COLLEGE_DOMAIN)) {
+      if (COLLEGE_DOMAIN && !email.endsWith(COLLEGE_DOMAIN)) {
         return res.status(403).json({ message: "Use college email only" });
       }
       if (!departmentCode) {
@@ -126,6 +141,9 @@ export const register = async (req, res) => {
       accessToken,
       user: { id: user._id, name: user.name, role: user.role },
     });
+
+    // Log the action
+    await logAction(user._id, "REGISTER", "Auth", user._id, { role: user.role, email: user.email });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -185,6 +203,9 @@ export const login = async (req, res) => {
         childId: user.childId,
       },
     });
+
+    // Log the login
+    await logAction(user._id, "LOGIN", "Auth", user._id, { role: user.role, email: user.email });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
