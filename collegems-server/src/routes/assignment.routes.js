@@ -7,9 +7,11 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.js";
+import { getTeacherAssignments } from '../controllers/assignment.controller.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
+import { getAssignmentSubmissions } from '../controllers/assignment.controller.js';
 import log from "../utils/logger.js";
 import {
   createAssignment,
@@ -53,6 +55,7 @@ router.post(
   allowRoles("teacher"),
   asyncHandler(evaluateAssignment)
 );
+router.get("/teacher", protect, restrictTo("teacher", "hod"), getTeacherAssignments);
 
 router.get(
   "/student",
@@ -78,6 +81,7 @@ router.get(
     if (!assignmentId) {
       throw new AppError("Assignment ID is required", 400, "MISSING_ID");
     }
+    router.get("/teacher/submissions/:id", protect, restrictTo("teacher", "hod"), getAssignmentSubmissions);
 
     const assignment = await Assignment.findById(assignmentId)
       .populate(

@@ -28,6 +28,7 @@ import AuditLogs from "../common-components-management/AuditLogs";
 import BookingManagement from "../common-components-management/BookingManagement";
 import ResourceManagement from "../common-components-management/ResourceManagement";
 
+
 type TabType =
   | "overview"
   | "analytics"
