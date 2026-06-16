@@ -3,10 +3,15 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
+
+import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
+import ParentDashboard from "./pages/ParentDashboard";
+import DashboardLayout from "./layouts/DashboardLayout";
+
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
 import Teachers from "./hod-components/Teachers";
@@ -17,72 +22,76 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 
+import LostFoundPortal from "./pages/LostFoundPortal";
+import VerifyStudent from "./pages/VerifyStudent";
+
+import Library from "./common-components-management/Library";
+import ExamHalls from "./hod-components/ExamHalls";
+import HallAllocation from "./hod-components/HallAllocation";
+import StudentSeatView from "./user-components/StudentSeatView";
+import AuditLogs from "./hod-components/AuditLogs";
+import ResourceBooking from "./user-components/ResourceBooking";
+import BookingManagement from "./hod-components/BookingManagement";
+import ResourceManagement from "./hod-components/ResourceManagement";
+import AnnouncementForm from "./common-components-management/AnnouncementForm";
+import AnnouncementManage from "./common-components-management/AnnouncementManage";
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainDashboard />} />
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
 
-        <Route
-          path="/examschedule"
-          element={
-            <ProtectedRoute>
-              <ExamSchedule />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/results"
-          element={
-            <ProtectedRoute>
-              <StudentResults />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/events"
-          element={
-            <ProtectedRoute>
-              <EventsStudent />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/courses"
-          element={
-            <ProtectedRoute>
-              <Courses />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/timetable"
-          element={
-            <ProtectedRoute>
-              <div>Timetable Page</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty"
-          element={
-            <ProtectedRoute>
-              <Teachers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/quickaccess"
-          element={
-            <ProtectedRoute>
-              <QuickAccessAll />
-            </ProtectedRoute>
-          }
-        />
-       
+        {/* Dashboard Layout */}
+        <Route element={<DashboardLayout />}>
+          {/* Student/User Pages */}
+          <Route path="/examschedule" element={<ExamSchedule />} />
+          <Route path="/results" element={<StudentResults />} />
+          <Route path="/events" element={<EventsStudent />} />
+
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <Courses />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/faculty"
+            element={
+              <ProtectedRoute>
+                <Teachers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/quickaccess" element={<QuickAccessAll />} />
+
+          {/* Your Added Feature */}
+          <Route path="/lost-found" element={<LostFoundPortal />} />
+
+          <Route path="/timetable" element={<TimeTable />} />
+
+          {/* Existing Project Features */}
+          <Route path="/library" element={<Library />} />
+        </Route>
+
+        {/* Student Routes */}
         <Route
           path="/student/dashboard"
           element={
@@ -91,6 +100,7 @@ export default function App() {
             </RoleRoute>
           }
         />
+
         <Route
           path="/student/exam-form"
           element={
@@ -99,6 +109,26 @@ export default function App() {
             </RoleRoute>
           }
         />
+
+        <Route
+          path="/student/my-seat"
+          element={
+            <RoleRoute role="student">
+              <StudentSeatView />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/student/book-resources"
+          element={
+            <RoleRoute role="student">
+              <ResourceBooking />
+            </RoleRoute>
+          }
+        />
+
+        {/* Teacher Routes */}
         <Route
           path="/teacher/dashboard"
           element={
@@ -109,6 +139,24 @@ export default function App() {
         />
 
         <Route
+          path="/teacher/announcements"
+          element={
+            <RoleRoute role="teacher">
+              <TeacherDashboard initialTab="announcements" />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/teacher/book-resources"
+          element={
+            <RoleRoute role="teacher">
+              <ResourceBooking />
+            </RoleRoute>
+          }
+        />
+
+        {/* HOD Routes */}
+        <Route
           path="/hod/dashboard"
           element={
             <RoleRoute role="hod">
@@ -116,11 +164,67 @@ export default function App() {
             </RoleRoute>
           }
         />
+
         <Route
           path="/hod/reports"
           element={
             <RoleRoute role="hod">
               <ReportGenerator />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/exam-halls"
+          element={
+            <RoleRoute role="hod">
+              <ExamHalls />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/hall-allocation"
+          element={
+            <RoleRoute role="hod">
+              <HallAllocation />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/audit-logs"
+          element={
+            <RoleRoute role="hod">
+              <AuditLogs />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/manage-bookings"
+          element={
+            <RoleRoute role="hod">
+              <BookingManagement />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/manage-resources"
+          element={
+            <RoleRoute role="hod">
+              <ResourceManagement />
+            </RoleRoute>
+          }
+        />
+
+        {/* Parent Routes */}
+        <Route
+          path="/parent/dashboard"
+          element={
+            <RoleRoute role="parent">
+              <ParentDashboard />
             </RoleRoute>
           }
         />
