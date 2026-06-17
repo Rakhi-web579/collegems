@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 import {
   Users, Search, RefreshCw, X, Mail, IdCard, Calendar,
-  UserCircle, GraduationCap, BookOpen, ChevronRight, Filter,
+  UserCircle, GraduationCap, BookOpen, ChevronRight, Filter, Clock, MapPin, Wifi,
 } from "lucide-react";
 import api from "../api/axios";
-import { useTheme } from "../context/ThemeContext";
+import { extractArray } from "../utils/apiHelpers";
 
 interface Teacher {
+  _id?: string;
   name: string;
   email: string;
   role: string;
@@ -17,8 +19,16 @@ interface Teacher {
   qualification?: string;
 }
 
+interface OfficeHourSlot {
+  day: string;
+  startTime: string;
+  endTime: string;
+  location?: string;
+  isOnline?: boolean;
+}
+
 const Teachers: React.FC = () => {
-  useTheme();
+  const { darkMode } = useTheme();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,26 +37,52 @@ const Teachers: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filterDepartment, setFilterDepartment] = useState<string>("all");
   const [error, setError] = useState("");
+  const [officeHours, setOfficeHours] = useState<{ slots: OfficeHourSlot[]; notes: string } | null>(null);
+  const [officeHoursLoading, setOfficeHoursLoading] = useState(false);
 
   useEffect(() => { fetchTeachers(); }, []);
 
   useEffect(() => {
-    const filtered = teachers.filter(
+    let filtered = teachers.filter(
       (t) =>
         t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.teacherId.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.email.toLowerCase().includes(searchTerm.toLowerCase()),
     );
+    
+    if (filterDepartment !== "all") {
+      filtered = filtered.filter((t) => t.department === filterDepartment);
+    }
+    
     setFilteredTeachers(filtered);
-  }, [searchTerm, teachers]);
+  }, [searchTerm, teachers, filterDepartment]);
+
+  useEffect(() => {
+    if (!selectedTeacher?._id) {
+      setOfficeHours(null);
+      return;
+    }
+    const fetchOfficeHours = async () => {
+      setOfficeHoursLoading(true);
+      try {
+        const res = await api.get(`/office-hours/faculty/${selectedTeacher._id}`);
+        setOfficeHours(res.data.officeHours);
+      } catch {
+        setOfficeHours(null);
+      } finally {
+        setOfficeHoursLoading(false);
+      }
+    };
+    fetchOfficeHours();
+  }, [selectedTeacher]);
 
   const fetchTeachers = async () => {
     try {
       setLoading(true);
       setError("");
       const response = await api.get("/users/teachers");
-      setTeachers(response.data);
-      setFilteredTeachers(response.data);
+      setTeachers(extractArray(response.data));
+      setFilteredTeachers(extractArray(response.data));
     } catch (error) {
       console.error("Error fetching teachers:", error);
       setError("Failed to load teachers data");
@@ -167,11 +203,13 @@ const Teachers: React.FC = () => {
           </div>
         )}
       </div>
+      
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
+      
       {/* Teachers Grid */}
       {loading ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
@@ -183,7 +221,7 @@ const Teachers: React.FC = () => {
           <Users className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No teachers found</h3>
           <p className="text-gray-500 dark:text-gray-400">
-            {searchTerm ? "Try adjusting your search or filters" : "No teachers registered yet"}
+            {searchTerm || filterDepartment !== "all" ? "Try adjusting your search or filters" : "No teachers registered yet"}
           </p>
         </div>
       ) : (
@@ -233,7 +271,7 @@ const Teachers: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Calendar className="w-4 h-4" />
-                    Joined 2024
+                    Joined {teacher.joinDate?.split("-")[0] || "2024"}
                   </div>
                   <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium inline-flex items-center gap-1">
                     View Profile <ChevronRight className="w-4 h-4" />
@@ -248,7 +286,7 @@ const Teachers: React.FC = () => {
       {!loading && filteredTeachers.length > 0 && (
         <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
           Showing {filteredTeachers.length} of {teachers.length} teachers
-          {searchTerm && ` matching "${searchTerm}"`}
+          {(searchTerm || filterDepartment !== "all") && ` matching criteria`}
         </div>
       )}
 
@@ -257,83 +295,117 @@ const Teachers: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setSelectedTeacher(null)} />
           <div className="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
-            <div className="bg-blue-600 p-6">
+            <div className="bg-blue-600 p-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-white">Teacher Profile</h3>
+                <h3 className="text-lg font-semibold text-white">Teacher Profile</h3>
                 <button onClick={() => setSelectedTeacher(null)} className="text-white/80 hover:text-white transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="p-6">
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-2xl mb-4">
+            <div className="p-4">
+              <div className="flex flex-col items-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-xl mb-3">
                   {getInitials(selectedTeacher.name)}
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 dark:text-white">{selectedTeacher.name}</h4>
-                <p className="text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white">{selectedTeacher.name}</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                   <Mail className="w-4 h-4" />{selectedTeacher.email}
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Teacher ID</p>
-                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Teacher ID</p>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2 text-sm">
                       <IdCard className="w-4 h-4 text-gray-400 dark:text-gray-500" />{selectedTeacher.teacherId}
                     </p>
                   </div>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Role</p>
-                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Role</p>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2 text-sm">
                       <GraduationCap className="w-4 h-4 text-gray-400 dark:text-gray-500" />{selectedTeacher.role}
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                   {selectedTeacher.qualification && (
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Qualification</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{selectedTeacher.qualification}</p>
+                    <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Qualification</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{selectedTeacher.qualification}</p>
                     </div>
                   )}
                   {selectedTeacher.phone && (
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Phone</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{selectedTeacher.phone}</p>
+                    <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{selectedTeacher.phone}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span className="font-medium text-gray-900 dark:text-white">Active</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Status</p>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span className="font-medium text-gray-900 dark:text-white">Active</span>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Joined</p>
+                    <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2 text-sm">
+                      <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      {selectedTeacher.joinDate || "Jan 2024"}
+                    </p>
                   </div>
                 </div>
 
-                <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Joined Date</p>
-                  <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                    {selectedTeacher.joinDate || "January 2024"}
+                <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                    Office Hours
                   </p>
+                  {officeHoursLoading ? (
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="inline-block animate-spin rounded-full h-3 w-3 border-2 border-blue-600 border-t-transparent"></div>
+                      Loading...
+                    </div>
+                  ) : officeHours && officeHours.slots.length > 0 ? (
+                    <div className="space-y-1.5">
+                      {officeHours.slots.map((slot, i) => (
+                        <div key={i} className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-gray-900 dark:text-white min-w-[80px]">{slot.day}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {slot.startTime} - {slot.endTime}
+                          </span>
+                          <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            {slot.isOnline ? (
+                              <><Wifi className="w-3 h-3" /> Online</>
+                            ) : slot.location ? (
+                              <><MapPin className="w-3 h-3" /> {slot.location}</>
+                            ) : null}
+                          </span>
+                        </div>
+                      ))}
+                      {officeHours.notes && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">{officeHours.notes}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Not set</p>
+                  )}
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end gap-3">
+              <div className="mt-4 flex justify-end">
                 <button
                   onClick={() => setSelectedTeacher(null)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
                 >
                   Close
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  View Full Profile
                 </button>
               </div>
             </div>

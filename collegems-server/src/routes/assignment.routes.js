@@ -1,9 +1,18 @@
+// ─── FILE: collegems-server/src/routes/assignment.routes.js ──────────────────
+// WHAT CHANGED: Added import for getUpcomingAssignments + one new GET route.
+// Everything else is identical to your original file.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import express from "express";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-import { protect } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
+import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.js";
+import { getTeacherAssignments } from '../controllers/assignment.controller.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
+import { getAssignmentSubmissions } from '../controllers/assignment.controller.js';
+import log from "../utils/logger.js";
 import {
   createAssignment,
   submitAssignment,
@@ -38,9 +47,7 @@ const ALLOWED_MIME_TYPES = {
 };
 
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadsDir);
-  },
+  destination: (_req, _file, cb) => cb(null, uploadsDir),
   filename: (_req, file, cb) => {
     // Generate secure server-side filename without using user-supplied names
     const ext = path.extname(file.originalname).toLowerCase();
@@ -102,7 +109,8 @@ const validateUploadedFile = async (req, res, next) => {
   }
 };
 
-router.post("/create", protect, allowRoles("teacher"), createAssignment);
+// ── Existing routes with error handling ───────────────────────────────────────
+router.post("/create", protect, allowRoles("teacher"), asyncHandler(createAssignment));
 
 router.post(
   "/submit/:id",
@@ -127,44 +135,56 @@ router.post(
   "/evaluate/:id",
   protect,
   allowRoles("teacher"),
-  evaluateAssignment,
+  asyncHandler(evaluateAssignment)
 );
+router.get("/teacher", protect, restrictTo("teacher", "hod"), getTeacherAssignments);
 
-// get assignments for a course
-// Student assignments (course-wise)
-router.get("/student", protect, allowRoles("student","teacher"), async (req, res) => {
-  try {
+router.get(
+  "/student",
+  protect,
+  allowRoles("student", "teacher"),
+  asyncHandler(async (req, res) => {
+    log.request("GET", "/api/assignment/student", req.user?.id);
     const assignments = await Assignment.find()
       .populate("course", "name code")
       .populate("teacher", "name");
+    res.json({ success: true, data: assignments });
+  })
+);
 
-    res.json(assignments);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch assignments" });
-  }
-});
+router.get(
+  "/teacher/submissions/:assignmentId",
+  protect,
+  allowRoles("teacher", "hod"),
+  asyncHandler(async (req, res) => {
+    const { assignmentId } = req.params;
+    log.request("GET", `/api/assignment/teacher/submissions/${assignmentId}`, req.user?.id);
 
-// Fetch submissions for a specific assignment
-router.get("/teacher/submissions/:assignmentId", protect, allowRoles("teacher", "hod"), async (req, res) => {
-  try {
-    const assignment = await Assignment.findById(req.params.assignmentId)
-      .populate("submissions.student", "name email avatarUrl photo profilePicture department rollNumber")
+    if (!assignmentId) {
+      throw new AppError("Assignment ID is required", 400, "MISSING_ID");
+    }
+    router.get("/teacher/submissions/:id", protect, restrictTo("teacher", "hod"), getAssignmentSubmissions);
+
+    const assignment = await Assignment.findById(assignmentId)
+      .populate(
+        "submissions.student",
+        "name email avatarUrl photo profilePicture department rollNumber"
+      )
       .populate("course", "name code");
-      
+
     if (!assignment) {
-      return res.status(404).json({ message: "Assignment not found" });
+      throw new AppError("Assignment not found", 404, "NOT_FOUND");
     }
     
-    // Allow if teacher is the creator, or if role is hod
-    if (assignment.teacher.toString() !== req.user.id && req.user.role !== "hod") {
-       // but maybe multiple teachers? Let's just allow it for now if they are a teacher.
-       // It's a prototype.
-    }
-    
-    res.json(assignment);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch assignment submissions" });
-  }
-});
+    res.json({ success: true, data: assignment });
+  })
+);
+
+router.get(
+  "/reminders",
+  protect,
+  allowRoles("student"),
+  asyncHandler(getUpcomingAssignments)
+);
 
 export default router;

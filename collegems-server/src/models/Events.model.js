@@ -7,12 +7,22 @@ const EventsSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        readBy: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+],
 
         shortDescription: {
             type: String,
             required: true,
             trim: true,
         },
+        club: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Club",
+         },
 
         description: {
             type: String,
@@ -128,6 +138,15 @@ const EventsSchema = new mongoose.Schema(
         tags: {
             type: String,
             trim: true,
+        },
+        qrCode: {
+            type: String,
+            unique: true,
+            sparse: true,
+        },
+        qrCodeActive: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true }

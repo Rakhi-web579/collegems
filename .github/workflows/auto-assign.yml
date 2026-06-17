@@ -1,11 +1,12 @@
 name: Auto Assign PR Author
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
 
 permissions:
   pull-requests: write
+  contents: read
 
 jobs:
   auto-assign:
@@ -13,6 +14,6 @@ jobs:
 
     steps:
       - name: Auto assign PR author
-        uses: toshimaru/auto-author-assign@v2
+        uses: toshimaru/auto-author-assign@v2.1.1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

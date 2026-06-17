@@ -9,11 +9,12 @@ import {
   getPreferences,
   updatePreferences,
   getStudentProfile,
+  getStudents,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
-router.get("/me", protect, authorize("teacher", "hod"), getMe);
+router.get("/me", protect, getMe);
 router.put("/me", protect, authorize("teacher", "hod"), updateMe);
 router.put(
   "/me/password",
@@ -34,18 +35,12 @@ router.put(
   updatePreferences,
 );
 
-// Teacher fetches all students
+// Teacher fetches all students (Paginated)
 router.get(
   "/students",
   protect,
   authorize("teacher", "hod"),
-  async (req, res) => {
-    const students = await User.find({ role: "student" }).select(
-      "name email role studentId course semester",
-    );
-
-    res.json(students);
-  },
+  getStudents
 );
 
 router.get(
@@ -55,7 +50,7 @@ router.get(
   getStudentProfile
 );
 
-router.get("/teachers", protect, authorize("hod"), async (req, res) => {
+router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
   const teachers = await User.find({ role: "teacher" }).select("name email role teacherId department phone");
 
   res.json(teachers);
