@@ -4,9 +4,11 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["student", "teacher", "hod", "parent"], required: true },
+  role: { type: String, enum: ["student", "teacher", "hod", "parent", "alumni"], required: true },
   phone: { type: String },
-
+  
+  // File attachments
+  resumeUrl: { type: String },
 
   // Parent-specific fields
   childId: {
@@ -17,8 +19,7 @@ const userSchema = new mongoose.Schema({
     },
   },
 
-
-  // Student-specific fields
+  // Student/Alumni-specific fields
   studentId: { type: String },
   semester: {
     type: String,
