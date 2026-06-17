@@ -19,14 +19,15 @@ import HODCourses from "../hod-components/Courses";
 import HODExamForms from "../hod-components/ExamForms";
 import AnnouncementForm from "../common-components-management/AnnouncementForm";
 import AnnouncementManage from "../common-components-management/AnnouncementManage";
-import FeedbackManagement from "../common-components-management/FeedbackManagement";
+import FeedbackManagement from "../hod-components/FeedbackManagement";
 import Scholarships from "../common-components-management/Scholarships";
 import BusRoutes from "../common-components-management/BusRoutes";
-import ExamHalls from "../common-components-management/ExamHalls";
-import HallAllocation from "../common-components-management/HallAllocation";
-import AuditLogs from "../common-components-management/AuditLogs";
-import BookingManagement from "../common-components-management/BookingManagement";
-import ResourceManagement from "../common-components-management/ResourceManagement";
+import ExamHalls from "../hod-components/ExamHalls";
+import HallAllocation from "../hod-components/HallAllocation";
+import AuditLogs from "../hod-components/AuditLogs";
+import BookingManagement from "../hod-components/BookingManagement";
+import ResourceManagement from "../hod-components/ResourceManagement";
+import RiskDashboard from "./RiskDashboard";
 
 
 type TabType =
@@ -55,7 +56,8 @@ type TabType =
   | "hall-allocation"
   | "audit-logs"
   | "manage-bookings"
-  | "manage-resources";
+  | "manage-resources"
+  | "risk-dashboard";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -124,6 +126,7 @@ export default function HODDashboard() {
     { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+    { id: "risk-dashboard" as TabType, label: "Predictive Analytics", icon: LayoutGrid },
   ];
 
   // Fetch data on mount
@@ -316,6 +319,7 @@ export default function HODDashboard() {
         {activeTab === "audit-logs" && <AuditLogs />}
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
+        {activeTab === "risk-dashboard" && <RiskDashboard />}
       </>
     );
   };

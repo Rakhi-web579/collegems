@@ -1,7 +1,7 @@
 import StudentAnalytics from "../models/StudentAnalytics.model.js";
 import User from "../models/User.model.js";
 import Attendance from "../models/Attendance.model.js";
-import InternalAssessment from "../models/InternalAssessment.model.js";
+import Results from "../models/Results.model.js";
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
 
@@ -18,20 +18,21 @@ export const generateAnalyticsForStudent = async (studentId) => {
         const presentAttendance = await Attendance.countDocuments({ student: studentId, status: "present" });
         const attendancePercentage = totalAttendance === 0 ? 100 : (presentAttendance / totalAttendance) * 100;
 
-        // Calculate average internal marks
-        const assessments = await InternalAssessment.find({ studentId });
-        let totalInternalMarks = 0;
+        // Calculate average internal marks from Results (seeded data)
+        const assessments = await Results.find({ studentId });
+        let totalInternalPercentage = 0;
         let missedAssessments = 0;
         
         assessments.forEach(assessment => {
-            if (assessment.totalInternalMarks > 0) {
-                 totalInternalMarks += assessment.totalInternalMarks;
+            if (assessment.internalMarks > 0) {
+                 // Assuming internal marks are out of 30 in the seeded data
+                 totalInternalPercentage += (assessment.internalMarks / 30) * 100;
             } else {
                  missedAssessments += 1;
             }
         });
         
-        const averageInternalMarks = assessments.length === 0 ? 50 : (totalInternalMarks / assessments.length);
+        const averageInternalMarks = assessments.length === 0 ? 50 : (totalInternalPercentage / assessments.length);
 
         const payload = {
             student_id: student._id.toString(),

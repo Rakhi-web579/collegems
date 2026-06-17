@@ -24,6 +24,7 @@ import ExaminationFormPage from "./pages/ExaminationFormPage";
 
 import LostFoundPortal from "./pages/LostFoundPortal";
 import VerifyStudent from "./pages/VerifyStudent";
+import RiskDashboard from "./pages/RiskDashboard";
 
 import Library from "./common-components-management/Library";
 import ExamHalls from "./hod-components/ExamHalls";
@@ -173,6 +174,8 @@ export default function App() {
             </RoleRoute>
           }
         />
+
+
 
         <Route
           path="/hod/exam-halls"
