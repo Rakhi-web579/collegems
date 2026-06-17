@@ -3,6 +3,9 @@ import User from "../models/User.model.js";
 import Attendance from "../models/Attendance.model.js";
 import Results from "../models/Results.model.js";
 
+import httpContext from "express-http-context";
+import log from "../utils/logger.js";
+
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
 
 export const generateAnalyticsForStudent = async (studentId) => {
@@ -43,9 +46,15 @@ export const generateAnalyticsForStudent = async (studentId) => {
         };
 
         // 2. Call ML Service
+        const correlationId = httpContext.get('correlationId') || 'N/A';
+        log.info(`Sending prediction request to ML service for student ${studentId}`);
+        
         const response = await fetch(`${ML_SERVICE_URL}/predict/dropout`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Correlation-ID': correlationId
+            },
             body: JSON.stringify(payload)
         });
 
