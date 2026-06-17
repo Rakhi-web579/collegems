@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axios";
+import AdvancedExportButton from "../common-components-management/AdvancedExportButton";
 
 interface Student {
   _id: string;
@@ -57,6 +58,7 @@ export default function RiskDashboard() {
     try {
       const res = await api.post("/analytics/batch");
       alert(res.data.message || "Batch analytics generation started.");
+      fetchAnalytics(); // Refresh data after batch prediction
     } catch (err: any) {
       alert("Failed to start batch analytics generation: " + (err.response?.data?.message || err.message));
     }
@@ -66,19 +68,43 @@ export default function RiskDashboard() {
     fetchAnalytics();
   }, [riskLevel, course, semester]);
 
+  const exportHeaders = ["Student Name", "ID", "Course", "Semester", "Risk Level", "Risk Score (%)", "Predicted Grade", "Interventions"];
+  const exportMapper = (row: AnalyticsData) => [
+    row.studentId?.name || "N/A",
+    row.studentId?.studentId || "N/A",
+    row.studentId?.course || "N/A",
+    row.studentId?.semester?.toString() || "N/A",
+    row.riskLevel.toUpperCase(),
+    (row.dropoutRiskScore * 100).toFixed(1),
+    row.predictedPerformance,
+    row.recommendedInterventions?.join("; ") || "None"
+  ];
+
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Predictive Analytics Dashboard</h1>
-        <button
-          onClick={handleBatchGenerate}
-          className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
-        >
-          Run Batch Predictions
-        </button>
+        <div className="flex gap-3 flex-wrap">
+          
+          <AdvancedExportButton 
+            data={analytics}
+            filename="Predictive_Analytics_Report"
+            pdfTitle="Predictive Analytics Report"
+            pdfMetadata={`Filters applied - Risk: ${riskLevel || "All"}, Course: ${course || "All"}, Semester: ${semester || "All"}`}
+            headers={exportHeaders}
+            dataMapper={exportMapper}
+          />
+
+          <button
+            onClick={handleBatchGenerate}
+            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+          >
+            Run Batch Predictions
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow mb-6">
+      <div className="bg-white p-4 rounded shadow mb-6 print:hidden">
         <h2 className="text-lg font-semibold mb-4">Filters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -118,15 +144,15 @@ export default function RiskDashboard() {
       </div>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-4 print:hidden">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="text-center py-10">Loading analytics...</div>
+        <div className="text-center py-10 print:hidden">Loading analytics...</div>
       ) : (
-        <div className="bg-white rounded shadow overflow-hidden">
+        <div id="exportable-table" className="bg-white rounded shadow overflow-hidden">
           <table className="min-w-full text-left text-sm whitespace-nowrap">
             <thead className="uppercase tracking-wider border-b-2 bg-gray-50 border-gray-200">
               <tr>

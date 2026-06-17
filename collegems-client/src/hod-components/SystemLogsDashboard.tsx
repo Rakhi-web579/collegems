@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axios";
+import AdvancedExportButton from "../common-components-management/AdvancedExportButton";
 
 interface SystemLog {
   _id: string;
@@ -57,16 +58,35 @@ export default function SystemLogsDashboard() {
     }
   };
 
+  const exportHeaders = ["Timestamp", "Level", "Service", "Trace/Correlation ID", "Message"];
+  const exportMapper = (log: SystemLog) => [
+    new Date(log.timestamp).toLocaleString(),
+    log.level.toUpperCase(),
+    log.service,
+    log.correlationId || "N/A",
+    log.message
+  ];
+
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Distributed System Logs</h1>
-        <button
-          onClick={fetchLogs}
-          className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
-        >
-          Refresh Logs
-        </button>
+        <div className="flex gap-3 flex-wrap">
+          <AdvancedExportButton
+            data={logs}
+            filename="System_Logs_Export"
+            pdfTitle="System Observability Traces"
+            pdfMetadata={`Filters applied - Level: ${level || "All"}, Service: ${service || "All"}, Trace ID: ${correlationId || "All"}`}
+            headers={exportHeaders}
+            dataMapper={exportMapper}
+          />
+          <button
+            onClick={fetchLogs}
+            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+          >
+            Refresh Logs
+          </button>
+        </div>
       </div>
 
       <div className="bg-white p-4 rounded shadow mb-6">
