@@ -55,7 +55,9 @@ type TabType =
   | "hall-allocation"
   | "audit-logs"
   | "manage-bookings"
-  | "manage-resources";
+  | "manage-resources"
+  | "risk-dashboard"
+  | "system-logs";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -122,8 +124,10 @@ export default function HODDashboard() {
     { id: "exam-halls" as TabType, label: "Exam Halls", icon: Building2 },
     { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
     { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
+    { id: "system-logs" as TabType, label: "System Traces", icon: FileText },
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+    { id: "risk-dashboard" as TabType, label: "Predictive Analytics", icon: LayoutGrid },
   ];
 
   // Fetch data on mount
@@ -314,8 +318,10 @@ export default function HODDashboard() {
         {activeTab === "exam-halls" && <ExamHalls />}
         {activeTab === "hall-allocation" && <HallAllocation />}
         {activeTab === "audit-logs" && <AuditLogs />}
+        {activeTab === "system-logs" && <SystemLogsDashboard />}
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
+        {activeTab === "risk-dashboard" && <RiskDashboard />}
       </>
     );
   };

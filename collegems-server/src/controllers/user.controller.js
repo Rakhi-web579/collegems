@@ -100,7 +100,7 @@ export const updatePassword = async (req, res) => {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.password = await bcrypt.hash(newPassword, 8);
     await user.save();
 
     res.json({ message: "Password updated successfully" });
@@ -187,5 +187,32 @@ export const getStudents = async (req, res) => {
   } catch (error) {
     console.error("Error fetching students:", error);
     res.status(500).json({ message: "Server error fetching students" });
+  }
+};
+
+export const uploadResumeFile = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Please upload a PDF file" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Save relative path
+    const resumePath = `/uploads/resumes/${req.file.filename}`;
+    user.resumeUrl = resumePath;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Resume uploaded successfully",
+      resumeUrl: resumePath,
+    });
+  } catch (error) {
+    console.error("Error uploading resume:", error);
+    res.status(500).json({ message: "Server error uploading resume" });
   }
 };
