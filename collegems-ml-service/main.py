@@ -99,6 +99,57 @@ async def predict_dropout(data: StudentData, request: Request):
         log_adapter.error(f"Error predicting dropout for student {data.student_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+class SentimentRequest(BaseModel):
+    feedback_id: str
+    text: str
+
+class SentimentResponse(BaseModel):
+    feedback_id: str
+    sentiment: str
+    sentiment_score: float
+
+def mock_predict_sentiment(text: str) -> tuple[str, float]:
+    # Very simple heuristic based on keywords for phase 1 mock
+    text_lower = text.lower()
+    positive_words = ['good', 'great', 'excellent', 'awesome', 'helpful', 'love', 'best', 'amazing', 'clear']
+    negative_words = ['bad', 'terrible', 'worst', 'unhelpful', 'hate', 'awful', 'confusing', 'poor', 'hard']
+    
+    pos_count = sum(1 for word in positive_words if word in text_lower)
+    neg_count = sum(1 for word in negative_words if word in text_lower)
+    
+    score = (pos_count - neg_count) * 0.3
+    # add slight random variation
+    score += random.uniform(-0.1, 0.1)
+    score = max(-1.0, min(1.0, score))
+    
+    if score > 0.1:
+        sentiment = "Positive"
+    elif score < -0.1:
+        sentiment = "Negative"
+    else:
+        sentiment = "Neutral"
+        
+    return sentiment, score
+
+@app.post("/predict/sentiment", response_model=SentimentResponse)
+async def predict_sentiment(data: SentimentRequest, request: Request):
+    correlation_id = request.headers.get("x-correlation-id", "N/A")
+    log_adapter = logging.LoggerAdapter(logger, {"correlation_id": correlation_id})
+    log_adapter.info(f"Received sentiment analysis request for feedback {data.feedback_id}")
+    
+    try:
+        sentiment, score = mock_predict_sentiment(data.text)
+        log_adapter.info(f"Analyzed sentiment for feedback {data.feedback_id} - Sentiment: {sentiment}, Score: {score:.2f}")
+        
+        return SentimentResponse(
+            feedback_id=data.feedback_id,
+            sentiment=sentiment,
+            sentiment_score=round(score, 2)
+        )
+    except Exception as e:
+        log_adapter.error(f"Error analyzing sentiment for feedback {data.feedback_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "CollegeMS ML Analytics"}
