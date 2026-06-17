@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Search, MapPin, Briefcase, Filter, ChevronDown, UserSquare, Linkedin } from "lucide-react";
 import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
+import AdvancedExportButton from "./AdvancedExportButton";
 
 interface Alumni {
   _id: string;
@@ -93,6 +94,22 @@ export default function AlumniDirectory() {
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none" />
             </div>
+
+            <AdvancedExportButton
+              data={alumni}
+              filename="Alumni_Directory_Export"
+              pdfTitle="Alumni Directory"
+              headers={["Name", "Email", "Batch", "Department", "Company", "Designation", "LinkedIn"]}
+              dataMapper={(person: Alumni) => [
+                person.name,
+                person.email,
+                person.batch,
+                person.department,
+                person.currentCompany || "N/A",
+                person.designation || "N/A",
+                person.linkedInUrl || "N/A"
+              ]}
+            />
           </div>
         </div>
       </div>

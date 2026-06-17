@@ -64,7 +64,7 @@ export const register = async (req, res) => {
     let userData = {
       name,
       email: normalizeEmail(email),
-      password: await bcrypt.hash(password, 10),
+      password: await bcrypt.hash(password, 8),
       role,
     };
 

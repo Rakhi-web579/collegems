@@ -56,6 +56,9 @@ import timetableRoutes from './routes/timetable.routes.js'
 import plagiarismRoutes from "./routes/plagiarism.routes.js";
 import log from "./utils/logger.js";
 
+import httpContext from "express-http-context";
+import { v4 as uuidv4 } from "uuid";
+
 const app = express();
 
 // Middlewares
@@ -63,9 +66,23 @@ app.use(cors({
   origin: (origin, callback) => { callback(null, true); },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Correlation-ID"]
 }));
 app.use(express.json());
+
+// Correlation ID Tracking & Request Logging
+app.use(httpContext.middleware);
+app.use((req, res, next) => {
+  const correlationId = req.headers['x-correlation-id'] || uuidv4();
+  httpContext.set('correlationId', correlationId);
+  // Attach back to response headers so client knows
+  res.setHeader('X-Correlation-ID', correlationId);
+  
+  // Log request start
+  log.request(req.method, req.originalUrl, req.user?.id || "anonymous");
+  next();
+});
+
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
@@ -107,6 +124,7 @@ app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
+app.use("/api/audit-logs", authenticate, auditLogRoutes);
 app.use("/api/complaints", complaintRoutes);
 
 app.use("/api/announcements", announcementRoutes);  
