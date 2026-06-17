@@ -53,6 +53,10 @@ import Scholarships from "../common-components-management/Scholarships";
 import Teachers from "../hod-components/Teachers";
 import FacultyView from "../user-components/FacultyView";
 
+
+import Scholarships from "../common-components-management/Scholarships";
+import IDCard from "../user-components/IDCard";
+
 import StudentResults from "../user-components/StudentResults";
 import StudentSeatView from "../user-components/StudentSeatView";
 import UpcomingExamsWidget from "../user-components/UpcomingExamWidget";
@@ -186,8 +190,57 @@ export default function StudentDashboard() {
     return "Good evening";
   };
 
+
+  const navigationItems = [
+    { id: "overview",          label: "Overview",          icon: LayoutGrid },
+    { id: "attendance",        label: "Attendance",        icon: CalendarCheck },
+    { id: "assignments",       label: "Assignments",       icon: FileText },
+    { id: "fees",              label: "Fees",              icon: Wallet },
+    { id: "courses",           label: "Courses",           icon: BookOpen },
+    { id: "examschedule",      label: "Exam Schedule",     icon: Calendar },
+    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
+    { id: "events",            label: "Events",            icon: CalendarDays },
+    { id: "results",           label: "Results",           icon: AwardIcon },
+    { id: "leave",             label: "Leave Requests",    icon: ClipboardList },
+    { id: "library",           label: "Library",           icon: BookOpen },
+    { id: "exam-form",         label: "Examination Form",  icon: FileText },
+    { id: "feedback",          label: "Feedback",          icon: MessageSquare }, // ← NEW
+    { id: "overview",           label: "Overview",          icon: LayoutGrid },
+    { id: "attendance",         label: "Attendance",        icon: CalendarCheck },
+    { id: "assignments",        label: "Assignments",       icon: FileText },
+    { id: "fees",               label: "Fees",              icon: Wallet },
+    { id: "courses",            label: "Courses",           icon: BookOpen },
+    { id: "examschedule",       label: "Exam Schedule",     icon: Calendar },
+    { id: "academic-calendar",  label: "Academic Calendar", icon: CalendarDays },
+    { id: "events",             label: "Events",            icon: CalendarDays },
+    { id: "results",            label: "Results",           icon: AwardIcon },
+    { id: "leave",              label: "Leave Requests",    icon: ClipboardList }, // ← master
+    { id: "library",            label: "Library",           icon: BookOpen },
+    { id: "exam-form",          label: "Examination Form",  icon: FileText },      // ← master
+    { id: "scholarships",       label: "Scholarships",      icon: AwardIcon },
+    { id: "id-card",            label: "ID Card",           icon: IdCard },
+    { id: "overview", label: "Overview", icon: LayoutGrid },
+    { id: "attendance", label: "Attendance", icon: CalendarCheck },
+    { id: "assignments", label: "Assignments", icon: FileText },
+    { id: "fees", label: "Fees", icon: Wallet },
+    { id: "courses", label: "Courses", icon: BookOpen },
+    { id: "examschedule", label: "Exam Schedule", icon: Calendar },
+    { id: "academic-calendar", label: "Academic Calendar", icon: CalendarDays },
+    { id: "events", label: "Events", icon: CalendarDays },
+    { id: "results", label: "Results", icon: AwardIcon },
+    { id: "achievements", label: "Achievements", icon: Trophy },
+    { id: "leave", label: "Leave Requests", icon: ClipboardList },
+    { id: "library", label: "Library", icon: BookOpen },
+    { id: "exam-form", label: "Examination Form", icon: FileText },
+    { id: "leave", label: "Leave Requests", icon: ClipboardList },
+    { id: "library", label: "Library", icon: BookOpen },
+    { id: "exam-form", label: "Examination Form", icon: FileText },
+    { id: "bus-routes", label: "Bus Tracking", icon: Bus }
+  ];
+
   // Fixed: Removed duplicate renderTab function - now using inline rendering to avoid duplication
   // The old renderTab function was redundant and had dark mode issues
+
 
   if (loading) {
     return (
@@ -624,7 +677,9 @@ export default function StudentDashboard() {
               {activeTab === "fees" && <Fees />}
               {activeTab === "courses" && <Courses />}
               {activeTab === "examschedule" && <ExamSchedule />}
+
               {activeTab === "my-seat" && <StudentSeatView />}
+
               {activeTab === "academic-calendar" && (
                 <AcademicCalendar role="student" />
               )}
@@ -635,6 +690,22 @@ export default function StudentDashboard() {
               {activeTab === "leave" && <LeaveRequest />}
               {activeTab === "library" && <Library />}
               {activeTab === "exam-form" && <ExaminationForm />}
+
+              {activeTab === "scholarships" && <Scholarships />}
+              {activeTab === "feedback" && <StudentFeedback />}
+              {activeTab === "id-card" && <IDCard student={student} />}
+              {activeTab === "bus-routes" && <BusRoutes />}
+
+              {activeTab === "settings" && (
+                <div className="text-sm text-gray-600">
+                    Settings are not available yet for student accounts.
+                </div>
+            )}
+              {activeTab === "library" && <Library />}
+              {activeTab === "exam-form" && <ExaminationForm />}
+              {activeTab === "bus-routes" && <BusRoutes />}
+
+
               {activeTab === "feedback" && <StudentFeedback />}
               {activeTab === "bus-routes" && <BusRoutes />}
               {activeTab === "faculty" && <FacultyView />}
@@ -648,6 +719,7 @@ export default function StudentDashboard() {
                   Settings are not available yet for student accounts.
                 </div>
               )}
+
             </div>
           )}
 

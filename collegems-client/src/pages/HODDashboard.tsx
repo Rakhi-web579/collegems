@@ -5,9 +5,20 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
+
+  Moon, Sun, Award,Bus,MessageSquare
+} from "lucide-react";
+import api from "../api/axios";
+import Scholarships from "../common-components-management/Scholarships";
+import HODExamForms from "../hod-components/ExamForms";
+
+
+import BusRoutes from "../common-components-management/BusRoutes";
+
   Moon, Sun, MessageSquare, Award, Bus
 } from "lucide-react";
 import api from "../api/axios";
+
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
@@ -48,6 +59,11 @@ type TabType =
   | "settings"
   | "reports"
   | "exam-forms"
+
+  | "scholarships"
+  | "feedback"
+  | "bus-routes";
+
   | "feedback"
   | "scholarships"
   | "bus-routes"
@@ -58,6 +74,7 @@ type TabType =
   | "manage-resources"
   | "risk-dashboard"
   | "system-logs";
+
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -468,7 +485,130 @@ export default function HODDashboard() {
               {activeTab === "overview" ? "Welcome back. Here's what's happening with your department today." : `Manage ${activeLabel.toLowerCase()}.`}
             </p>
           </div>
+
+
+          {activeTab === "overview" && (
+            <div className="space-y-8">
+              {/* Profile Card */}
+              <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center overflow-hidden shrink-0">
+                      {profile?.avatarUrl ? (
+                        <img src={profile.avatarUrl} alt={profile.name || "HOD"} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-lg font-semibold text-blue-700">{profileInitials || "H"}</span>
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{profile?.name || "HOD Profile"}</h2>
+                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                          {profile?.role?.toUpperCase() || "HOD"}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {profile?.department || "Department not assigned"}
+                        {profile?.departmentCode ? ` • ${profile.departmentCode}` : ""}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+                        {profile?.email || "No email available"}
+                        {profile?.phone ? ` • ${profile.phone}` : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:min-w-[320px]">
+                    <div className="rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Designation</p>
+                      <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">Head of Department</p>
+                    </div>
+                    <div className="rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Last sync</p>
+                      <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                        {profileRefreshing ? "Refreshing..." : profileUpdatedAt
+                          ? profileUpdatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                          : "Waiting for data"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {profileError && (
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{profileError}</div>
+                )}
+              </section>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {statsCards?.map((card, index) => {
+                  const Icon = card.icon;
+                  const colorClasses = {
+                    blue: "bg-blue-50 text-blue-700",
+                    amber: "bg-amber-50 text-amber-700",
+                    emerald: "bg-emerald-50 text-emerald-700",
+                    purple: "bg-purple-50 text-purple-700",
+                  }[card.color];
+                  return (
+                    <div key={index} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{card.title}</p>
+                          <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</p>
+                        </div>
+                        <div className={`p-3 rounded-lg ${colorClasses}`}><Icon className="w-5 h-5" /></div>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                          View details <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { label: "Generate Reports", icon: FileText, color: "blue", onClick: () => navigate("/hod/reports") },
+                    { label: "View Students", icon: GraduationCap, color: "amber", onClick: () => setActiveTab("students") },
+                    { label: "Manage Courses", icon: BookOpen, color: "emerald", onClick: () => setActiveTab("courses") },
+                  ].map((action, index) => {
+                    const Icon = action.icon;
+                    const colorClasses = {
+                      blue: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+                      amber: "bg-amber-50 text-amber-700 hover:bg-amber-100",
+                      emerald: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+                    }[action.color as "blue" | "amber" | "emerald"];
+                    return (
+                      <button key={index} onClick={action.onClick} className={`flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors ${colorClasses}`}>
+                        <div className="p-2 rounded-lg bg-white dark:bg-gray-700"><Icon className="w-5 h-5" /></div>
+                        <span className="font-medium">{action.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "teachers" && <Teachers />}
+          {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
+          {activeTab === "students" && <Students />}
+          {activeTab === "salary" && <HODSalary />}
+          {activeTab === "academic-calendar" && <AcademicCalendar/>}
+          {activeTab === "library" && <Library />}
+          {activeTab === "courses" && <HODCourses />}
+          {activeTab === "settings" && <HODSettings />}
+          {activeTab === "feedback" && <FeedbackManagement />}
+          {activeTab === "exam-forms" && <HODExamForms />}
+          {activeTab === "scholarships" && <Scholarships />}
+          {activeTab === "bus-routes" && <BusRoutes />}
+
           {renderTab()}
+
         </main>
       </div>
     </div>

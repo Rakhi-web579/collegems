@@ -1,10 +1,11 @@
+import AcademicCalendar from "./common-components-management/AcademicCalendar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
 import TimeTable from "./user-components/TimeTable";
+
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
@@ -26,6 +27,7 @@ import LostFoundPortal from "./pages/LostFoundPortal";
 import VerifyStudent from "./pages/VerifyStudent";
 import RiskDashboard from "./pages/RiskDashboard";
 
+import DashboardLayout from "./layouts/DashboardLayout";
 import Library from "./common-components-management/Library";
 import ExamHalls from "./hod-components/ExamHalls";
 import HallAllocation from "./hod-components/HallAllocation";
@@ -36,6 +38,7 @@ import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
+
 
 export default function App() {
   return (
@@ -58,10 +61,21 @@ export default function App() {
 
         {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>
+
+        
+
+          {/* student/user pages */}
+          <Route path="/examschedule" element={<ExamSchedule />} />
+          <Route path="/results" element={<StudentResults />} />
+          <Route path="/events" element={<EventsStudent />} />
+          {/* <Route path="/calendar" element={<AcademicCalendar />} /> */}
+          <Route path="/calendar" element={<AcademicCalendar />} />
+
           {/* Student/User Pages */}
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
           <Route path="/events" element={<EventsStudent />} />
+
 
           <Route
             path="/courses"
@@ -82,6 +96,9 @@ export default function App() {
           />
 
           <Route path="/quickaccess" element={<QuickAccessAll />} />
+
+           <Route path="/timetable" element={ <TimeTable /> } /> 
+
 
           {/* Your Added Feature */}
           <Route path="/lost-found" element={<LostFoundPortal />} />
