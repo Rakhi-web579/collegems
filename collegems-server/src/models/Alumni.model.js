@@ -8,6 +8,10 @@ const alumniSchema = new mongoose.Schema({
   currentCompany: { type: String },
   designation: { type: String },
   linkedInUrl: { type: String },
+  skills: [{ type: String }],
+  achievements: { type: String },
+  experience: { type: String },
+  isVerified: { type: Boolean, default: false },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
 }, { timestamps: true });
 

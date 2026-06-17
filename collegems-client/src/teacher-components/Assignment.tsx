@@ -36,7 +36,7 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
   const [gradingId, setGradingId] = useState<string | null>(null);
   const hasCourseId = Boolean(courseId);
 
- const fetchAssignments = async () => {
+  const fetchAssignments = async () => {
     setLoadingAssignments(true);
     try {
       // FIX: Changed from /assignment/student to /assignment/teacher
@@ -64,7 +64,7 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
     fetchAssignments();
   }, [courseId]);
 
- const createAssignment = async () => {
+  const createAssignment = async () => {
     if (!hasCourseId) {
       setError("Select a course before creating an assignment.");
       return;
@@ -118,8 +118,7 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
     }
   };
 
-
-const fetchSubmissions = async (assignmentId: string) => {
+  const fetchSubmissions = async (assignmentId: string) => {
     setLoadingSubmissions(true);
     setViewingSubmissions({ _id: assignmentId, loading: true });
     
@@ -544,7 +543,6 @@ const fetchSubmissions = async (assignmentId: string) => {
                 const bTime = new Date(b.createdAt || b.dueDate || 0).getTime();
                 return bTime - aTime;
               })
-             
               .map((assignment) => {
                 const dueDate = assignment.dueDate
                   ? new Date(assignment.dueDate)
@@ -693,7 +691,16 @@ const fetchSubmissions = async (assignmentId: string) => {
                                 <p className="text-sm font-medium text-gray-900 truncate" title={sub.file.originalName}>{sub.file.originalName || "Attachment"}</p>
                                 <p className="text-xs text-gray-500">{(sub.file.size / 1024).toFixed(1)} KB</p>
                               </div>
-                             <a href={sub.file.url} target="_blank" rel="noreferrer" className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                              <a 
+                                href={
+                                  sub.file.url.startsWith("http") 
+                                    ? `${sub.file.url}?token=${localStorage.getItem("token")}` 
+                                    : `http://localhost:5000${sub.file.url}?token=${localStorage.getItem("token")}`
+                                } 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              >
                                 <Download className="w-4 h-4" />
                               </a>
                             </div>

@@ -21,6 +21,8 @@ import resultsRoutes from "./routes/results.routes.js";
 import libraryRoutes from "./routes/library.routes.js";
 import assessmentRoutes from "./routes/assessment.routes.js";
 import clubRoutes from "./routes/clubs.routes.js";
+import jobBoardRoutes from "./routes/jobBoard.routes.js";
+import discussionRoutes from "./routes/discussion.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import salaryRoutes from "./routes/salary.route.js";
 import academicCalendarRoutes from "./routes/academicCalendar.routes.js";
@@ -56,16 +58,43 @@ import timetableRoutes from './routes/timetable.routes.js'
 import plagiarismRoutes from "./routes/plagiarism.routes.js";
 import log from "./utils/logger.js";
 
+import httpContext from "express-http-context";
+import { v4 as uuidv4 } from "uuid";
+
 const app = express();
 
 // Middlewares
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173"];
+
 app.use(cors({
-  origin: (origin, callback) => { callback(null, true); },
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Correlation-ID"]
 }));
 app.use(express.json());
+
+// Correlation ID Tracking & Request Logging
+app.use(httpContext.middleware);
+app.use((req, res, next) => {
+  const correlationId = req.headers['x-correlation-id'] || uuidv4();
+  httpContext.set('correlationId', correlationId);
+  // Attach back to response headers so client knows
+  res.setHeader('X-Correlation-ID', correlationId);
+  
+  // Log request start
+  log.request(req.method, req.originalUrl, req.user?.id || "anonymous");
+  next();
+});
+
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
@@ -81,6 +110,8 @@ app.use("/api/results",           authenticate, resultsRoutes);
 app.use("/api/library",           libraryRoutes);
 app.use("/api/assessments", authenticate, assessmentRoutes);
 app.use("/api/clubs", authenticate, clubRoutes);
+app.use("/api/jobs", jobBoardRoutes);
+app.use("/api/discussions", discussionRoutes);
 app.use("/api/resources", authenticate, resourceRoutes);
 app.use("/api/bookings", authenticate, bookingRoutes);
 app.use("/api/mentorships", authenticate, mentorshipRoutes);
@@ -100,6 +131,7 @@ app.use("/api/syllabus", authenticate, syllabusRoutes);
 app.use("/api/reports",         reportRoutes);
 app.use("/api/feedback",        authenticate, feedbackRoutes);
 app.use("/api/placements",      authenticate, placementRoutes);
+app.use("/api/alumni",          alumniRoutes);
 app.use("/api/achievements",    authenticate, achievementRoutes); 
 app.use("/api/student/idcard", idCardRoutes);
 app.get("/api/verify/student/:studentId", authenticate, verifyStudent);
@@ -107,6 +139,7 @@ app.use("/api/bus-routes", authenticate, busRouteRoutes);
 app.use("/api/office-hours", officeHoursRoutes);
 app.use("/api/exam-halls", authenticate, examHallRoutes);
 app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
+app.use("/api/audit-logs", authenticate, auditLogRoutes);
 app.use("/api/complaints", complaintRoutes);
 
 app.use("/api/announcements", announcementRoutes);  

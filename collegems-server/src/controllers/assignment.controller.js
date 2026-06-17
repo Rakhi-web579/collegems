@@ -5,6 +5,8 @@
 
 import Assignment from "../models/Assignment.model.js";
 import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
 
 export const createAssignment = async (req, res) => {
   try {
@@ -101,7 +103,7 @@ export const submitAssignment = async (req, res) => {
       link: hasLink ? link : undefined,
       file: req.file
         ? {
-            url: `${baseUrl}/uploads/assignments/${req.file.filename}`,
+            url: `${baseUrl}/api/assignment/download/${req.file.filename}`,
             originalName: req.file.originalname,
             mimeType: req.file.mimetype,
             size: req.file.size,
@@ -255,23 +257,78 @@ export const getTeacherAssignments = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch teacher assignments" });
   }
 };
+
+// download assignment file securely
+export const downloadAssignmentFile = async (req, res) => {
+  try {
+    const { filename } = req.params;
+
+    // Find the assignment that has this submission filename
+    const assignment = await Assignment.findOne({ "submissions.file.filename": filename });
+
+    if (!assignment) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    // Find the specific submission inside this assignment
+    const submission = assignment.submissions.find(
+      (s) => s.file && s.file.filename === filename
+    );
+
+    if (!submission) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    // Check authorization:
+    // Teachers and HODs can download any file.
+    // Students can only download their own submissions.
+    const isTeacher = req.user.role === "teacher" || req.user.role === "hod";
+    const isOwner = submission.student.toString() === req.user.id;
+
+    if (!isTeacher && !isOwner) {
+      return res.status(403).json({ message: "Access denied. You are not authorized to download this file." });
+    }
+
+    const filePath = path.join(process.cwd(), "secure-uploads", "assignments", filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    // Set secure headers to prevent XSS / raw execution of files:
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Security-Policy", "default-src 'none'");
+
+    // Serve the file as a download/attachment with the original filename
+    res.download(filePath, submission.file.originalName);
+  } catch (error) {
+    console.error("Download Assignment Error:", error);
+    res.status(500).json({ message: "Failed to download file" });
+  }
+};
 /**
  * GET /api/assignment/teacher/submissions/:id
- * Fetches a specific assignment and populates the student details for the teacher view.
+ * Fetches a single assignment and populates the student data for the submissions
  */
 export const getAssignmentSubmissions = async (req, res) => {
   try {
-    const assignment = await Assignment.findById(req.params.id)
-      .populate("submissions.student", "name email avatarUrl photo") // Populates the student data!
-      .lean();
+    const assignmentId = req.params.id;
+    
+    // Find the assignment and populate the student details inside the submissions array
+    const assignment = await Assignment.findById(assignmentId)
+      .populate({
+        path: "submissions.student",
+        select: "name email avatarUrl photo", // Pulling in necessary student profile data
+      });
 
     if (!assignment) {
       return res.status(404).json({ message: "Assignment not found" });
     }
 
-    res.json(assignment);
+    res.status(200).json(assignment);
   } catch (error) {
-    console.error("Get Submissions Error:", error);
+    console.error("Error fetching assignment submissions:", error);
     res.status(500).json({ message: "Failed to fetch submissions" });
   }
 };
+

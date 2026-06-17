@@ -37,6 +37,7 @@ import AnnouncementManage from "../common-components-management/AnnouncementMana
 import Clubs from "../common-components-management/Clubs";
 import PlagiarismChecker from "../teacher-components/PlagiarismChecker";
 import { useNotifications } from "../hooks/useNotifications";
+import RiskDashboard from "./RiskDashboard";
 
 interface TeacherDashboardProps {
   initialTab?: string;
@@ -121,7 +122,8 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
     { id: "library", label: "Library Catalog", icon: Book },
     { id: "book-resources", label: "Book Resources", icon: CalendarDays },
     { id: "clubs", label: "Clubs & Organizations", icon: Users },
-   { id: "plagiarism-checker", label: "Plagiarism Checker", icon: ShieldCheck },
+    { id: "plagiarism-checker", label: "Plagiarism Checker", icon: ShieldCheck },
+    { id: "risk-dashboard", label: "Predictive Analytics", icon: LayoutDashboard },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -396,6 +398,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
           {activeTab === "book-resources" && <ResourceBooking />}
           {activeTab === "clubs" && <Clubs />}
           {activeTab === "plagiarism-checker" && <PlagiarismChecker />}
+          {activeTab === "risk-dashboard" && <RiskDashboard />}
           {activeTab === "announcements" && (
             <div className="space-y-8">
               <AnnouncementForm />

@@ -20,6 +20,7 @@ import {
   Bookmark,
   Inbox
 } from "lucide-react";
+import AdvancedExportButton from "./AdvancedExportButton";
 
 interface Book {
   _id: string;
@@ -456,6 +457,21 @@ export default function Library() {
                 >
                   <RotateCcw className="w-4 h-4" />
                 </button>
+                <AdvancedExportButton
+                  data={filteredBooks}
+                  filename="Library_Books_Export"
+                  pdfTitle="Library Catalog"
+                  headers={["Title", "Author", "Category", "ISBN", "Total Qty", "Available Qty", "Status"]}
+                  dataMapper={(book: Book) => [
+                    book.title,
+                    book.author,
+                    book.category,
+                    book.isbn || "N/A",
+                    book.quantity.toString(),
+                    book.availableQuantity.toString(),
+                    book.status.toUpperCase()
+                  ]}
+                />
               </div>
             </div>
 

@@ -1,24 +1,21 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
+import React, { useState, useEffect } from "react";
 import {
   Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  MapPin,
   Plus,
   Search,
-  Trash2,
+  ChevronLeft,
+  ChevronRight,
   X,
-  Loader2,
-  Edit2
+  Clock,
+  MapPin,
+  Edit2,
+  Trash2,
+  Loader2
 } from "lucide-react";
+import api from "../api/axios";
 
-interface AcademicCalendarProps {
-  role: "student" | "teacher" | "hod";
-}
-
-interface CalendarEvent {
+// 1. Fixed the broken interface
+export interface CalendarEvent {
   _id?: string;
   title: string;
   description: string;
@@ -28,6 +25,10 @@ interface CalendarEvent {
   endTime?: string;
   location?: string;
   isSystemGenerated?: boolean;
+}
+
+interface AcademicCalendarProps {
+  role?: string;
 }
 
 export default function AcademicCalendar({ role }: AcademicCalendarProps) {
@@ -197,7 +198,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
 
   return (
     <div className="space-y-4">
-      {/* Top Header - FIXED */}
+      {/* Top Header */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -215,7 +216,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
         )}
       </div>
 
-      {/* Filters - FIXED */}
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl shadow-xs">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
@@ -241,9 +242,9 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
         </select>
       </div>
 
-      {/* Calendar Grid Container - FIXED */}
+      {/* Calendar Grid Container */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-xs">
-        {/* Month Selector - FIXED */}
+        {/* Month Selector */}
         <div className="flex justify-between items-center mb-4">
           <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
             {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
@@ -261,7 +262,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
           </div>
         </div>
 
-        {/* Days grid - FIXED */}
+        {/* Days grid */}
         <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
             <div key={d} className="py-1">{d}</div>
@@ -274,7 +275,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
             <div key={`blank-${i}`} className="min-h-[60px] bg-gray-50/50 dark:bg-gray-800/50 rounded-lg opacity-30" />
           ))}
 
-          {/* Current month days - FIXED */}
+          {/* Current month days */}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
             const dayEvents = getDayEvents(day);
@@ -317,7 +318,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
         </div>
       </div>
 
-      {/* LEGEND - FIXED */}
+      {/* LEGEND */}
       <div className="flex flex-wrap gap-3 text-[9px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
         {categories.map((c) => (
           <div key={c} className="flex items-center gap-1">
@@ -333,7 +334,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
         ))}
       </div>
 
-      {/* DETAIL MODAL - FIXED */}
+      {/* DETAIL MODAL */}
       {showDetails && selectedEvent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg max-w-md w-full overflow-hidden">
@@ -387,7 +388,7 @@ export default function AcademicCalendar({ role }: AcademicCalendarProps) {
         </div>
       )}
 
-      {/* FORM MODAL - FIXED */}
+      {/* FORM MODAL */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg max-w-md w-full overflow-hidden">

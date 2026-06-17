@@ -35,7 +35,12 @@ export default function Navbar(){
 
                     {/* Right side buttons */}
                     <div className="flex items-center space-x-3">
-                    {/* Theme Toggle */}
+                    <button
+                        onClick={() => navigate("/calendar")}
+                        className="px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+                        >
+                        📅 Calendar
+                    </button>
                     <button
                         onClick={toggleTheme}
                         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
