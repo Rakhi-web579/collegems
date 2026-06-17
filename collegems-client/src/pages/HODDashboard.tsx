@@ -27,8 +27,6 @@ import HallAllocation from "../hod-components/HallAllocation";
 import AuditLogs from "../hod-components/AuditLogs";
 import BookingManagement from "../hod-components/BookingManagement";
 import ResourceManagement from "../hod-components/ResourceManagement";
-import RiskDashboard from "./RiskDashboard";
-import SystemLogsDashboard from "../hod-components/SystemLogsDashboard";
 
 
 type TabType =

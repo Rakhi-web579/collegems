@@ -1,28 +1,37 @@
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 
+// Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = "uploads/resumes";
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    cb(null, dir);
+    cb(null, "uploads/assignments/");
   },
   filename: (req, file, cb) => {
-    cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
+    cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`); 
   },
 });
 
-export const uploadResume = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === "application/pdf") {
-      cb(null, true);
-    } else {
-      cb(new Error("Only PDF files are allowed for resumes"));
-    }
+// File Type Validation (The Filter)
+const fileFilter = (req, file, cb) => {
+  const allowedMimeTypes = [
+    "application/pdf", // .pdf
+    "application/msword", // .doc
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  ];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true); // Accept the file
+  } else {
+    // Reject the file
+    cb(new Error("Invalid file type. Only PDF and Word documents are allowed."), false);
+  }
+};
+
+// Export the configured middleware
+export const uploadAssignment = multer({
+  storage: storage,
+  limits: { 
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   },
+  fileFilter: fileFilter,
 });
