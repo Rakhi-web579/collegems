@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import api from "../api/axios";
 import { useServerDataTable } from "../hooks/useServerDataTable";
+import AdvancedExportButton from "./AdvancedExportButton";
 
 interface Student {
   _id?: string;
@@ -101,6 +102,16 @@ const Students: React.FC = () => {
     });
   };
 
+  const studentHeaders = ["Name", "Email", "Student ID", "Course", "Semester", "Joined Date"];
+  const studentMapper = (student: Student) => [
+    student.name || "N/A",
+    student.email || "N/A",
+    student.studentId || "N/A",
+    student.course || "N/A",
+    student.semester?.toString() || "N/A",
+    formatDate(student.joinedAt)
+  ];
+
   return (
     <div className="space-y-6">
       {/* Stats Cards - Simplified since we only have server data now */}
@@ -165,6 +176,13 @@ const Students: React.FC = () => {
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </button>
+              <AdvancedExportButton 
+                data={students}
+                filename="Students_Export"
+                pdfTitle="Students Report"
+                headers={studentHeaders}
+                dataMapper={studentMapper}
+              />
             </div>
           </div>
 
