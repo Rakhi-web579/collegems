@@ -10,7 +10,9 @@ import {
   updatePreferences,
   getStudentProfile,
   getStudents,
+  uploadResumeFile,
 } from "../controllers/user.controller.js";
+import { uploadResume } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -33,6 +35,15 @@ router.put(
   protect,
   authorize("teacher", "hod"),
   updatePreferences,
+);
+
+// Resume Upload
+router.post(
+  "/me/resume",
+  protect,
+  authorize("student", "alumni"),
+  uploadResume.single("resume"),
+  uploadResumeFile
 );
 
 // Teacher fetches all students (Paginated)
