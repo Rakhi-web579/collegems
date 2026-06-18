@@ -14,9 +14,12 @@ import {
   XCircle,
   FolderOpen,
   FileCheck,
+  MessageSquare, // Added MessageSquare import
+  X, // Added X for the modal close button
 } from "lucide-react";
 import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
+import AssignmentComments from "../common-components-management/AssignmentComments";
 
 export default function Assignment() {
   const [assignments, setAssignments] = useState<any[]>([]);
@@ -25,6 +28,9 @@ export default function Assignment() {
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeSubmission, setActiveSubmission] = useState<any | null>(null);
+  // NEW: State for viewing the comments modal
+  const [viewingComments, setViewingComments] = useState<any | null>(null); 
+  
   const [submissionForm, setSubmissionForm] = useState({
     textResponse: "",
     link: "",
@@ -64,7 +70,6 @@ export default function Assignment() {
     setSubmitError(null);
   };
 
-  // NEW: Pre-upload validation handler
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     
@@ -562,7 +567,7 @@ export default function Assignment() {
                 )}
 
                 {/* Actions */}
-                <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-gray-100">
                   {assignment.instructionsFile && (
                     <a
                       href={assignment.instructionsFile}
@@ -574,6 +579,15 @@ export default function Assignment() {
                       Instructions
                     </a>
                   )}
+
+                  {/* NEW: Comments Button */}
+                  <button
+                    onClick={() => setViewingComments(assignment)}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Class Comments ({assignment.comments?.length || 0})
+                  </button>
 
                   {!submitted ? (
                     <button
@@ -610,13 +624,14 @@ export default function Assignment() {
         </div>
       )}
 
+      {/* Submission Modal */}
       {activeSubmission && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
             onClick={closeSubmission}
           />
-          <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+          <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden animate-in fade-in zoom-in-95">
             <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
                 <div>
@@ -729,6 +744,39 @@ export default function Assignment() {
                   {submitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Comments Modal */}
+      {viewingComments && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-in fade-in" 
+            onClick={() => setViewingComments(null)} 
+          />
+          <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
+            <div className="px-6 py-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {viewingComments.title}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">Class Discussion</p>
+              </div>
+              <button 
+                onClick={() => setViewingComments(null)} 
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto">
+              <AssignmentComments 
+                assignmentId={viewingComments._id} 
+                initialComments={viewingComments.comments || []} 
+              />
             </div>
           </div>
         </div>

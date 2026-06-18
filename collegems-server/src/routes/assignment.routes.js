@@ -20,7 +20,8 @@ import {
   downloadAssignmentFile,
   getTeacherAssignments,
   getAssignmentSubmissions,
-  getUpcomingAssignments 
+  getUpcomingAssignments ,
+  addAssignmentComment
 } from "../controllers/assignment.controller.js";
 
 const router = express.Router();
@@ -140,6 +141,7 @@ router.post(
   allowRoles("teacher"),
   asyncHandler(evaluateAssignment)
 );
+router.post("/:id/comments", protect, asyncHandler(addAssignmentComment));
 
 router.get("/teacher", protect, restrictTo("teacher", "hod"), getTeacherAssignments);
 
@@ -151,7 +153,8 @@ router.get(
     log.request("GET", "/api/assignment/student", req.user?.id);
     const assignments = await Assignment.find()
       .populate("course", "name code")
-      .populate("teacher", "name");
+      .populate("teacher", "name")
+      .populate("comments.user", "name role avatarUrl photo"); 
     res.json({ success: true, data: assignments });
   })
 );
@@ -183,6 +186,16 @@ router.get(
     res.json({ success: true, data: assignment });
   })
 );
+
+router.get(
+  "/reminders",
+  protect,
+  allowRoles("student"),
+  asyncHandler(getUpcomingAssignments)
+);
+
+// The new StackOverflow-style Comments Route!
+router.post("/:id/comments", protect, asyncHandler(addAssignmentComment));
 
 router.get(
   "/reminders",
