@@ -181,6 +181,7 @@ export const getStudents = async (req, res) => {
       searchFields: ["name", "email", "studentId"],
       select: "name email role studentId course semester joinedAt lastUpdated",
       defaultSort: { name: 1 },
+      defaultLimit: 20,
     });
 
     res.json(result);
