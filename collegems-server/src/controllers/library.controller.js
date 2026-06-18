@@ -209,6 +209,18 @@ export const getIssueRecords = async (req, res) => {
 
     if (role === "student") {
       query.user = id;
+    } else if (role === "parent") {
+      const parentUser = await User.findById(id);
+      if (parentUser && parentUser.studentId) {
+        const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+        if (studentUser) {
+          query.user = studentUser._id;
+        } else {
+          query.user = null;
+        }
+      } else {
+        query.user = null;
+      }
     }
 
     // Update overdue statuses dynamically

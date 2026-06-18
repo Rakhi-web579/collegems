@@ -207,6 +207,49 @@ export const getDashboardData = async (req, res) => {
     });
   }
 
+  // 👪 PARENT
+  if (role === "parent") {
+    const studentUser = await User.findOne({ studentId: user?.studentId, role: "student" }).lean();
+    if (!studentUser) {
+      return res.json({
+        user,
+        student: null,
+        message: "No child student found linked to this account",
+        cards: [
+          { title: "Attendance %", value: "0%" },
+          { title: "Pending Assignments", value: 0 },
+          { title: "Fee Due", value: 0 },
+        ],
+      });
+    }
+
+    const total = await Attendance.countDocuments({ student: studentUser._id });
+    const present = await Attendance.countDocuments({
+      student: studentUser._id,
+      status: "present",
+    });
+
+    const assignments = await Assignment.countDocuments({
+      "submissions.student": { $ne: studentUser._id },
+    });
+
+    const fee = await Fee.findOne({ student: studentUser._id });
+
+    return res.json({
+      user,
+      student: studentUser,
+      currentSemester: studentUser?.semester,
+      cards: [
+        {
+          title: "Attendance %",
+          value: total ? Math.round((present / total) * 100) + "%" : "0%",
+        },
+        { title: "Pending Assignments", value: assignments },
+        { title: "Fee Due", value: fee ? fee.total - fee.paid : 0 },
+      ],
+    });
+  }
+
   // 👨‍🏫 TEACHER
   if (role === "teacher") {
     const courses = await Course.countDocuments({ teacher: id });

@@ -118,9 +118,8 @@ router.delete(
 router.get(
   "/all",
   protect,
-  allowRoles("student", "teacher", "admin", "hod"),
-  asyncHandler(async (req, res) => {
-    log.request("GET", "/api/examschedule/all", req.user?.id);
+  allowRoles("student", "teacher", "admin", "hod", "parent"),
+  async (req, res) => {
     const examSchedule = await ExamSchedule.find({});
     res.json({ success: true, data: examSchedule });
   })

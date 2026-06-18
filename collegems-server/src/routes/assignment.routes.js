@@ -143,12 +143,10 @@ router.post(
 
 router.get("/teacher", protect, restrictTo("teacher", "hod"), getTeacherAssignments);
 
-router.get(
-  "/student",
-  protect,
-  allowRoles("student", "teacher"),
-  asyncHandler(async (req, res) => {
-    log.request("GET", "/api/assignment/student", req.user?.id);
+// get assignments for a course
+// Student assignments (course-wise)
+router.get("/student", protect, allowRoles("student","teacher","parent"), async (req, res) => {
+  try {
     const assignments = await Assignment.find()
       .populate("course", "name code")
       .populate("teacher", "name");

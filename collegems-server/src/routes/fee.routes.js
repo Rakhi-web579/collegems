@@ -46,15 +46,25 @@ router.post(
   })
 );
 
-// Pay installment
-router.post(
-  "/pay",
-  protect,
-  allowRoles("student", "parent"),
-  asyncHandler(async (req, res) => {
+// installment pay
+router.post("/pay", protect, allowRoles("student", "parent"), async (req, res) => {
+  try {
     const { amount } = req.body;
+    let studentId = req.user.id;
+    if (req.user.role === "parent") {
+      const User = (await import("../models/User.model.js")).default;
+      const parentUser = await User.findById(req.user.id);
+      if (!parentUser || !parentUser.studentId) {
+        return res.status(400).json({ message: "No child linked to this parent account" });
+      }
+      const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+      if (!studentUser) {
+        return res.status(404).json({ message: "Linked student not found" });
+      }
+      studentId = studentUser._id;
+    }
 
-    log.request("POST", "/api/fee/pay", req.user?.id);
+    const fee = await Fee.findOne({ student: studentId });
 
     if (!amount || amount <= 0) {
       throw new AppError("Valid amount is required", 400, "INVALID_AMOUNT");
@@ -87,22 +97,23 @@ router.post(
   })
 );
 
-// Student views own fee
-router.get(
-  "/me",
-  protect,
-  allowRoles("student", "parent"),
-  asyncHandler(async (req, res) => {
-    log.request("GET", "/api/fee/me", req.user?.id);
-
+router.get("/me", protect, allowRoles("student", "parent"), async (req, res) => {
+  try {
     let studentId = req.user.id;
     if (req.user.role === "parent") {
-      const parent = await User.findById(req.user.id);
-      if (!parent || !parent.childId) {
-        throw new AppError("No child linked to parent account", 400, "NO_CHILD_LINKED");
+      const User = (await import("../models/User.model.js")).default;
+      const parentUser = await User.findById(req.user.id);
+      if (!parentUser || !parentUser.studentId) {
+        return res.status(400).json({ message: "No child linked to this parent account" });
       }
-      studentId = parent.childId;
+      const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+      if (!studentUser) {
+        return res.status(404).json({ message: "Linked student not found" });
+      }
+      studentId = studentUser._id;
     }
+
+    const fee = await Fee.findOne({ student: studentId });
 
     const fee = await Fee.findOne({ student: studentId });
     if (!fee) {
