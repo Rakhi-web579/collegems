@@ -39,7 +39,9 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
   const fetchAssignments = async () => {
     setLoadingAssignments(true);
     try {
-      const res = await api.get("/assignment/student");
+      // FIX: Changed from /assignment/student to /assignment/teacher
+      const res = await api.get("/assignment/teacher"); 
+      
       const items = Array.isArray(res.data) ? res.data : [];
       const filtered = courseId
         ? items.filter((assignment) => {
@@ -78,7 +80,8 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
     setError(null);
 
     try {
-      await api.post("/assignment/create", {
+      // 1. Capture the backend response containing the newly created assignment
+      const response = await api.post("/assignment/create", {
         title,
         description,
         courseId,
@@ -87,7 +90,10 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
         submissionType,
       });
 
-      // Show success message
+      // 2. OPTIMISTIC UI UPDATE: Push the new assignment directly into the UI state
+      setAssignments((prev) => [response.data, ...prev]);
+
+      // 3. Show success message
       const successMessage = document.createElement("div");
       successMessage.className =
         "fixed top-4 right-4 bg-green-50 text-green-800 px-4 py-3 rounded-lg border border-green-200 shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-top-2";
@@ -102,6 +108,8 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
 
       resetForm();
       setOpen(false);
+      
+      // Keep background fetch to ensure all populated fields (like course name) are strictly synced
       await fetchAssignments();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Error creating assignment");
@@ -110,20 +118,38 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
     }
   };
 
-
   const fetchSubmissions = async (assignmentId: string) => {
     setLoadingSubmissions(true);
     setViewingSubmissions({ _id: assignmentId, loading: true });
+    
     try {
-      const res = await api.get(`/assignment/teacher/submissions/${assignmentId}`);
-      setViewingSubmissions(extractArray(res.data));
-      // Initialize edited marks
+      // 1. Fetch fresh data from the main teacher route we KNOW works perfectly
+      const res = await api.get("/assignment/teacher");
+      const items = Array.isArray(res.data) ? res.data : [];
+      
+      // 2. Find the exact assignment the teacher clicked on
+      const assignmentData = items.find((a: any) => a._id === assignmentId);
+      
+      if (!assignmentData) {
+        throw new Error("Assignment not found in database");
+      }
+
+      // 3. Extract the submissions safely
+      const submissionsList = assignmentData.submissions || [];
+      
+      setViewingSubmissions({
+        ...assignmentData,
+        submissions: submissionsList
+      });
+
+      // 4. Initialize edited marks safely
       const marksObj: Record<string, string> = {};
-      res.data.submissions.forEach((sub: any) => {
-        if (sub.marks !== undefined) {
+      submissionsList.forEach((sub: any) => {
+        if (sub.marks !== undefined && sub.student && sub.student._id) {
           marksObj[sub.student._id] = String(sub.marks);
         }
       });
+      
       setEditedMarks(marksObj);
     } catch (err: any) {
       console.error(err);
@@ -517,7 +543,6 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                 const bTime = new Date(b.createdAt || b.dueDate || 0).getTime();
                 return bTime - aTime;
               })
-              .slice(0, 3)
               .map((assignment) => {
                 const dueDate = assignment.dueDate
                   ? new Date(assignment.dueDate)

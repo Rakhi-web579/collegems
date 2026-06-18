@@ -1,7 +1,4 @@
 // ─── FILE: collegems-server/src/routes/assignment.routes.js ──────────────────
-// WHAT CHANGED: Added import for getUpcomingAssignments + one new GET route.
-// Everything else is identical to your original file.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import express from "express";
 import fs from "fs";
@@ -9,19 +6,22 @@ import path from "path";
 import multer from "multer";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.js";
-import { getTeacherAssignments } from '../controllers/assignment.controller.js';
 import { protect, restrictTo } from '../middlewares/auth.middleware.js';
 import { uploadAssignment } from '../middlewares/upload.middleware.js';
-import { getAssignmentSubmissions } from '../controllers/assignment.controller.js';
 import log from "../utils/logger.js";
+import Assignment from "../models/Assignment.model.js";
+import { verifyFileSignature, scanFileForMalware } from "../utils/malwareScanner.js";
+
+// Consolidated all controller imports into one clean block, INCLUDING getUpcomingAssignments
 import {
   createAssignment,
   submitAssignment,
   evaluateAssignment,
   downloadAssignmentFile,
+  getTeacherAssignments,
+  getAssignmentSubmissions,
+  getUpcomingAssignments 
 } from "../controllers/assignment.controller.js";
-import Assignment from "../models/Assignment.model.js";
-import { verifyFileSignature, scanFileForMalware } from "../utils/malwareScanner.js";
 
 const router = express.Router();
 
@@ -111,8 +111,10 @@ const validateUploadedFile = async (req, res, next) => {
 };
 
 // ── Existing routes with error handling ───────────────────────────────────────
+
 router.post("/create", protect, allowRoles("teacher"), asyncHandler(createAssignment));
 
+// Single robust submit route (removed the duplicate conflicting one)
 router.post(
   "/submit/:id",
   protect,
@@ -127,9 +129,8 @@ router.post(
     });
   },
   validateUploadedFile,
-  submitAssignment,
+  submitAssignment
 );
-router.post("/submit/:id", protect, restrictTo("student"), uploadAssignment.single("file"), submitAssignment);
 
 router.get("/download/:filename", protect, downloadAssignmentFile);
 
@@ -139,6 +140,7 @@ router.post(
   allowRoles("teacher"),
   asyncHandler(evaluateAssignment)
 );
+
 router.get("/teacher", protect, restrictTo("teacher", "hod"), getTeacherAssignments);
 
 router.get(
@@ -154,6 +156,7 @@ router.get(
   })
 );
 
+// Fixed the nested route bug here
 router.get(
   "/teacher/submissions/:assignmentId",
   protect,
@@ -165,7 +168,6 @@ router.get(
     if (!assignmentId) {
       throw new AppError("Assignment ID is required", 400, "MISSING_ID");
     }
-    router.get("/teacher/submissions/:id", protect, restrictTo("teacher", "hod"), getAssignmentSubmissions);
 
     const assignment = await Assignment.findById(assignmentId)
       .populate(

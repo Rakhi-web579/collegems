@@ -306,4 +306,29 @@ export const downloadAssignmentFile = async (req, res) => {
     res.status(500).json({ message: "Failed to download file" });
   }
 };
+/**
+ * GET /api/assignment/teacher/submissions/:id
+ * Fetches a single assignment and populates the student data for the submissions
+ */
+export const getAssignmentSubmissions = async (req, res) => {
+  try {
+    const assignmentId = req.params.id;
+    
+    // Find the assignment and populate the student details inside the submissions array
+    const assignment = await Assignment.findById(assignmentId)
+      .populate({
+        path: "submissions.student",
+        select: "name email avatarUrl photo", // Pulling in necessary student profile data
+      });
+
+    if (!assignment) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    res.status(200).json(assignment);
+  } catch (error) {
+    console.error("Error fetching assignment submissions:", error);
+    res.status(500).json({ message: "Failed to fetch submissions" });
+  }
+};
 
