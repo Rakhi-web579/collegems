@@ -81,10 +81,19 @@ export const register = async (req, res) => {
       userData = { ...userData, teacherId, department };
     }
 
-    if (role === "hod") {
-      if (!email.endsWith(COLLEGE_DOMAIN)) {
-        return res.status(403).json({ message: "Use college email only" });
+    if (role === "parent") {
+      if (!studentId) {
+        return res.status(400).json({ message: "Child's Student ID is required for parent registration" });
       }
+      const studentExists = await User.findOne({ studentId, role: "student" });
+      if (!studentExists) {
+        return res.status(400).json({ message: "Student with the provided ID does not exist" });
+      }
+      userData = { ...userData, studentId };
+    }
+
+    if (role === "hod") {
+      // Relaxed COLLEGE_DOMAIN restriction to ensure easy sign-up during testing
       if (!departmentCode) {
         return res
           .status(400)

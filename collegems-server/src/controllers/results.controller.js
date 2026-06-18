@@ -10,8 +10,22 @@ export const getResults = async (req, res) => {
             });
         }
 
+        let studentId = req.user.id;
+        if (req.user.role === "parent") {
+            const User = (await import("../models/User.model.js")).default;
+            const parentUser = await User.findById(req.user.id);
+            if (!parentUser || !parentUser.studentId) {
+                return res.status(400).json({ message: "No child linked to this parent account" });
+            }
+            const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+            if (!studentUser) {
+                return res.status(404).json({ message: "Linked student not found" });
+            }
+            studentId = studentUser._id;
+        }
+
         const results = await Results.find({
-            studentId: req.user.id,
+            studentId: studentId,
             status: "published",
         })
             .populate("courseId", "name code")

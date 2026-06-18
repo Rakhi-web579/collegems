@@ -37,11 +37,24 @@ router.post("/set", protect, allowRoles("hod"), async (req, res) => {
 });
 
 // installment pay
-router.post("/pay", protect, allowRoles("student"), async (req, res) => {
+router.post("/pay", protect, allowRoles("student", "parent"), async (req, res) => {
   try {
     const { amount } = req.body;
+    let studentId = req.user.id;
+    if (req.user.role === "parent") {
+      const User = (await import("../models/User.model.js")).default;
+      const parentUser = await User.findById(req.user.id);
+      if (!parentUser || !parentUser.studentId) {
+        return res.status(400).json({ message: "No child linked to this parent account" });
+      }
+      const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+      if (!studentUser) {
+        return res.status(404).json({ message: "Linked student not found" });
+      }
+      studentId = studentUser._id;
+    }
 
-    const fee = await Fee.findOne({ student: req.user.id });
+    const fee = await Fee.findOne({ student: studentId });
 
     if (!fee) {
       return res.status(404).json({ message: "Fee record not found" });
@@ -64,9 +77,23 @@ router.post("/pay", protect, allowRoles("student"), async (req, res) => {
 
 //  Student views own fee
 
-router.get("/me", protect, allowRoles("student"), async (req, res) => {
+router.get("/me", protect, allowRoles("student", "parent"), async (req, res) => {
   try {
-    const fee = await Fee.findOne({ student: req.user.id });
+    let studentId = req.user.id;
+    if (req.user.role === "parent") {
+      const User = (await import("../models/User.model.js")).default;
+      const parentUser = await User.findById(req.user.id);
+      if (!parentUser || !parentUser.studentId) {
+        return res.status(400).json({ message: "No child linked to this parent account" });
+      }
+      const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+      if (!studentUser) {
+        return res.status(404).json({ message: "Linked student not found" });
+      }
+      studentId = studentUser._id;
+    }
+
+    const fee = await Fee.findOne({ student: studentId });
 
     if (!fee) {
       return res.status(404).json({

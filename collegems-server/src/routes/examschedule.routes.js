@@ -120,7 +120,7 @@ router.delete(
 router.get(
   "/all",
   protect,
-  allowRoles("student", "teacher", "admin", "hod"),
+  allowRoles("student", "teacher", "admin", "hod", "parent"),
   async (req, res) => {
     const examSchedule = await ExamSchedule.find({});
     res.json(examSchedule);

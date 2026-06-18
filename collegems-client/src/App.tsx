@@ -6,6 +6,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
+import ParentDashboard from "./pages/ParentDashboard";
 import MainDashboard from "./pages/MainDashboard";
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
@@ -121,6 +122,14 @@ export default function App() {
           element={
             <RoleRoute role="hod">
               <ReportGenerator />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/parent/dashboard"
+          element={
+            <RoleRoute role="parent">
+              <ParentDashboard />
             </RoleRoute>
           }
         />

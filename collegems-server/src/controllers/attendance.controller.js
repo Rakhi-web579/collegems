@@ -24,9 +24,27 @@ export const markAttendance = async (req, res) => {
 };
 
 export const getMyAttendance = async (req, res) => {
-  const data = await Attendance.find({
-    student: req.user.id,
-  }).populate("course", "name");
+  try {
+    let studentId = req.user.id;
+    if (req.user.role === "parent") {
+      const User = (await import("../models/User.model.js")).default;
+      const parentUser = await User.findById(req.user.id);
+      if (!parentUser || !parentUser.studentId) {
+        return res.status(400).json({ message: "No child linked to this parent account" });
+      }
+      const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+      if (!studentUser) {
+        return res.status(404).json({ message: "Linked student not found" });
+      }
+      studentId = studentUser._id;
+    }
 
-  res.json(data);
+    const data = await Attendance.find({
+      student: studentId,
+    }).populate("course", "name");
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

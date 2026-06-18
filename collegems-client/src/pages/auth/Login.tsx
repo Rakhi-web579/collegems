@@ -30,11 +30,12 @@ export default function Login() {
       const res = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("userId", res.data.user.id);
       localStorage.setItem("userData", JSON.stringify(res.data.user));
       if (rememberMe) localStorage.setItem("rememberEmail", email);
       else localStorage.removeItem("rememberEmail");
       const role = res.data.user.role;
-      const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard" };
+      const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard", parent: "/parent/dashboard" };
       navigate(routes[role] || "/");
     } catch (err: any) {
       const errorMessage =
@@ -51,6 +52,7 @@ export default function Login() {
   const roleHighlights = [
     { role: "Student", icon: Users, color: "blue" },
     { role: "Teacher", icon: BookOpen, color: "amber" },
+    { role: "Parent", icon: Users, color: "purple" },
     { role: "HOD", icon: Shield, color: "emerald" },
   ];
 
@@ -92,7 +94,8 @@ export default function Login() {
                 blue: "bg-blue-50 text-blue-700",
                 amber: "bg-amber-50 text-amber-700",
                 emerald: "bg-emerald-50 text-emerald-700",
-              }[item.color];
+                purple: "bg-purple-50 text-purple-700",
+              }[item.color as "blue" | "amber" | "emerald" | "purple"];
               return (
                 <div key={index} className="text-center">
                   <div className={`w-10 h-10 ${colors} rounded-lg flex items-center justify-center mx-auto mb-1`}>

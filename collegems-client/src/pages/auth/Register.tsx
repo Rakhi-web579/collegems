@@ -36,9 +36,10 @@ export default function Register() {
       const res = await api.post("/auth/register", { ...form, role });
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("userId", res.data.user.id);
       localStorage.setItem("userData", JSON.stringify(res.data.user));
       setForm({});
-      const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard" };
+      const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard", parent: "/parent/dashboard" };
       navigate(routes[res.data.user.role] || "/");
     } catch (err: any) {
       if (err.response?.data?.errors && Array.isArray(err.response.data.errors) && err.response.data.errors.length > 0) {
@@ -54,17 +55,19 @@ export default function Register() {
   const roleOptions = [
     { value: "student", label: "Student", icon: GraduationCap, color: "blue", description: "Access courses, assignments, and grades" },
     { value: "teacher", label: "Teacher", icon: Users, color: "amber", description: "Manage classes, assignments, and attendance" },
+    { value: "parent", label: "Parent", icon: Users, color: "purple", description: "Monitor your child's academic progress" },
     { value: "hod", label: "HOD", icon: Shield, color: "emerald", description: "Oversee department and faculty" },
   ];
 
   const getRoleColor = (roleValue: string) => {
-    switch (roleValue) { case "student": return "blue"; case "teacher": return "amber"; case "hod": return "emerald"; default: return "blue"; }
+    switch (roleValue) { case "student": return "blue"; case "teacher": return "amber"; case "hod": return "emerald"; case "parent": return "purple"; default: return "blue"; }
   };
 
   const colorClasses = {
     blue:    { bg: "bg-blue-50",    text: "text-blue-700",    border: "border-blue-200",    ring: "ring-blue-500",    button: "bg-blue-600 hover:bg-blue-700",    light: "bg-blue-100" },
     amber:   { bg: "bg-amber-50",   text: "text-amber-700",   border: "border-amber-200",   ring: "ring-amber-500",   button: "bg-amber-600 hover:bg-amber-700",   light: "bg-amber-100" },
     emerald: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", ring: "ring-emerald-500", button: "bg-emerald-600 hover:bg-emerald-700", light: "bg-emerald-100" },
+    purple:  { bg: "bg-purple-50",  text: "text-purple-700",  border: "border-purple-200",  ring: "ring-purple-500",  button: "bg-purple-600 hover:bg-purple-700",  light: "bg-purple-100" },
   };
 
   const currentColor = colorClasses[getRoleColor(role) as keyof typeof colorClasses];
@@ -242,6 +245,22 @@ export default function Register() {
                 <div>
                   <label htmlFor="experience" className={labelClass}>Years of Experience</label>
                   <input id="experience" name="experience" type="number" value={form.experience || ""} onChange={handleChange} className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500" placeholder="10" />
+                </div>
+              </div>
+            )}
+
+            {/* Parent Fields */}
+            {role === "parent" && (
+              <div className="space-y-4 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple-600" /> Parent Information
+                </h3>
+                <div>
+                  <label htmlFor="studentId" className={labelClass}>Child's Student ID *</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><IdCard className="h-4 w-4 text-gray-400" /></div>
+                    <input id="studentId" name="studentId" value={form.studentId || ""} onChange={handleChange} className={inputClass} placeholder="STU2024001" />
+                  </div>
                 </div>
               </div>
             )}

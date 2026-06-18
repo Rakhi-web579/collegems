@@ -18,6 +18,10 @@ import {
 import api from "../api/axios";
 
 export default function Assignment() {
+  const getUserId = () => {
+    const role = localStorage.getItem("role");
+    return role === "parent" ? localStorage.getItem("childStudentId") : localStorage.getItem("userId");
+  };
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -123,7 +127,7 @@ export default function Assignment() {
 
   // Filter assignments
   const filteredAssignments = assignments.filter((a) => {
-    const userId = localStorage.getItem("userId");
+    const userId = getUserId();
     const submitted = a.submissions?.some((s: any) => {
       if (!s.student || !userId) return false;
       return s.student.toString() === userId;
@@ -146,7 +150,7 @@ export default function Assignment() {
 
   // Sort assignments
   const sortedAssignments = [...filteredAssignments].sort((a, b) => {
-    const userId = localStorage.getItem("userId");
+    const userId = getUserId();
 
     const aSubmitted = a.submissions?.some(
       (s: any) => s.student?.toString() === userId,
@@ -179,7 +183,7 @@ export default function Assignment() {
   const stats = {
     total: assignments.length,
     pending: assignments.filter((a) => {
-      const userId = localStorage.getItem("userId");
+      const userId = getUserId();
       const submitted = a.submissions?.some(
         (s: any) => s.student?.toString() === userId,
       );
@@ -188,11 +192,11 @@ export default function Assignment() {
       return !submitted && dueDate > now;
     }).length,
     submitted: assignments.filter((a) => {
-      const userId = localStorage.getItem("userId");
+      const userId = getUserId();
       return a.submissions?.some((s: any) => s.student?.toString() === userId);
     }).length,
     overdue: assignments.filter((a) => {
-      const userId = localStorage.getItem("userId");
+      const userId = getUserId();
       const submitted = a.submissions?.some(
         (s: any) => s.student?.toString() === userId,
       );
@@ -203,7 +207,7 @@ export default function Assignment() {
   };
 
   const getStatusConfig = (assignment: any) => {
-    const userId = localStorage.getItem("userId");
+    const userId = getUserId();
     const submitted = assignment.submissions?.some(
       (s: any) => s.student?.toString() === userId,
     );
@@ -418,7 +422,7 @@ export default function Assignment() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {sortedAssignments.map((assignment) => {
-            const userId = localStorage.getItem("userId");
+            const userId = getUserId();
             const studentSubmission = assignment.submissions?.find(
               (s: any) => s.student?.toString() === userId,
             );
