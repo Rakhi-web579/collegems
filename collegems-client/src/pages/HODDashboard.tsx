@@ -4,21 +4,10 @@ import { useTheme } from "../context/ThemeContext";
 import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
-  Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-
-  Moon, Sun, Award,Bus,MessageSquare
+  Bell, Search, LogOut, Settings, CalendarDays,
+  Moon, Sun, Award, Bus, MessageSquare,
 } from "lucide-react";
 import api from "../api/axios";
-import Scholarships from "../common-components-management/Scholarships";
-import HODExamForms from "../hod-components/ExamForms";
-
-
-import BusRoutes from "../common-components-management/BusRoutes";
-
-  Moon, Sun, MessageSquare, Award, Bus
-} from "lucide-react";
-import api from "../api/axios";
-
 import Students from "../common-components-management/Students";
 import HODSalary from "../hod-components/Salary";
 import HODTeacherAttendance from "../hod-components/TeacherAttendance";
@@ -59,13 +48,8 @@ type TabType =
   | "settings"
   | "reports"
   | "exam-forms"
-
   | "scholarships"
   | "feedback"
-  | "bus-routes";
-
-  | "feedback"
-  | "scholarships"
   | "bus-routes"
   | "exam-halls"
   | "hall-allocation"
@@ -207,12 +191,14 @@ export default function HODDashboard() {
   const fetchSearchData = async () => {
     try {
       const [studentsRes, teachersRes, coursesRes] = await Promise.all([
-        api.get("/users/students"),
+        api.get("/users/students?limit=200"),
         api.get("/users/teachers"),
         api.get("/courses/all"),
       ]);
       setSearchData({
-        students: studentsRes.data || [],
+        // The students endpoint now returns a paginated envelope { success, data, meta };
+        // fall back to the raw value for any future format changes.
+        students: studentsRes.data?.data || studentsRes.data || [],
         teachers: teachersRes.data || [],
         courses: coursesRes.data || [],
       });
@@ -265,39 +251,9 @@ export default function HODDashboard() {
     .map((part) => part[0]?.toUpperCase())
     .join("") || "H";
 
-  // Render tab content
+  // Render tab content (non-overview tabs only; overview is rendered inline above)
   const renderTab = () => {
-    if (activeTab === "overview") {
-      return (
-        <div className="space-y-8">
-          <section className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {profile?.name || "HOD Profile"}
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{profileDepartment}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">{profile?.email || "No email available"}</p>
-          </section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statsCards.map((card, index) => {
-              const Icon = card.icon;
-              return (
-                <div key={index} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{card.title}</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</p>
-                    </div>
-                    <div className={`p-3 rounded-lg ${card.color}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
+    if (activeTab === "overview") return null;
 
     const placeholders: Partial<Record<TabType, string>> = {
       classes: "Class management is not connected on this dashboard yet.",
@@ -593,19 +549,6 @@ export default function HODDashboard() {
               </div>
             </div>
           )}
-
-          {activeTab === "teachers" && <Teachers />}
-          {activeTab === "teachers-attendance" && <HODTeacherAttendance />}
-          {activeTab === "students" && <Students />}
-          {activeTab === "salary" && <HODSalary />}
-          {activeTab === "academic-calendar" && <AcademicCalendar/>}
-          {activeTab === "library" && <Library />}
-          {activeTab === "courses" && <HODCourses />}
-          {activeTab === "settings" && <HODSettings />}
-          {activeTab === "feedback" && <FeedbackManagement />}
-          {activeTab === "exam-forms" && <HODExamForms />}
-          {activeTab === "scholarships" && <Scholarships />}
-          {activeTab === "bus-routes" && <BusRoutes />}
 
           {renderTab()}
 
