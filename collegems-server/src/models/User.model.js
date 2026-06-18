@@ -6,8 +6,20 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ["student", "teacher", "parent", "hod"], required: true },
   phone: { type: String },
+  
+  // File attachments
+  resumeUrl: { type: String },
 
-  // Student-specific fields
+  // Parent-specific fields
+  childId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: function () {
+      return this.role === "parent";
+    },
+  },
+
+  // Student/Alumni-specific fields
   studentId: { type: String },
   semester: {
     type: String,
@@ -22,6 +34,7 @@ const userSchema = new mongoose.Schema({
     },
   },
 
+
   // Teacher-specific
   teacherId: { type: String },
   department: {
@@ -30,6 +43,11 @@ const userSchema = new mongoose.Schema({
       return this.role === "teacher";
     },
   },
+  unavailableTimeSlots: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "TimeSlot"
+  }],
+
 
   // HOD-specific
   departmentCode: { type: String },
@@ -47,5 +65,7 @@ const userSchema = new mongoose.Schema({
     },
   },
 });
+
+userSchema.index({ name: "text", email: "text", studentId: "text", teacherId: "text" });
 
 export default mongoose.model("User", userSchema);

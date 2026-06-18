@@ -73,9 +73,16 @@ SCMS is structured around role-based modules, ensuring that every user has a tai
 - **Financial Registry**: Manage tuition fees, salaries, and system-wide transactions.
 - **Approval Workflows**: Review leave requests, enrollment approvals, and administrative actions.
 
+### 👨‍👩‍👧 Parent Portal Module
+
+- **Secure Login & Verification**: Verification matching for parent/guardian logins.
+- **Student Progress Monitoring**: Real-time view of child's attendance stats, leave history, and academic results.
+- **Financial Access**: View and track children's tuition fees and pending balances.
+
 ### 📊 Analytics & Reports
 
 - **Visual Dashboards**: High-fidelity charts for tracking campus performance, outstanding fees, and monthly attendance rates.
+- **Predictive Analytics (AI/ML)**: Identifies at-risk students through machine learning algorithms analyzing historical and ongoing student data to provide timely interventions.
 - **Exporting Tools**: Download financial, academic, and attendance reports as PDF or Excel spreadsheets.
 
 ### ⚡ Real-Time & AI Features
@@ -110,6 +117,13 @@ A reliable, scalable REST API built using the robust Node.js ecosystem:
 - **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/) (ODM)
 - **Security & Encryption**: BcryptJS & JSON Web Tokens (JWT)
 - **Utilities**: Nodemailer (Email integration) & Multer (Multi-part file uploads)
+
+### Machine Learning Service
+
+A dedicated microservice for intelligent student analytics and risk prediction:
+
+- **Runtime**: [Python](https://www.python.org/)
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (high performance API framework)
 
 ---
 
@@ -183,6 +197,7 @@ Follow these steps to run a copy of the project locally on your machine.
 - **Node.js** (v18.x or above recommended)
 - **MongoDB** (Local instance or MongoDB Atlas cluster URI)
 - **NPM** or **Yarn**
+- **Python** (v3.10+ for the Machine Learning service)
 
 ### 1. Backend Setup
 
@@ -206,7 +221,7 @@ Follow these steps to run a copy of the project locally on your machine.
    ```
 5. Start the backend server in development mode:
    ```bash
-   npm run start
+   npm run dev
    ```
    _The server will start running on_ `http://localhost:5000`
 
@@ -234,9 +249,25 @@ Follow these steps to run a copy of the project locally on your machine.
    ```
    _The client app will compile and start running on_ `http://localhost:5173` _(or your local Vite default port)_
 
-### 3. Database Seeding (Dummy Users)
+### 3. Machine Learning Service Setup
 
-To help developers quickly populate the database with sample data for local development and testing, a seed script is included.
+1. Open a new terminal and navigate to the ML service directory:
+   ```bash
+   cd collegems-ml-service
+   ```
+2. Install the required Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Start the FastAPI server:
+   ```bash
+   python main.py
+   ```
+   _The ML service will start running on_ `http://localhost:8000`
+
+### 3. Database Seeding & Demo Data
+
+To help contributors quickly test the application locally without manually creating records, a comprehensive demo dataset is provided. This dataset populates Users, Courses, Attendance, Assignments, Results, Leaves, and Salaries.
 
 1. Ensure your local MongoDB instance is running.
 2. Verify that your `.env` file in the `collegems-server` directory contains your correct `MONGO_URI`.
@@ -244,17 +275,22 @@ To help developers quickly populate the database with sample data for local deve
    ```bash
    npm run seed
    ```
+   _(Note: You can run this command anytime to reset/refresh the database with the baseline demo data.)_
 
-**Available Dummy Accounts:**
+**🔑 Available Demo Accounts:**
 _All accounts share the default password:_ `password123`
 
-- **Student:** student@example.com
-- **Teacher:** teacher@example.com
-- **HOD:** hod@college.edu
+| Role            | Name                | Email                       |
+| :-------------- | :------------------ | :-------------------------- |
+| **HOD / Admin** | Dr. Alice Vance     | `hod@college.edu`           |
+| **Teacher**     | Dr. David Evans     | `david.evans@college.edu`   |
+| **Teacher**     | Prof. Sarah Jenkins | `sarah.jenkins@college.edu` |
+| **Student**     | Alice Johnson       | `alice.johnson@college.edu` |
+| **Student**     | Bob Smith           | `bob.smith@college.edu`     |
 
-````
+**🧪 Testing the Setup:**
+Once seeded, you can log in as **Alice Johnson** (Student) to verify that you can see published results, upcoming assignments (like the _Socket Programming Project_), and past attendance records. You can then log in as **Dr. David Evans** (Teacher) to test grading submissions, managing leaves, and viewing salary records.
 
----
 
 ## 📁 Project Directory Structure
 
@@ -289,6 +325,9 @@ collegems/
 │   │   └── utils/             # Mailers and helper scripts
 │   ├── server.js              # Server entry point
 │   └── package.json
+├── collegems-ml-service/      # Python FastAPI Microservice
+│   ├── main.py                # ML service entry point
+│   └── requirements.txt       # Python dependencies
 └── README.md
 ````
 

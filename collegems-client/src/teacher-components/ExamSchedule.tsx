@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
 import {
   Calendar, Clock, MapPin, BookOpen, Search, Filter, ChevronDown,
   Plus, RefreshCw, Edit, Trash2, X, CheckCircle, AlertCircle,
   FileText, Building2,
 } from "lucide-react";
 import api from "../api/axios";
+import { extractArray } from "../utils/apiHelpers";
 
 interface ExamSchedule {
   _id: string;
@@ -56,7 +58,7 @@ const ExamSchedule: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.get("/examschedule/all");
-      setExamSchedules(response.data || []);
+      setExamSchedules(extractArray(response.data));
       setMessage(null);
     } catch (err: any) {
       setMessage({ type: "error", text: err?.response?.data?.message || "Failed to fetch exam schedules" });
