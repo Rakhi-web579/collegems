@@ -53,3 +53,39 @@ export const getMyAttendance = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+export const getLowAttendance = async (req, res) => {
+  try {
+    const threshold = 75; // attendance percentage cutoff
+
+    const result = await Attendance.aggregate([
+      {
+        $group: {
+          _id: { student: "$student", course: "$course" },
+          totalClasses: { $sum: 1 },
+          presentClasses: {
+            $sum: { $cond: [{ $eq: ["$status", "present"] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $addFields: {
+          percentage: {
+            $multiply: [{ $divide: ["$presentClasses", "$totalClasses"] }, 100],
+          },
+        },
+      },
+      {
+        $match: { percentage: { $lt: threshold } },
+      },
+    ]);
+
+    const populated = await Attendance.populate(result, [
+      { path: "_id.student", select: "name email rollNumber" },
+      { path: "_id.course", select: "name code" },
+    ]);
+
+    res.json({ success: true, data: populated });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -151,8 +151,11 @@ router.get("/student", protect, allowRoles("student","teacher","parent"), async 
       .populate("course", "name code")
       .populate("teacher", "name");
     res.json({ success: true, data: assignments });
-  })
-);
+} catch (error) {
+    console.error("Failed to fetch student assignments:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch assignments" });
+  }
+});
 
 // Fixed the nested route bug here
 router.get(
