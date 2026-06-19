@@ -1,7 +1,4 @@
 // ─── FILE: collegems-server/src/controllers/assignment.controller.js ──────────
-// WHAT CHANGED: Added getUpcomingAssignments() at the bottom.
-// Everything above this is YOUR ORIGINAL CODE — do not touch it.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import Assignment from "../models/Assignment.model.js";
 import mongoose from "mongoose";
@@ -147,21 +144,6 @@ export const evaluateAssignment = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NEW FUNCTION — Add this to the bottom of your existing controller
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * GET /api/assignment/reminders
- * Returns all assignments for the logged-in student with deadline status:
- *   - overdue   : dueDate is in the past, student hasn't submitted
- *   - dueToday  : dueDate is today, student hasn't submitted
- *   - upcoming  : dueDate is within the next 2 days, student hasn't submitted
- *   - submitted : student already submitted (any dueDate)
- *
- * Only assignments that need the student's attention are returned
- * (overdue, dueToday, upcoming, submitted within the last 7 days).
- */
 export const getUpcomingAssignments = async (req, res) => {
   try {
     const studentId = req.user.id;
@@ -186,12 +168,9 @@ export const getUpcomingAssignments = async (req, res) => {
 
     for (const assignment of all) {
       const due = new Date(assignment.dueDate);
-      // const mySubmission = assignment.submissions.find(
-      //   (s) => s.student.toString() === studentId
-      // );
-const mySubmission = (assignment.submissions || []).find(
-  (s) => s.student.toString() === studentId
-);
+      const mySubmission = (assignment.submissions || []).find(
+        (s) => s.student.toString() === studentId
+      );
       let status;
 
       if (mySubmission) {
@@ -236,6 +215,7 @@ const mySubmission = (assignment.submissions || []).find(
     res.status(500).json({ message: "Failed to fetch assignment reminders" });
   }
 };
+
 /**
  * GET /api/assignment/teacher
  * Returns all assignments created by the logged-in teacher.
@@ -248,6 +228,8 @@ export const getTeacherAssignments = async (req, res) => {
     const assignments = await Assignment.find({ teacher: teacherId })
       .populate("course", "name code")
       .populate("submissions.student", "name email avatarUrl photo") // Important for viewing submissions!
+      // 👇 NEW: Populate the user details inside the comments array for the teacher's view!
+      .populate("comments.user", "name role avatarUrl photo") 
       .sort({ createdAt: -1 })
       .lean();
 
@@ -306,6 +288,7 @@ export const downloadAssignmentFile = async (req, res) => {
     res.status(500).json({ message: "Failed to download file" });
   }
 };
+
 /**
  * GET /api/assignment/teacher/submissions/:id
  * Fetches a single assignment and populates the student data for the submissions
@@ -332,3 +315,44 @@ export const getAssignmentSubmissions = async (req, res) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// NEW FUNCTION — Adds a public comment/question to an assignment
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const addAssignmentComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+    
+    if (!text || text.trim() === "") {
+      return res.status(400).json({ message: "Comment text is required" });
+    }
+
+    const assignment = await Assignment.findById(id);
+    if (!assignment) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    // Add the comment
+    assignment.comments.push({
+      user: req.user.id,
+      text: text.trim()
+    });
+
+    await assignment.save();
+
+    // Fetch the newly saved assignment and populate the user details for the UI response
+    const updatedAssignment = await Assignment.findById(id).populate(
+      "comments.user", 
+      "name role avatarUrl photo"
+    );
+
+    res.status(201).json({ 
+      success: true, 
+      data: updatedAssignment.comments 
+    });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).json({ message: "Failed to add comment" });
+  }
+};
