@@ -101,12 +101,11 @@ router.delete(
 router.get(
   "/all",
   protect,
-  allowRoles("hod", "admin", "teacher", "student"),
-  asyncHandler(async (req, res) => {
-    log.request("GET", "/api/courses/all", req.user?.id);
+  allowRoles("hod", "admin", "teacher", "student", "parent"),
+  async (req, res) => {
     const courses = await Course.find().populate("teacher", "name email");
     res.json(courses);
-  })
+  }
 );
 
 export default router;

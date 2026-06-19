@@ -202,12 +202,14 @@ export default function HODDashboard() {
   const fetchSearchData = async () => {
     try {
       const [studentsRes, teachersRes, coursesRes] = await Promise.all([
-        api.get("/users/students"),
+        api.get("/users/students?limit=200"),
         api.get("/users/teachers"),
         api.get("/courses/all"),
       ]);
       setSearchData({
-        students: studentsRes.data || [],
+        // The students endpoint now returns a paginated envelope { success, data, meta };
+        // fall back to the raw value for any future format changes.
+        students: studentsRes.data?.data || studentsRes.data || [],
         teachers: teachersRes.data || [],
         courses: coursesRes.data || [],
       });
@@ -260,7 +262,7 @@ export default function HODDashboard() {
     .map((part) => part[0]?.toUpperCase())
     .join("") || "H";
 
-  // Render tab content
+  // Render tab content (non-overview tabs only; overview is rendered inline above)
   const renderTab = () => {
     if (activeTab === "overview") {
       return (

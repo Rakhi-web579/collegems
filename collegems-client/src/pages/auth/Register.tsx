@@ -38,9 +38,10 @@ export default function Register() {
       const res = await api.post("/auth/register", { ...form, role });
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("userId", res.data.user.id);
       localStorage.setItem("userData", JSON.stringify(res.data.user));
       setForm({});
-      const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard" };
+      const routes: Record<string, string> = { student: "/student/dashboard", teacher: "/teacher/dashboard", hod: "/hod/dashboard", parent: "/parent/dashboard" };
       navigate(routes[res.data.user.role] || "/");
     } catch (err: any) {
       if (err.response?.data?.errors && Array.isArray(err.response.data.errors) && err.response.data.errors.length > 0) {
@@ -56,18 +57,13 @@ export default function Register() {
   const roleOptions = [
     { value: "student", label: "Student", icon: GraduationCap, color: "blue", description: "Access courses, assignments, and grades" },
     { value: "teacher", label: "Teacher", icon: Users, color: "amber", description: "Manage classes, assignments, and attendance" },
+    { value: "parent", label: "Parent", icon: Users, color: "purple", description: "Monitor your child's academic progress" },
     { value: "hod", label: "HOD", icon: Shield, color: "emerald", description: "Oversee department and faculty" },
     { value: "parent", label: "Parent", icon: Users, color: "purple", description: "Monitor your child's progress" },
   ];
 
   const getRoleColor = (roleValue: string) => {
-    switch (roleValue) {
-      case "student": return "blue";
-      case "teacher": return "amber";
-      case "hod": return "emerald";
-      case "parent": return "purple";
-      default: return "blue";
-    }
+    switch (roleValue) { case "student": return "blue"; case "teacher": return "amber"; case "hod": return "emerald"; case "parent": return "purple"; default: return "blue"; }
   };
 
   const colorClasses = {
@@ -270,10 +266,10 @@ export default function Register() {
                   <Users className="w-4 h-4 text-purple-600" /> Parent Information
                 </h3>
                 <div>
-                  <label htmlFor="childStudentId" className={labelClass}>Child's Student ID *</label>
+                  <label htmlFor="studentId" className={labelClass}>Child's Student ID *</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><IdCard className="h-4 w-4 text-gray-400" /></div>
-                    <input id="childStudentId" name="childStudentId" value={form.childStudentId || ""} onChange={handleChange} className={inputClass} placeholder="STU2024001" />
+                    <input id="studentId" name="studentId" value={form.studentId || ""} onChange={handleChange} className={inputClass} placeholder="STU2024001" />
                   </div>
                 </div>
               </div>

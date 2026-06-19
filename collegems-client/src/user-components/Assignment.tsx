@@ -15,17 +15,19 @@ import {
   FolderOpen,
   FileCheck,
   MessageSquare,
-  X,
-  Edit2,
-  Save
+  X
 } from "lucide-react";
 import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
 import AssignmentComments from "../common-components-management/AssignmentComments";
-// 👇 NEW: Imported the custom hook
 import { useAutoSave } from "../hooks/useAutoSave";
 
 export default function Assignment() {
+  const getUserId = () => {
+    const role = localStorage.getItem("role");
+    return role === "parent" ? localStorage.getItem("childStudentId") : localStorage.getItem("userId");
+  };
+
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -61,8 +63,7 @@ export default function Assignment() {
     }
   };
 
-  // 👇 NEW: Using our custom Auto-Save Hook!
-  const userId = localStorage.getItem("userId");
+  const userId = getUserId();
   const draftKey = activeSubmission && !submitting ? `draft_${activeSubmission._id}_${userId}` : "";
   
   useAutoSave(
@@ -73,14 +74,12 @@ export default function Assignment() {
 
   const openSubmission = (assignment: any) => {
     setActiveSubmission(assignment);
-    const currentUserId = localStorage.getItem("userId");
+    const currentUserId = getUserId();
     
-    // 1. Load the backend draft text/link if it exists
     const existingDraft = assignment.submissions?.find((s: any) => s.student?.toString() === currentUserId);
     const initialText = existingDraft?.textResponse || "";
     const initialLink = existingDraft?.link || "";
 
-    // The useAutoSave hook will automatically override this if a newer local draft exists!
     setSubmissionForm({ textResponse: initialText, link: initialLink, file: null });
     setSubmitError(null);
   };
@@ -99,7 +98,6 @@ export default function Assignment() {
       return;
     }
 
-    // Size Validation (5MB)
     if (selectedFile.size > 5 * 1024 * 1024) {
       setSubmitError("File is too large! Maximum allowed size is 5MB.");
       e.target.value = ""; 
@@ -129,11 +127,10 @@ export default function Assignment() {
 
     const textResponse = submissionForm.textResponse.trim();
     const link = submissionForm.link.trim();
-    const currentUserId = localStorage.getItem("userId");
+    const currentUserId = getUserId();
     const existingDraft = activeSubmission.submissions?.find((s: any) => s.student?.toString() === currentUserId);
 
-    // Only strictly validate files if it's a FINAL submission
-   const hasFile = Boolean(submissionForm.file) || Boolean(existingDraft?.file);
+    const hasFile = Boolean(submissionForm.file) || Boolean(existingDraft?.file);
     
     if (activeSubmissionType === "file" && !hasFile) return setSubmitError("Please attach a file.");
     if (activeSubmissionType === "text" && !textResponse) return setSubmitError("Please enter your response.");
@@ -149,13 +146,10 @@ export default function Assignment() {
       if (textResponse) formData.append("textResponse", textResponse);
       if (link) formData.append("link", link);
 
-
-      // 👇 FIX: Removed manual headers so Axios handles the boundary automatically (Fixes 400 Error!)
       await api.post(`/assignment/submit/${activeSubmission._id}`, formData);
 
-      // Clear local storage completely upon successful submit/draft save
       localStorage.removeItem(`draft_${activeSubmission._id}_${currentUserId}`);
-setSubmitSuccess("Assignment submitted successfully.");
+      setSubmitSuccess("Assignment submitted successfully.");
       closeSubmission();
       await fetchAssignments();
       setTimeout(() => setSubmitSuccess(null), 3000);
@@ -169,10 +163,12 @@ setSubmitSuccess("Assignment submitted successfully.");
 
   // Filter assignments
   const filteredAssignments = assignments.filter((a) => {
-    const currentUserId = localStorage.getItem("userId");
-    const submission = a.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-    
-    const isSubmitted = submission && submission.status !== "draft";
+    const userId = getUserId();
+    const isSubmitted = a.submissions?.some((s: any) => {
+      if (!s.student || !userId) return false;
+      return s.student.toString() === userId;
+    });
+
     const now = new Date();
     const dueDate = new Date(a.dueDate);
     const isOverdue = dueDate < now && !isSubmitted;
@@ -191,13 +187,10 @@ setSubmitSuccess("Assignment submitted successfully.");
 
   // Sort assignments
   const sortedAssignments = [...filteredAssignments].sort((a, b) => {
-    const currentUserId = localStorage.getItem("userId");
+    const userId = getUserId();
 
-    const aSubmission = a.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-    const bSubmission = b.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-    
-    const aSubmitted = aSubmission && aSubmission.status !== "draft";
-    const bSubmitted = bSubmission && bSubmission.status !== "draft";
+    const aSubmitted = a.submissions?.some((s: any) => s.student?.toString() === userId);
+    const bSubmitted = b.submissions?.some((s: any) => s.student?.toString() === userId);
 
     const aDue = new Date(a.dueDate);
     const bDue = new Date(b.dueDate);
@@ -223,22 +216,19 @@ setSubmitSuccess("Assignment submitted successfully.");
   const stats = {
     total: assignments.length,
     pending: assignments.filter((a) => {
-      const currentUserId = localStorage.getItem("userId");
-      const submission = a.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-      const isSubmitted = submission && submission.status !== "draft";
+      const userId = getUserId();
+      const isSubmitted = a.submissions?.some((s: any) => s.student?.toString() === userId);
       const dueDate = new Date(a.dueDate);
       const now = new Date();
       return !isSubmitted && dueDate > now;
     }).length,
     submitted: assignments.filter((a) => {
-      const currentUserId = localStorage.getItem("userId");
-      const submission = a.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-      return submission && submission.status !== "draft";
+      const userId = getUserId();
+      return a.submissions?.some((s: any) => s.student?.toString() === userId);
     }).length,
     overdue: assignments.filter((a) => {
-      const currentUserId = localStorage.getItem("userId");
-      const submission = a.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-      const isSubmitted = submission && submission.status !== "draft";
+      const userId = getUserId();
+      const isSubmitted = a.submissions?.some((s: any) => s.student?.toString() === userId);
       const dueDate = new Date(a.dueDate);
       const now = new Date();
       return !isSubmitted && dueDate < now;
@@ -246,10 +236,8 @@ setSubmitSuccess("Assignment submitted successfully.");
   };
 
   const getStatusConfig = (assignment: any) => {
-    const currentUserId = localStorage.getItem("userId");
-    const submission = assignment.submissions?.find((s: any) => s.student?.toString() === currentUserId);
-    const isSubmitted = submission && submission.status !== "draft";
-    const isDraft = submission?.status === "draft";
+    const userId = getUserId();
+    const isSubmitted = assignment.submissions?.some((s: any) => s.student?.toString() === userId);
     
     const dueDate = new Date(assignment.dueDate);
     const now = new Date();
@@ -259,13 +247,6 @@ setSubmitSuccess("Assignment submitted successfully.");
         color: "bg-green-50 text-green-700 border-green-200",
         icon: CheckCircle,
         text: "Submitted",
-      };
-    }
-    if (isDraft) {
-      return {
-        color: "bg-purple-50 text-purple-700 border-purple-200",
-        icon: Edit2,
-        text: "Draft Saved",
       };
     }
     if (dueDate < now) {
@@ -467,10 +448,10 @@ setSubmitSuccess("Assignment submitted successfully.");
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {sortedAssignments.map((assignment) => {
-            const currentUserId = localStorage.getItem("userId");
-            const studentSubmission = assignment.submissions?.find((s: any) => s.student?.toString() === currentUserId);
+            const userId = getUserId();
+            const studentSubmission = assignment.submissions?.find((s: any) => s.student?.toString() === userId);
             
-            const isSubmitted = studentSubmission && studentSubmission.status !== "draft";
+            const isSubmitted = Boolean(studentSubmission);
             const status = getStatusConfig(assignment);
             const StatusIcon = status.icon;
 
@@ -612,7 +593,7 @@ setSubmitSuccess("Assignment submitted successfully.");
                       ) : (
                         <>
                           <Upload className="w-4 h-4" />
-                          {studentSubmission?.status === "draft" ? "Continue Draft" : "Submit"}
+                          Submit
                         </>
                       )}
                     </button>
@@ -718,9 +699,9 @@ setSubmitSuccess("Assignment submitted successfully.");
                     <span className="text-red-500"> *</span>
                   </label>
                   
-                  {activeSubmission.submissions?.find((s:any) => s.student.toString() === localStorage.getItem("userId"))?.file && !submissionForm.file && (
+                  {activeSubmission.submissions?.find((s:any) => s.student.toString() === getUserId())?.file && !submissionForm.file && (
                      <div className="mb-2 p-2 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center justify-between">
-                       <span>Draft file attached: {activeSubmission.submissions.find((s:any) => s.student.toString() === localStorage.getItem("userId")).file.originalName}</span>
+                       <span>Draft file attached: {activeSubmission.submissions.find((s:any) => s.student.toString() === getUserId()).file.originalName}</span>
                      </div>
                   )}
 
@@ -739,7 +720,7 @@ setSubmitSuccess("Assignment submitted successfully.");
               )}
             </div>
 
-           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
               <button 
                 onClick={closeSubmission} 
                 disabled={Boolean(submitting)} 

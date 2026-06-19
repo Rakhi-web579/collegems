@@ -9,8 +9,8 @@ import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
-import MainDashboard from "./pages/MainDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
+import MainDashboard from "./pages/MainDashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 import ExamSchedule from "./user-components/ExamSchedule";
@@ -240,6 +240,14 @@ export default function App() {
         />
 
         {/* Parent Routes */}
+        <Route
+          path="/parent/dashboard"
+          element={
+            <RoleRoute role="parent">
+              <ParentDashboard />
+            </RoleRoute>
+          }
+        />
         <Route
           path="/parent/dashboard"
           element={

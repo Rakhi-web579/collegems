@@ -80,6 +80,17 @@ export const getExamForms = async (req, res) => {
       // Students only see their own submissions
       const forms = await ExaminationForm.find({ student: id }).sort({ createdAt: -1 });
       return res.json(forms);
+    } else if (role === "parent") {
+      const User = (await import("../models/User.model.js")).default;
+      const parentUser = await User.findById(id);
+      if (parentUser && parentUser.studentId) {
+        const studentUser = await User.findOne({ studentId: parentUser.studentId, role: "student" });
+        if (studentUser) {
+          const forms = await ExaminationForm.find({ student: studentUser._id }).sort({ createdAt: -1 });
+          return res.json(forms);
+        }
+      }
+      return res.json([]);
     } else {
       return res.status(403).json({ message: "Access forbidden" });
     }
