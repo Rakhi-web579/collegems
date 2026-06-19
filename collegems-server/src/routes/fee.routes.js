@@ -64,19 +64,8 @@ router.post("/pay", protect, allowRoles("student", "parent"), async (req, res) =
       studentId = studentUser._id;
     }
 
-    const fee = await Fee.findOne({ student: studentId });
-
     if (!amount || amount <= 0) {
       throw new AppError("Valid amount is required", 400, "INVALID_AMOUNT");
-    }
-
-    let studentId = req.user.id;
-    if (req.user.role === "parent") {
-      const parent = await User.findById(req.user.id);
-      if (!parent || !parent.childId) {
-        throw new AppError("No child linked to parent account", 400, "NO_CHILD_LINKED");
-      }
-      studentId = parent.childId;
     }
 
     const fee = await Fee.findOne({ student: studentId });
@@ -94,8 +83,11 @@ router.post("/pay", protect, allowRoles("student", "parent"), async (req, res) =
       message: "Payment successful",
       data: fee,
     });
-  })
-);
+  } catch (error) {
+    console.error("Payment failed:", error);
+    res.status(500).json({ success: false, message: "Failed to process payment" });
+  }
+});
 
 router.get("/me", protect, allowRoles("student", "parent"), async (req, res) => {
   try {
@@ -114,15 +106,16 @@ router.get("/me", protect, allowRoles("student", "parent"), async (req, res) => 
     }
 
     const fee = await Fee.findOne({ student: studentId });
-
-    const fee = await Fee.findOne({ student: studentId });
     if (!fee) {
       throw new AppError("No fee record found", 404, "NOT_FOUND");
     }
 
     res.json({ success: true, data: fee });
-  })
-);
+  } catch (error) {
+    console.error("Failed to fetch fee:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch fee record" });
+  }
+});
 
 // View all student fees
 router.get(

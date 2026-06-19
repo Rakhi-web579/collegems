@@ -105,7 +105,7 @@ router.get(
   async (req, res) => {
     const courses = await Course.find().populate("teacher", "name email");
     res.json(courses);
-  })
+  }
 );
 
 export default router;
