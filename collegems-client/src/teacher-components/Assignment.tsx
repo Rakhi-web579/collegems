@@ -651,7 +651,9 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                                   ) : sub.student?.name?.charAt(0).toUpperCase() || "S"}
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-900">{sub.student?.name || "Unknown Student"}</p>
+                             <p className="font-semibold text-gray-900 flex items-center">
+                         {sub.student?.name || "Unknown Student"}
+                            </p>
                                   <p className="text-sm text-gray-500">{sub.student?.email || "No email"}</p>
                                 </div>
                               </div>
@@ -716,12 +718,12 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                                   placeholder={`/${viewingSubmissions.totalPoints || viewingSubmissions.maxMarks || 100}`} 
                                   value={editedMarks[sub.student?._id] || ""} 
                                   onChange={(e) => setEditedMarks({ ...editedMarks, [sub.student?._id]: e.target.value })}
-                                  disabled={gradingId === sub.student?._id}
+                                  disabled={gradingId === sub.student?._id || sub.status === "draft"}
                                 />
                               </div>
                               <button 
                                 onClick={() => handleSaveGrade(sub.student?._id, viewingSubmissions._id)}
-                                disabled={gradingId === sub.student?._id || !editedMarks[sub.student?._id]}
+                                disabled={gradingId === sub.student?._id || !editedMarks[sub.student?._id] || sub.status === "draft"}
                                 className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center gap-2"
                               >
                                 {gradingId === sub.student?._id ? (
