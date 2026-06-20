@@ -3,6 +3,11 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import mongoose from "mongoose";
+
+// Apply Global Multi-Tenant Plugin
+import tenantPlugin from "./utils/tenantPlugin.js";
+mongoose.plugin(tenantPlugin);
 
 // Auth & Core
 import authRoutes from "./routes/auth.routes.js";
@@ -97,6 +102,9 @@ app.use((req, res, next) => {
 });
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+import tenantResolver from "./middlewares/tenantResolver.js";
+app.use(tenantResolver);
 
 // Routes
 app.use("/api/auth",      authRoutes);
