@@ -17,3 +17,13 @@ export const checkSemesterFrozen = async (semesterStr) => {
     throw error;
   }
 };
+
+/**
+ * Returns the currently active academic session, or null if none exists.
+ * Useful for controllers that need to auto-fill the semester on new records.
+ * @returns {Promise<import('../models/Semester.model.js').default|null>}
+ */
+export const getActiveSession = async () => {
+  return Semester.findOne({ isActive: true }).lean();
+};
+
