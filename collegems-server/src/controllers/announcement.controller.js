@@ -164,7 +164,7 @@ export const updateAnnouncement = async (req, res) => {
     // Teachers can only edit their own announcements
     if (
       req.user.role === "teacher" &&
-      announcement.postedBy.toString() !== req.user._id.toString()
+      announcement.postedBy.toString() !== req.user.id
     ) {
       return res
         .status(403)
@@ -225,7 +225,7 @@ export const deleteAnnouncement = async (req, res) => {
 
     if (
       req.user.role === "teacher" &&
-      announcement.postedBy.toString() !== req.user._id.toString()
+      announcement.postedBy.toString() !== req.user.id
     ) {
       return res
         .status(403)

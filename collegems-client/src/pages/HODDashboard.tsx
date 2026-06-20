@@ -331,7 +331,7 @@ export default function HODDashboard() {
                 "bg-emerald-50 text-emerald-700": "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
                 "bg-purple-50 text-purple-700": "bg-purple-50 text-purple-700 hover:bg-purple-100",
               }[card.color] || card.color;
-              
+
               return (
                 <div key={index} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow">
                   <div className="flex items-start justify-between">
@@ -379,13 +379,13 @@ export default function HODDashboard() {
         </div>
       );
     }
-const placeholders: Partial<Record<TabType, string>> = {
+    const placeholders: Partial<Record<TabType, string>> = {
       classes: "Class management is not connected on this dashboard yet.",
       syllabus: "Syllabus management is not connected on this dashboard yet.",
       fees: "Fee management is not connected on this dashboard yet.",
       examSchedule: "Use the exam schedule route to manage exam schedules.",
       events: "Event management is not connected on this dashboard yet.",
-      "system-logs": "System Logs dashboard is currently under development.",
+      "system-logs": "System Logs dashboard is currently under development.", // <-- Add this line
     };
 
     if (placeholders[activeTab]) {
@@ -476,11 +476,10 @@ const placeholders: Partial<Record<TabType, string>> = {
                         setSidebarOpen(false);
                       }
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive 
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" 
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
+                      }`}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-500 dark:text-gray-400"}`} />
                     <span>{item.label}</span>

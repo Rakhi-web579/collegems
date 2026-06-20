@@ -27,7 +27,7 @@ interface Announcement {
   isActive: boolean;
   status?: "draft" | "published";
   createdAt: string;
-  postedBy: { name: string; role: string };
+  postedBy: { _id: string; name: string; email?: string; role: string };
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
