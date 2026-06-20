@@ -8,9 +8,9 @@ import {
   updatePassword,
   getPreferences,
   updatePreferences,
-  getStudentProfile,
   getStudents,
   uploadResumeFile,
+  getStudentSummary,
 } from "../controllers/user.controller.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
@@ -61,10 +61,19 @@ router.get(
   getStudentProfile
 );
 
+router.get(
+  "/students/:id/summary",
+  protect,
+  authorize("teacher", "hod", "admin"),
+  getStudentSummary
+);
+
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
   const teachers = await User.find({ role: "teacher" }).select("name email role teacherId department phone");
 
   res.json(teachers);
 });
+
+router.get("/cleanup-suggestions", protect, authorize("admin"), getCleanupSuggestions);
 
 export default router;
