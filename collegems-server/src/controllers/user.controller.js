@@ -217,3 +217,19 @@ export const uploadResumeFile = async (req, res) => {
     res.status(500).json({ message: "Server error uploading resume" });
   }
 };
+
+import { getCleanupSuggestions as fetchCleanupSuggestions } from "../services/userCleanup.service.js";
+
+export const getCleanupSuggestions = async (req, res) => {
+  try {
+    const thresholdDays = parseInt(req.query.threshold) || 180;
+    const suggestions = await fetchCleanupSuggestions(thresholdDays);
+    res.json({
+      success: true,
+      suggestions
+    });
+  } catch (error) {
+    console.error("Error fetching cleanup suggestions:", error);
+    res.status(500).json({ success: false, message: "Server error calculating suggestions" });
+  }
+};

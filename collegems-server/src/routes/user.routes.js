@@ -11,6 +11,7 @@ import {
   getStudentProfile,
   getStudents,
   uploadResumeFile,
+  getCleanupSuggestions,
 } from "../controllers/user.controller.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
@@ -66,5 +67,7 @@ router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (
 
   res.json(teachers);
 });
+
+router.get("/cleanup-suggestions", protect, authorize("admin"), getCleanupSuggestions);
 
 export default router;
