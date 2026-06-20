@@ -1,6 +1,6 @@
 // FILE: collegems-client/src/teacher-components/AnnouncementForm.tsx
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Bell, Send, Tag, Calendar, Users, AlertCircle,
   CheckCircle, Loader2, FileText, Megaphone,
@@ -112,13 +112,47 @@ function FieldWrapper({
 
 //  Main Component ─
 
+export interface AnnouncementData {
+  _id: string;
+  title: string;
+  message: string;
+  targetRole: string;
+  targetCourse: string | null;
+  targetSemester: string | null;
+  expiresAt: string | null;
+  priority: string;
+  status?: "draft" | "published";
+}
+
 interface Props {
+  mode?: "create" | "edit";
+  initialAnnouncement?: AnnouncementData;
   onSuccess?: () => void;
 }
 
-export default function AnnouncementForm({ onSuccess }: Props) {
+export default function AnnouncementForm({ mode = "create", initialAnnouncement, onSuccess }: Props) {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  useEffect(() => {
+    if (initialAnnouncement) {
+      setFormData({
+        title: initialAnnouncement.title || "",
+        message: initialAnnouncement.message || "",
+        targetRole: initialAnnouncement.targetRole || "all",
+        targetCourse: initialAnnouncement.targetCourse || "",
+        targetSemester: initialAnnouncement.targetSemester || "",
+        expiresAt: initialAnnouncement.expiresAt ? new Date(initialAnnouncement.expiresAt).toISOString().slice(0, 16) : "",
+        priority: initialAnnouncement.priority || "medium",
+      });
+      if (initialAnnouncement.status) {
+         submitActionRef.current = initialAnnouncement.status;
+      }
+    } else {
+      setFormData(EMPTY_FORM);
+      submitActionRef.current = "published";
+    }
+  }, [initialAnnouncement]);
   const [submitStatus, setSubmitStatus] = useState<"draft" | "published">("published");
   const submitActionRef = useRef<"draft" | "published">("published");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -155,13 +189,19 @@ export default function AnnouncementForm({ onSuccess }: Props) {
 
     setIsSubmitting(true);
     try {
-      await api.post("/announcements", {
+      const payload = {
         ...formData,
         targetCourse: formData.targetCourse || null,
         targetSemester: formData.targetSemester || null,
         expiresAt: formData.expiresAt || null,
         status: submitActionRef.current,
-      });
+      };
+
+      if (mode === "edit" && initialAnnouncement?._id) {
+        await api.put(`/announcements/${initialAnnouncement._id}`, payload);
+      } else {
+        await api.post("/announcements", payload);
+      }
       setIsSuccess(true);
       setFormData(EMPTY_FORM);
       setErrors({});
@@ -211,15 +251,23 @@ export default function AnnouncementForm({ onSuccess }: Props) {
 
         {/*  Success banner  */}
         {isSuccess && (
-          <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium text-green-800">
-                {submitStatus === "draft"
-                  ? "Draft saved successfully."
-                  : "Announcement published successfully."}
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between animate-fade-in">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <p className="text-sm font-medium text-green-800">
+                {mode === "edit" 
+                  ? "Announcement updated successfully." 
+                  : (submitActionRef.current === "draft" 
+                      ? "Draft saved successfully." 
+                      : "Announcement published successfully.")}
               </p>
             </div>
+            <button
+              onClick={() => setIsSuccess(false)}
+              className="text-green-600 hover:text-green-800 transition-colors p-1"
+            >
+              ×
+            </button>
           </div>
         )}
 

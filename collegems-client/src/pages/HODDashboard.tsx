@@ -96,6 +96,7 @@ export default function HODDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [refreshAnnouncements, setRefreshAnnouncements] = useState(0);
 
   // Profile states
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -384,7 +385,7 @@ const placeholders: Partial<Record<TabType, string>> = {
       fees: "Fee management is not connected on this dashboard yet.",
       examSchedule: "Use the exam schedule route to manage exam schedules.",
       events: "Event management is not connected on this dashboard yet.",
-      "system-logs": "System Logs dashboard is currently under development.", // <-- Add this line
+      "system-logs": "System Logs dashboard is currently under development.",
     };
 
     if (placeholders[activeTab]) {
@@ -395,9 +396,9 @@ const placeholders: Partial<Record<TabType, string>> = {
       <>
         {activeTab === "announcements" && (
           <div className="space-y-8">
-            <AnnouncementForm />
+            <AnnouncementForm onSuccess={() => setRefreshAnnouncements((k) => k + 1)} />
             <hr className="border-gray-200 dark:border-gray-700" />
-            <AnnouncementManage />
+            <AnnouncementManage refreshKey={refreshAnnouncements} />
           </div>
         )}
         {activeTab === "teachers" && <Teachers />}

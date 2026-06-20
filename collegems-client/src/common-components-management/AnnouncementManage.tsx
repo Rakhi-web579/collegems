@@ -9,8 +9,11 @@ import {
   AlertTriangle,
   Send,
   Loader2,
+  Edit,
+  X,
 } from "lucide-react";
 import api from "../api/axios";
+import AnnouncementForm from "./AnnouncementForm";
 
 interface Announcement {
   _id: string;
@@ -34,7 +37,11 @@ const PRIORITY_STYLES: Record<string, string> = {
   urgent: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
 };
 
-export default function AnnouncementManage() {
+interface AnnouncementManageProps {
+  refreshKey?: number;
+}
+
+export default function AnnouncementManage({ refreshKey }: AnnouncementManageProps = {}) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +52,7 @@ export default function AnnouncementManage() {
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
 
   // inline confirm modal state
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -72,7 +80,7 @@ export default function AnnouncementManage() {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, [filterRole, filterCourse, filterSemester, filterStatus]);
+  }, [filterRole, filterCourse, filterSemester, filterStatus, refreshKey]);
 
   const handleDelete = async () => {
     if (!confirmDeleteId) return;
@@ -286,18 +294,28 @@ export default function AnnouncementManage() {
                 {/* Action Buttons */}
                 <div className="flex items-center gap-1 shrink-0">
                   {a.status === "draft" && (
-                    <button
-                      onClick={() => handlePublish(a._id)}
-                      disabled={publishingId === a._id}
-                      className="p-2 rounded-xl text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-600 transition-colors disabled:opacity-50"
-                      title="Publish announcement"
-                    >
-                      {publishingId === a._id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4" />
-                      )}
-                    </button>
+                    <>
+                      <button
+                        onClick={() => setEditingAnnouncement(a)}
+                        className="p-2 rounded-xl text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 transition-colors"
+                        title="Edit draft"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        onClick={() => handlePublish(a._id)}
+                        disabled={publishingId === a._id}
+                        className="p-2 rounded-xl text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-600 transition-colors disabled:opacity-50"
+                        title="Publish announcement"
+                      >
+                        {publishingId === a._id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
+                      </button>
+                    </>
                   )}
 
                   <button
@@ -349,6 +367,33 @@ export default function AnnouncementManage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingAnnouncement && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 z-10 px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Edit Draft Announcement</h2>
+              <button
+                onClick={() => setEditingAnnouncement(null)}
+                className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            <div className="p-6">
+              <AnnouncementForm
+                mode="edit"
+                initialAnnouncement={editingAnnouncement}
+                onSuccess={() => {
+                  setEditingAnnouncement(null);
+                  fetchAnnouncements();
+                }}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
