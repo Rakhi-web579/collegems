@@ -11,6 +11,7 @@ import {
   getStudentProfile,
   getStudents,
   uploadResumeFile,
+  getStudentSummary,
 } from "../controllers/user.controller.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
@@ -59,6 +60,13 @@ router.get(
   protect,
   authorize("teacher", "hod"),
   getStudentProfile
+);
+
+router.get(
+  "/students/:id/summary",
+  protect,
+  authorize("teacher", "hod", "admin"),
+  getStudentSummary
 );
 
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
