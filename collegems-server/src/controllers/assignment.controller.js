@@ -4,6 +4,8 @@ import Assignment from "../models/Assignment.model.js";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
+import Course from "../models/Course.model.js";
+import { checkSemesterFrozen } from "../services/semesterService.js";
 
 export const createAssignment = async (req, res) => {
   try {
@@ -32,6 +34,12 @@ export const createAssignment = async (req, res) => {
       return res.status(400).json({ message: "Invalid total points" });
     }
 
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    await checkSemesterFrozen(course.semester);
+
     const assignment = await Assignment.create({
       title,
       description,
@@ -45,15 +53,20 @@ export const createAssignment = async (req, res) => {
     res.status(201).json(assignment);
   } catch (error) {
     console.error("Create Assignment Error:", error);
+    if (error.status === 403) return res.status(403).json({ message: error.message });
     res.status(500).json({ message: "Failed to create assignment" });
   }
 };
 
 export const submitAssignment = async (req, res) => {
   try {
-    const assignment = await Assignment.findById(req.params.id);
+    const assignment = await Assignment.findById(req.params.id).populate("course");
     if (!assignment) {
       return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    if (assignment.course && assignment.course.semester) {
+      await checkSemesterFrozen(assignment.course.semester);
     }
 
     const alreadySubmitted = assignment.submissions.some(
@@ -114,6 +127,7 @@ export const submitAssignment = async (req, res) => {
     res.json({ message: "Assignment submitted", submission });
   } catch (error) {
     console.error("Submit Assignment Error:", error);
+    if (error.status === 403) return res.status(403).json({ message: error.message });
     res.status(500).json({ message: "Submission failed" });
   }
 };
@@ -121,10 +135,14 @@ export const submitAssignment = async (req, res) => {
 export const evaluateAssignment = async (req, res) => {
   try {
     const { studentId, marks } = req.body;
-    const assignment = await Assignment.findById(req.params.id);
+    const assignment = await Assignment.findById(req.params.id).populate("course");
 
     if (!assignment) {
       return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    if (assignment.course && assignment.course.semester) {
+      await checkSemesterFrozen(assignment.course.semester);
     }
 
     const submission = assignment.submissions.find(
@@ -140,6 +158,7 @@ export const evaluateAssignment = async (req, res) => {
     res.json({ message: "Assignment evaluated" });
   } catch (error) {
     console.error("Evaluate Assignment Error:", error);
+    if (error.status === 403) return res.status(403).json({ message: error.message });
     res.status(500).json({ message: "Evaluation failed" });
   }
 };
@@ -328,9 +347,13 @@ export const addAssignmentComment = async (req, res) => {
       return res.status(400).json({ message: "Comment text is required" });
     }
 
-    const assignment = await Assignment.findById(id);
+    const assignment = await Assignment.findById(id).populate("course");
     if (!assignment) {
       return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    if (assignment.course && assignment.course.semester) {
+      await checkSemesterFrozen(assignment.course.semester);
     }
 
     // Add the comment
@@ -353,6 +376,7 @@ export const addAssignmentComment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding comment:", error);
+    if (error.status === 403) return res.status(403).json({ message: error.message });
     res.status(500).json({ message: "Failed to add comment" });
   }
 };
