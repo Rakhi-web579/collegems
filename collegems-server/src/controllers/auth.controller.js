@@ -232,6 +232,11 @@ export const login = async (req, res) => {
       },
     });
 
+    // Update telemetry
+    user.lastLogin = Date.now();
+    user.loginCount = (user.loginCount || 0) + 1;
+    await user.save({ validateBeforeSave: false });
+
     // Log the login
     await logAction(user._id, "LOGIN", "Auth", user._id, { role: user.role, email: user.email });
   } catch (err) {

@@ -219,23 +219,18 @@ export const uploadResumeFile = async (req, res) => {
   }
 };
 
-export const getStudentTimeline = async (req, res) => {
+import { getCleanupSuggestions as fetchCleanupSuggestions } from "../services/userCleanup.service.js";
+
+export const getCleanupSuggestions = async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    // Support filtering by field (optional)
-    const { field } = req.query;
-    const filter = { student: id };
-    if (field) filter.field = field;
-
-    const timeline = await StudentTimelineEvent.find(filter)
-      .populate("changedBy", "name role")
-      .sort({ timestamp: -1 })
-      .lean();
-
-    res.json(timeline);
+    const thresholdDays = parseInt(req.query.threshold) || 180;
+    const suggestions = await fetchCleanupSuggestions(thresholdDays);
+    res.json({
+      success: true,
+      suggestions
+    });
   } catch (error) {
-    console.error("Error fetching timeline:", error);
-    res.status(500).json({ message: "Server error fetching timeline" });
+    console.error("Error fetching cleanup suggestions:", error);
+    res.status(500).json({ success: false, message: "Server error calculating suggestions" });
   }
 };

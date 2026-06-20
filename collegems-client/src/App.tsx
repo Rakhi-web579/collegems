@@ -39,10 +39,12 @@ import ResourceManagement from "./hod-components/ResourceManagement";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
 
+import { PwaManager } from "./components/PwaManager";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <PwaManager />
       <Routes>
         {/* Public Routes */}
         <Route

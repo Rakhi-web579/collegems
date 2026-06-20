@@ -84,32 +84,48 @@ export const getTimetableEntries = async (req, res) => {
   }
 };
 
+import { checkConflicts } from "../services/scheduleValidation.service.js";
+
 // @desc    Update a specific entry (manual override)
 // @route   PUT /api/timetable/entries/:entryId
 // @access  Private/Admin
 export const updateTimetableEntry = async (req, res) => {
   try {
-    const { room, timeSlot, faculty } = req.body;
+    const { room, timeSlot, faculty, course } = req.body;
+    const entryId = req.params.entryId;
     
-    const existingEntry = await TimetableEntry.findById(req.params.entryId).populate("timetable");
+    // Validate hard constraints before updating.
+    // We need to fetch the existing entry to get the timetable ID and course ID if not provided in body
+    const existingEntry = await TimetableEntry.findById(entryId);
     if (!existingEntry) {
       return res.status(404).json({ success: false, message: "Entry not found" });
     }
 
-    if (existingEntry.timetable && existingEntry.timetable.semester) {
-      await checkSemesterFrozen(existingEntry.timetable.semester);
+    const targetCourse = course || existingEntry.course;
+
+    const validation = await checkConflicts({
+      timetableId: existingEntry.timetable,
+      timeSlotId: timeSlot,
+      facultyId: faculty,
+      roomId: room,
+      courseId: targetCourse,
+      excludeEntryId: entryId
+    });
+
+    if (validation.hasConflicts) {
+      return res.status(409).json({
+        success: false,
+        errorType: "SCHEDULE_CONFLICT",
+        message: "Schedule conflicts detected.",
+        conflicts: validation.conflicts
+      });
     }
 
-    // In a real scenario, we should re-validate the hard constraints here before updating.
     const entry = await TimetableEntry.findByIdAndUpdate(
-      req.params.entryId,
-      { room, timeSlot, faculty },
+      entryId,
+      { room, timeSlot, faculty, course: targetCourse },
       { new: true }
     );
-
-    if (!entry) {
-      return res.status(404).json({ success: false, message: "Entry not found" });
-    }
 
     res.status(200).json({ success: true, data: entry });
   } catch (error) {

@@ -5,9 +5,14 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["student", "teacher", "parent", "hod", "alumni"], required: true },
+  role: { type: String, enum: ["student", "teacher", "parent", "hod", "alumni", "admin"], required: true },
   phone: { type: String },
   
+  // Telemetry & Account Status
+  lastLogin: { type: Date },
+  loginCount: { type: Number, default: 0 },
+  accountStatus: { type: String, enum: ["active", "archived", "suspended"], default: "active" },
+
   // File attachments
   resumeUrl: { type: String },
 
@@ -65,7 +70,7 @@ const userSchema = new mongoose.Schema({
       inApp: { type: Boolean, default: true },
     },
   },
-});
+}, { timestamps: true });
 
 userSchema.index({ name: "text", email: "text", studentId: "text", teacherId: "text" });
 
