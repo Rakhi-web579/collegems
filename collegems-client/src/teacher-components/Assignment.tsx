@@ -19,7 +19,7 @@ import {
 import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
 import AssignmentComments from "../common-components-management/AssignmentComments";
-
+import RichTextEditor from "../common-components-management/RichTExtEditor";
 export default function TeacherAssignments({ courseId }: { courseId: string }) {
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loadingAssignments, setLoadingAssignments] = useState(false);
@@ -371,14 +371,16 @@ export default function TeacherAssignments({ courseId }: { courseId: string }) {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Description
                 </label>
-                <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow resize-none"
-                  placeholder="Provide detailed instructions for the assignment (optional)"
-                  rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  disabled={loading}
-                />
+              <div className={loading ? "opacity-50 pointer-events-none" : ""}>
+  <RichTextEditor
+    value={description}
+    onChange={(val) => {
+      const cleanVal = val === '<p><br></p>' ? '' : val;
+      setDescription(cleanVal);
+    }}
+    placeholder="Provide detailed instructions for the assignment (optional)"
+  />
+</div>
               </div>
 
               {/* Due Date and Max Marks Row */}

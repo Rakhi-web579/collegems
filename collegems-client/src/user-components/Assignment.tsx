@@ -23,7 +23,7 @@ import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
 import AssignmentComments from "../common-components-management/AssignmentComments";
 import { useAutoSave } from "../hooks/useAutoSave";
-
+import RichTextEditor from "../common-components-management/RichTExtEditor";
 export default function Assignment() {
   const getUserId = () => {
     const role = localStorage.getItem("role");
@@ -532,11 +532,12 @@ const processFile = (selectedFile: File) => {
                   </div>
                 </div>
 
-                {/* Description */}
+               {/* Description */}
                 {assignment.description && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {assignment.description}
-                  </p>
+                  <div 
+                    className="text-gray-600 text-sm mb-4 line-clamp-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-5 [&_ol]:ml-5 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800"
+                    dangerouslySetInnerHTML={{ __html: assignment.description }}
+                  />
                 )}
 
                 {/* Due Date */}
@@ -693,16 +694,17 @@ const processFile = (selectedFile: File) => {
                       <span className="text-red-500"> *</span>
                     )}
                   </label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
+                <RichTextEditor
                     value={submissionForm.textResponse}
-                    onChange={(e) =>
+                    onChange={(val) => {
+                      // ReactQuill inserts <p><br></p> when empty. We clean it up so validation still works!
+                      const cleanVal = val === '<p><br></p>' ? '' : val;
                       setSubmissionForm((prev) => ({
                         ...prev,
-                        textResponse: e.target.value,
-                      }))
-                    }
+                        textResponse: cleanVal,
+                      }));
+                    }}
+                    placeholder={requiresTextResponse ? "Write your essay or response here..." : "Add any optional notes here..."}
                   />
                 </div>
               </div>
