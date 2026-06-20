@@ -8,9 +8,10 @@ import {
   updatePassword,
   getPreferences,
   updatePreferences,
-  getStudentProfile,
   getStudents,
   uploadResumeFile,
+  getStudentTimeline,
+  getStudentProfile,
 } from "../controllers/user.controller.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
@@ -59,6 +60,13 @@ router.get(
   protect,
   authorize("teacher", "hod"),
   getStudentProfile
+);
+
+router.get(
+  "/students/:id/timeline",
+  protect,
+  authorize("teacher", "hod", "student"),
+  getStudentTimeline
 );
 
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {

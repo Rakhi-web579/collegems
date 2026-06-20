@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
+import timelinePlugin from "../plugins/timelinePlugin.js";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["student", "teacher", "parent", "hod"], required: true },
+  role: { type: String, enum: ["student", "teacher", "parent", "hod", "alumni"], required: true },
   phone: { type: String },
   
   // File attachments
@@ -67,5 +68,9 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.index({ name: "text", email: "text", studentId: "text", teacherId: "text" });
+
+userSchema.plugin(timelinePlugin, {
+  trackedFields: ["course", "semester", "phone", "email"]
+});
 
 export default mongoose.model("User", userSchema);

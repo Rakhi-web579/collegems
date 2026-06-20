@@ -36,6 +36,7 @@ import RiskDashboard from "./RiskDashboard";
 // If SystemLogsDashboard is in another folder, update this path accordingly. 
 // For now, assuming it's in pages based on the previous error logs.
 // import SystemLogsDashboard from "./SystemLogsDashboard";
+import AttendanceAlertsWidget from "../teacher-components/AttendanceAlertsWidget";
 
 type TabType =
   | "overview"
@@ -349,23 +350,29 @@ export default function HODDashboard() {
             })}
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { label: "Generate Reports", icon: FileText, color: "bg-blue-50 text-blue-700 hover:bg-blue-100", onClick: () => navigate("/hod/reports") },
-                { label: "View Students", icon: GraduationCap, color: "bg-amber-50 text-amber-700 hover:bg-amber-100", onClick: () => setActiveTab("students") },
-                { label: "Manage Courses", icon: BookOpen, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100", onClick: () => setActiveTab("courses") },
-              ].map((action, index) => {
-                const Icon = action.icon;
-                return (
-                  <button key={index} onClick={action.onClick} className={`flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors ${action.color}`}>
-                    <div className="p-2 rounded-lg bg-white dark:bg-gray-700"><Icon className="w-5 h-5" /></div>
-                    <span className="font-medium">{action.label}</span>
-                  </button>
-                );
-              })}
+          {/* Quick Actions & Widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { label: "Generate Reports", icon: FileText, color: "bg-blue-50 text-blue-700 hover:bg-blue-100", onClick: () => navigate("/hod/reports") },
+                  { label: "View Students", icon: GraduationCap, color: "bg-amber-50 text-amber-700 hover:bg-amber-100", onClick: () => setActiveTab("students") },
+                  { label: "Manage Courses", icon: BookOpen, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100", onClick: () => setActiveTab("courses") },
+                ].map((action, index) => {
+                  const Icon = action.icon;
+                  return (
+                    <button key={index} onClick={action.onClick} className={`flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors ${action.color}`}>
+                      <div className="p-2 rounded-lg bg-white dark:bg-gray-700"><Icon className="w-5 h-5" /></div>
+                      <span className="font-medium">{action.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <AttendanceAlertsWidget />
             </div>
           </div>
         </div>

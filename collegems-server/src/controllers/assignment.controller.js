@@ -4,8 +4,7 @@ import Assignment from "../models/Assignment.model.js";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
-import Course from "../models/Course.model.js";
-import { checkSemesterFrozen } from "../services/semesterService.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 
 export const createAssignment = async (req, res) => {
   try {
@@ -124,6 +123,13 @@ export const submitAssignment = async (req, res) => {
 
     assignment.submissions.push(submission);
     await assignment.save();
+    
+    // Background Plagiarism Detection Pipeline Trigger
+    publishEvent("academics", "assignment.submitted", {
+      assignmentId: assignment._id,
+      studentId: req.user.id
+    });
+
     res.json({ message: "Assignment submitted", submission });
   } catch (error) {
     console.error("Submit Assignment Error:", error);

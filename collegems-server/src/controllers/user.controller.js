@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.model.js";
+import StudentTimelineEvent from "../models/StudentTimelineEvent.model.js";
 import { logAction } from "../utils/auditService.js";
 import { getPaginatedData } from "../utils/pagination.util.js";
 import calculateProfileCompletion from "../utils/profileCompletion.js";
@@ -215,5 +216,26 @@ export const uploadResumeFile = async (req, res) => {
   } catch (error) {
     console.error("Error uploading resume:", error);
     res.status(500).json({ message: "Server error uploading resume" });
+  }
+};
+
+export const getStudentTimeline = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Support filtering by field (optional)
+    const { field } = req.query;
+    const filter = { student: id };
+    if (field) filter.field = field;
+
+    const timeline = await StudentTimelineEvent.find(filter)
+      .populate("changedBy", "name role")
+      .sort({ timestamp: -1 })
+      .lean();
+
+    res.json(timeline);
+  } catch (error) {
+    console.error("Error fetching timeline:", error);
+    res.status(500).json({ message: "Server error fetching timeline" });
   }
 };
