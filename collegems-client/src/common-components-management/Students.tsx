@@ -519,6 +519,10 @@ const Students: React.FC = () => {
                       </p>
                     </div>
                   </div>
+
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <StudentTimeline studentId={fullProfile?._id || selectedStudent?._id || ""} />
+                  </div>
                 </div>
               )}
 

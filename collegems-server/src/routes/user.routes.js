@@ -8,7 +8,6 @@ import {
   updatePassword,
   getPreferences,
   updatePreferences,
-  getStudentProfile,
   getStudents,
   uploadResumeFile,
   getStudentSummary,
@@ -74,5 +73,7 @@ router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (
 
   res.json(teachers);
 });
+
+router.get("/cleanup-suggestions", protect, authorize("admin"), getCleanupSuggestions);
 
 export default router;
