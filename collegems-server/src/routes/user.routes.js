@@ -10,7 +10,7 @@ import {
   updatePreferences,
   getStudents,
   uploadResumeFile,
-  getCleanupSuggestions,
+  getStudentSummary,
 } from "../controllers/user.controller.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
@@ -62,10 +62,10 @@ router.get(
 );
 
 router.get(
-  "/students/:id/timeline",
+  "/students/:id/summary",
   protect,
-  authorize("teacher", "hod", "student"),
-  getStudentTimeline
+  authorize("teacher", "hod", "admin"),
+  getStudentSummary
 );
 
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
