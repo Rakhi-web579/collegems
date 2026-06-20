@@ -2,6 +2,7 @@ import Results from "../models/Results.model.js";
 import Student from "../models/User.model.js";
 import Course from "../models/Course.model.js";
 import { logAction } from "../utils/auditService.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 export const getResults = async (req, res) => {
     try {
         if (!req.user) {
@@ -84,6 +85,14 @@ export const publishResult = async (req, res) => {
 
         // Log result publish
         await logAction(req.user.id, "PUBLISH_RESULT", "Result", result._id, { studentId: result.studentId });
+        
+        // Publish Domain Event
+        publishEvent("academics", "result.published", {
+            studentId: result.studentId,
+            courseId: result.courseId,
+            resultId: result._id,
+            timestamp: new Date()
+        });
     } catch (error) {
         res.status(500).json({ message: "Publish failed" });
     }
