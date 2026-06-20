@@ -7,6 +7,8 @@ import {
   RefreshCw,
   Filter,
   AlertTriangle,
+  Send,
+  Loader2,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -20,6 +22,7 @@ interface Announcement {
   targetSemester: string | null;
   expiresAt: string | null;
   isActive: boolean;
+  status?: "draft" | "published";
   createdAt: string;
   postedBy: { name: string; role: string };
 }
@@ -38,8 +41,10 @@ export default function AnnouncementManage() {
   const [filterRole, setFilterRole] = useState("");
   const [filterCourse, setFilterCourse] = useState("");
   const [filterSemester, setFilterSemester] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
 
   // inline confirm modal state
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -53,6 +58,7 @@ export default function AnnouncementManage() {
       if (filterRole) params.targetRole = filterRole;
       if (filterCourse) params.targetCourse = filterCourse;
       if (filterSemester) params.targetSemester = filterSemester;
+      if (filterStatus) params.status = filterStatus;
 
       const res = await api.get("/announcements", { params });
 
@@ -66,7 +72,7 @@ export default function AnnouncementManage() {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, [filterRole, filterCourse, filterSemester]);
+  }, [filterRole, filterCourse, filterSemester, filterStatus]);
 
   const handleDelete = async () => {
     if (!confirmDeleteId) return;
@@ -85,6 +91,18 @@ export default function AnnouncementManage() {
       console.error("Delete failed:", err);
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handlePublish = async (id: string) => {
+    setPublishingId(id);
+    try {
+      await api.put(`/announcements/${id}`, { status: "published" });
+      await fetchAnnouncements();
+    } catch (err) {
+      console.error("Publish failed:", err);
+    } finally {
+      setPublishingId(null);
     }
   };
 
@@ -171,6 +189,17 @@ export default function AnnouncementManage() {
             </option>
           ))}
         </select>
+
+        {/* Status Filter */}
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+        >
+          <option value="">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Drafts</option>
+        </select>
       </div>
 
       {/* Loading */}
@@ -205,6 +234,12 @@ export default function AnnouncementManage() {
                     >
                       {a.priority}
                     </span>
+
+                    {a.status === "draft" && (
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                        Draft
+                      </span>
+                    )}
 
                     {!a.isActive && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500">
@@ -248,14 +283,31 @@ export default function AnnouncementManage() {
                   </p>
                 </div>
 
-                {/* Delete Button */}
-                <button
-                  onClick={() => setConfirmDeleteId(a._id)}
-                  className="p-2 rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors shrink-0"
-                  title="Delete announcement"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {a.status === "draft" && (
+                    <button
+                      onClick={() => handlePublish(a._id)}
+                      disabled={publishingId === a._id}
+                      className="p-2 rounded-xl text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-600 transition-colors disabled:opacity-50"
+                      title="Publish announcement"
+                    >
+                      {publishingId === a._id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setConfirmDeleteId(a._id)}
+                    className="p-2 rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors"
+                    title="Delete announcement"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Inline Delete Confirmation */}
