@@ -116,7 +116,20 @@ export const getAllAnnouncements = async (req, res) => {
     if (isActive !== undefined) filter.isActive = isActive === "true";
     if (status) filter.status = status;
 
-    const announcements = await Announcement.find(filter)
+    const visibilityFilter = {
+      $or: [
+        { status: "published" },
+        { status: { $exists: false } },
+        { postedBy: req.user.id }
+      ]
+    };
+
+    const finalFilter = {
+      ...filter,
+      ...visibilityFilter,
+    };
+
+    const announcements = await Announcement.find(finalFilter)
       .populate("postedBy", "name email role")
       .sort({ createdAt: -1 });
 

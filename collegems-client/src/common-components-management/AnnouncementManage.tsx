@@ -54,6 +54,11 @@ export default function AnnouncementManage({ refreshKey }: AnnouncementManagePro
   const [publishingId, setPublishingId] = useState<string | null>(null);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
 
+  const userStr = localStorage.getItem("userData");
+  const userData = userStr ? JSON.parse(userStr) : null;
+  const currentUserId = userData?._id || userData?.id;
+  const currentUserRole = userData?.role || localStorage.getItem("role");
+
   // inline confirm modal state
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -292,40 +297,42 @@ export default function AnnouncementManage({ refreshKey }: AnnouncementManagePro
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-1 shrink-0">
-                  {a.status === "draft" && (
-                    <>
-                      <button
-                        onClick={() => setEditingAnnouncement(a)}
-                        className="p-2 rounded-xl text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 transition-colors"
-                        title="Edit draft"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
+                {(currentUserRole === "hod" || currentUserRole === "admin" || a.postedBy?._id === currentUserId) && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    {a.status === "draft" && (
+                      <>
+                        <button
+                          onClick={() => setEditingAnnouncement(a)}
+                          className="p-2 rounded-xl text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 transition-colors"
+                          title="Edit draft"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
 
-                      <button
-                        onClick={() => handlePublish(a._id)}
-                        disabled={publishingId === a._id}
-                        className="p-2 rounded-xl text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-600 transition-colors disabled:opacity-50"
-                        title="Publish announcement"
-                      >
-                        {publishingId === a._id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Send className="w-4 h-4" />
-                        )}
-                      </button>
-                    </>
-                  )}
+                        <button
+                          onClick={() => handlePublish(a._id)}
+                          disabled={publishingId === a._id}
+                          className="p-2 rounded-xl text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-600 transition-colors disabled:opacity-50"
+                          title="Publish announcement"
+                        >
+                          {publishingId === a._id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Send className="w-4 h-4" />
+                          )}
+                        </button>
+                      </>
+                    )}
 
-                  <button
-                    onClick={() => setConfirmDeleteId(a._id)}
-                    className="p-2 rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors"
-                    title="Delete announcement"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                    <button
+                      onClick={() => setConfirmDeleteId(a._id)}
+                      className="p-2 rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors"
+                      title="Delete announcement"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Inline Delete Confirmation */}
