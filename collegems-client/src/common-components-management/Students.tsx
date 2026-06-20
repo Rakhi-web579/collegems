@@ -72,7 +72,8 @@ const Students: React.FC = () => {
     }
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+    if (!name) return "ST";
     return name
       .split(" ")
       .map((word) => word[0])
