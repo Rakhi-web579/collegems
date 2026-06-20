@@ -29,6 +29,7 @@ import HallAllocation from "../hod-components/HallAllocation";
 import AuditLogs from "../hod-components/AuditLogs";
 import BookingManagement from "../hod-components/BookingManagement";
 import ResourceManagement from "../hod-components/ResourceManagement";
+import SemesterManagement from "../hod-components/SemesterManagement";
 
 // Pages
 import RiskDashboard from "./RiskDashboard";
@@ -64,7 +65,8 @@ type TabType =
   | "manage-bookings"
   | "manage-resources"
   | "risk-dashboard"
-  | "system-logs";
+  | "system-logs"
+  | "freeze-semesters";
 
 interface Data {
   cards: Array<{ title: string; value: number }>;
@@ -136,6 +138,7 @@ export default function HODDashboard() {
     { id: "system-logs" as TabType, label: "System Traces", icon: FileText },
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
+    { id: "freeze-semesters" as TabType, label: "Freeze Semesters", icon: BookOpen },
     { id: "risk-dashboard" as TabType, label: "Predictive Analytics", icon: LayoutGrid },
   ];
 
@@ -408,6 +411,7 @@ const placeholders: Partial<Record<TabType, string>> = {
         {/* {activeTab === "system-logs" && <SystemLogsDashboard />} */}
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
+        {activeTab === "freeze-semesters" && <SemesterManagement />}
         {activeTab === "risk-dashboard" && <RiskDashboard />}
       </>
     );
