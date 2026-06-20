@@ -17,6 +17,7 @@ import {
 import api from "../api/axios";
 import { useServerDataTable } from "../hooks/useServerDataTable";
 import AdvancedExportButton from "./AdvancedExportButton";
+import StudentTimeline from "./StudentTimeline";
 
 interface Student {
   _id?: string;
@@ -491,6 +492,10 @@ const Students: React.FC = () => {
                         {formatDate(fullProfile?.lastUpdated || selectedStudent.lastUpdated)}
                       </p>
                     </div>
+                  </div>
+
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <StudentTimeline studentId={fullProfile?._id || selectedStudent?._id || ""} />
                   </div>
                 </div>
               )}
