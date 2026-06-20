@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import User from "../models/User.model.js";
 import StudentTimelineEvent from "../models/StudentTimelineEvent.model.js";
 import { logAction } from "../utils/auditService.js";
@@ -98,12 +98,12 @@ export const updatePassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const match = await bcrypt.compare(currentPassword, user.password);
+    const match = await comparePassword(currentPassword, user.password);
     if (!match) {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    user.password = await bcrypt.hash(newPassword, 8);
+    user.password = await hashPassword(newPassword, 8);
     await user.save();
 
     res.json({ message: "Password updated successfully" });
