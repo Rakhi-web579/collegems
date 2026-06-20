@@ -14,25 +14,26 @@ import {
   XCircle,
   FolderOpen,
   FileCheck,
-  MessageSquare, // Added MessageSquare import
-  X, // Added X for the modal close button
+  MessageSquare,
+  X
 } from "lucide-react";
 import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
 import AssignmentComments from "../common-components-management/AssignmentComments";
+import { useAutoSave } from "../hooks/useAutoSave";
 
 export default function Assignment() {
   const getUserId = () => {
     const role = localStorage.getItem("role");
     return role === "parent" ? localStorage.getItem("childStudentId") : localStorage.getItem("userId");
   };
+
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [submitting, setSubmitting] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState<"draft" | "final" | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeSubmission, setActiveSubmission] = useState<any | null>(null);
-  // NEW: State for viewing the comments modal
   const [viewingComments, setViewingComments] = useState<any | null>(null); 
   
   const [submissionForm, setSubmissionForm] = useState({
@@ -40,11 +41,11 @@ export default function Assignment() {
     link: "",
     file: null as File | null,
   });
+  
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const activeSubmissionType = activeSubmission?.submissionType || "file";
-  const requiresTextResponse =
-    activeSubmissionType === "text" || activeSubmissionType === "both";
+  const requiresTextResponse = activeSubmissionType === "text" || activeSubmissionType === "both";
 
   useEffect(() => {
     fetchAssignments();
@@ -62,9 +63,24 @@ export default function Assignment() {
     }
   };
 
+  const userId = getUserId();
+  const draftKey = activeSubmission && !submitting ? `draft_${activeSubmission._id}_${userId}` : "";
+  
+  useAutoSave(
+    draftKey, 
+    { textResponse: submissionForm.textResponse, link: submissionForm.link }, 
+    setSubmissionForm
+  );
+
   const openSubmission = (assignment: any) => {
     setActiveSubmission(assignment);
-    setSubmissionForm({ textResponse: "", link: "", file: null });
+    const currentUserId = getUserId();
+    
+    const existingDraft = assignment.submissions?.find((s: any) => s.student?.toString() === currentUserId);
+    const initialText = existingDraft?.textResponse || "";
+    const initialLink = existingDraft?.link || "";
+
+    setSubmissionForm({ textResponse: initialText, link: initialLink, file: null });
     setSubmitError(null);
   };
 
@@ -82,15 +98,13 @@ export default function Assignment() {
       return;
     }
 
-    // Size Validation (5MB = 5 * 1024 * 1024 bytes)
     if (selectedFile.size > 5 * 1024 * 1024) {
       setSubmitError("File is too large! Maximum allowed size is 5MB.");
-      e.target.value = ""; // Clear the invalid file from input
+      e.target.value = ""; 
       setSubmissionForm((prev) => ({ ...prev, file: null }));
       return;
     }
 
-    // Type Validation (Fallback for browsers ignoring the 'accept' attribute)
     const allowedTypes = [
       "application/pdf",
       "application/msword",
@@ -99,12 +113,11 @@ export default function Assignment() {
     
     if (!allowedTypes.includes(selectedFile.type)) {
       setSubmitError("Invalid file type! Please upload a .pdf, .doc, or .docx file.");
-      e.target.value = ""; // Clear the invalid file from input
+      e.target.value = ""; 
       setSubmissionForm((prev) => ({ ...prev, file: null }));
       return;
     }
 
-    // Clear any previous errors and set the valid file
     setSubmitError(null);
     setSubmissionForm((prev) => ({ ...prev, file: selectedFile }));
   };
@@ -112,49 +125,30 @@ export default function Assignment() {
   const submitAssignment = async () => {
     if (!activeSubmission || submitting) return;
 
-    const submissionType = activeSubmission.submissionType || "file";
     const textResponse = submissionForm.textResponse.trim();
     const link = submissionForm.link.trim();
+    const currentUserId = getUserId();
+    const existingDraft = activeSubmission.submissions?.find((s: any) => s.student?.toString() === currentUserId);
 
-    if (submissionType === "file" && !submissionForm.file) {
-      setSubmitError("Please attach a file.");
-      return;
-    }
+    const hasFile = Boolean(submissionForm.file) || Boolean(existingDraft?.file);
+    
+    if (activeSubmissionType === "file" && !hasFile) return setSubmitError("Please attach a file.");
+    if (activeSubmissionType === "text" && !textResponse) return setSubmitError("Please enter your response.");
+    if (activeSubmissionType === "link" && !link) return setSubmitError("Please provide a link.");
+    if (activeSubmissionType === "both" && (!hasFile || !textResponse)) return setSubmitError("Please attach a file and enter your response.");
 
-    if (submissionType === "text" && !textResponse) {
-      setSubmitError("Please enter your response.");
-      return;
-    }
-
-    if (submissionType === "link" && !link) {
-      setSubmitError("Please provide a link.");
-      return;
-    }
-
-    if (submissionType === "both" && (!submissionForm.file || !textResponse)) {
-      setSubmitError("Please attach a file and enter your response.");
-      return;
-    }
-
-    setSubmitting(activeSubmission._id);
+    setSubmitting("final");
     setSubmitError(null);
 
     try {
       const formData = new FormData();
-      if (submissionForm.file) {
-        formData.append("file", submissionForm.file);
-      }
-      if (textResponse) {
-        formData.append("textResponse", textResponse);
-      }
-      if (link) {
-        formData.append("link", link);
-      }
+      if (submissionForm.file) formData.append("file", submissionForm.file);
+      if (textResponse) formData.append("textResponse", textResponse);
+      if (link) formData.append("link", link);
 
-      await api.post(`/assignment/submit/${activeSubmission._id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post(`/assignment/submit/${activeSubmission._id}`, formData);
 
+      localStorage.removeItem(`draft_${activeSubmission._id}_${currentUserId}`);
       setSubmitSuccess("Assignment submitted successfully.");
       closeSubmission();
       await fetchAssignments();
@@ -170,19 +164,20 @@ export default function Assignment() {
   // Filter assignments
   const filteredAssignments = assignments.filter((a) => {
     const userId = getUserId();
-    const submitted = a.submissions?.some((s: any) => {
+    const isSubmitted = a.submissions?.some((s: any) => {
       if (!s.student || !userId) return false;
       return s.student.toString() === userId;
     });
+
     const now = new Date();
     const dueDate = new Date(a.dueDate);
-    const isOverdue = dueDate < now && !submitted;
+    const isOverdue = dueDate < now && !isSubmitted;
 
     switch (filter) {
       case "pending":
-        return !submitted && !isOverdue;
+        return !isSubmitted && !isOverdue;
       case "submitted":
-        return submitted;
+        return isSubmitted;
       case "overdue":
         return isOverdue;
       default:
@@ -194,12 +189,8 @@ export default function Assignment() {
   const sortedAssignments = [...filteredAssignments].sort((a, b) => {
     const userId = getUserId();
 
-    const aSubmitted = a.submissions?.some(
-      (s: any) => s.student?.toString() === userId,
-    );
-    const bSubmitted = b.submissions?.some(
-      (s: any) => s.student?.toString() === userId,
-    );
+    const aSubmitted = a.submissions?.some((s: any) => s.student?.toString() === userId);
+    const bSubmitted = b.submissions?.some((s: any) => s.student?.toString() === userId);
 
     const aDue = new Date(a.dueDate);
     const bDue = new Date(b.dueDate);
@@ -226,12 +217,10 @@ export default function Assignment() {
     total: assignments.length,
     pending: assignments.filter((a) => {
       const userId = getUserId();
-      const submitted = a.submissions?.some(
-        (s: any) => s.student?.toString() === userId,
-      );
+      const isSubmitted = a.submissions?.some((s: any) => s.student?.toString() === userId);
       const dueDate = new Date(a.dueDate);
       const now = new Date();
-      return !submitted && dueDate > now;
+      return !isSubmitted && dueDate > now;
     }).length,
     submitted: assignments.filter((a) => {
       const userId = getUserId();
@@ -239,31 +228,28 @@ export default function Assignment() {
     }).length,
     overdue: assignments.filter((a) => {
       const userId = getUserId();
-      const submitted = a.submissions?.some(
-        (s: any) => s.student?.toString() === userId,
-      );
+      const isSubmitted = a.submissions?.some((s: any) => s.student?.toString() === userId);
       const dueDate = new Date(a.dueDate);
       const now = new Date();
-      return !submitted && dueDate < now;
+      return !isSubmitted && dueDate < now;
     }).length,
   };
 
   const getStatusConfig = (assignment: any) => {
     const userId = getUserId();
-    const submitted = assignment.submissions?.some(
-      (s: any) => s.student?.toString() === userId,
-    );
+    const isSubmitted = assignment.submissions?.some((s: any) => s.student?.toString() === userId);
+    
     const dueDate = new Date(assignment.dueDate);
     const now = new Date();
 
-    if (submitted) {
+    if (isSubmitted) {
       return {
         color: "bg-green-50 text-green-700 border-green-200",
         icon: CheckCircle,
         text: "Submitted",
       };
     }
-    if (dueDate < now && !submitted) {
+    if (dueDate < now) {
       return {
         color: "bg-red-50 text-red-700 border-red-200",
         icon: XCircle,
@@ -271,9 +257,7 @@ export default function Assignment() {
       };
     }
 
-    const daysRemaining = Math.ceil(
-      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const daysRemaining = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysRemaining <= 1) {
       return {
@@ -465,10 +449,9 @@ export default function Assignment() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {sortedAssignments.map((assignment) => {
             const userId = getUserId();
-            const studentSubmission = assignment.submissions?.find(
-              (s: any) => s.student?.toString() === userId,
-            );
-            const submitted = Boolean(studentSubmission);
+            const studentSubmission = assignment.submissions?.find((s: any) => s.student?.toString() === userId);
+            
+            const isSubmitted = Boolean(studentSubmission);
             const status = getStatusConfig(assignment);
             const StatusIcon = status.icon;
 
@@ -533,7 +516,7 @@ export default function Assignment() {
                 </div>
 
                 {/* Submission Info */}
-                {submitted && (
+                {isSubmitted && (
                   <div className="mb-4 p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center text-sm text-green-700">
                       <FileCheck className="w-4 h-4 mr-2" />
@@ -584,7 +567,6 @@ export default function Assignment() {
                     </a>
                   )}
 
-                  {/* NEW: Comments Button */}
                   <button
                     onClick={() => setViewingComments(assignment)}
                     className="inline-flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
@@ -593,20 +575,20 @@ export default function Assignment() {
                     Class Comments ({assignment.comments?.length || 0})
                   </button>
 
-                  {!submitted ? (
+                  {!isSubmitted ? (
                     <button
                       onClick={() => openSubmission(assignment)}
-                      disabled={submitting === assignment._id}
+                      disabled={Boolean(submitting) && submitting === assignment._id}
                       className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        submitting === assignment._id
+                        Boolean(submitting) && submitting === assignment._id
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-blue-600 text-white hover:bg-blue-700"
                       } ml-auto`}
                     >
-                      {submitting === assignment._id ? (
+                      {Boolean(submitting) && submitting === assignment._id ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                          Submitting...
+                          Loading...
                         </>
                       ) : (
                         <>
@@ -713,9 +695,16 @@ export default function Assignment() {
                 activeSubmissionType === "both") && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload File (Max 5MB, PDF/DOCX)
+                    Upload File (Max 5MB)
                     <span className="text-red-500"> *</span>
                   </label>
+                  
+                  {activeSubmission.submissions?.find((s:any) => s.student.toString() === getUserId())?.file && !submissionForm.file && (
+                     <div className="mb-2 p-2 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center justify-between">
+                       <span>Draft file attached: {activeSubmission.submissions.find((s:any) => s.student.toString() === getUserId()).file.originalName}</span>
+                     </div>
+                  )}
+
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -731,29 +720,28 @@ export default function Assignment() {
               )}
             </div>
 
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={closeSubmission}
-                  disabled={Boolean(submitting)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={submitAssignment}
-                  disabled={Boolean(submitting)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300"
-                >
-                  {submitting ? "Submitting..." : "Submit"}
-                </button>
-              </div>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button 
+                onClick={closeSubmission} 
+                disabled={Boolean(submitting)} 
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              
+              <button
+                onClick={submitAssignment}
+                disabled={Boolean(submitting)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:bg-gray-400"
+              >
+                {submitting === "final" ? "Submitting..." : <><Upload className="w-4 h-4"/> Submit</>}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* NEW: Comments Modal */}
+      {/* Comments Modal */}
       {viewingComments && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div 

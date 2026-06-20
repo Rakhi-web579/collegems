@@ -63,18 +63,12 @@ export const submitAssignment = async (req, res) => {
     if (!assignment) {
       return res.status(404).json({ message: "Assignment not found" });
     }
-
-    if (assignment.course && assignment.course.semester) {
-      await checkSemesterFrozen(assignment.course.semester);
-    }
-
     const alreadySubmitted = assignment.submissions.some(
       (s) => s.student.toString() === req.user.id
     );
     if (alreadySubmitted) {
       return res.status(400).json({ message: "Assignment already submitted" });
     }
-
     const submissionType = assignment.submissionType || "file";
     const textResponse =
       typeof req.body.textResponse === "string" ? req.body.textResponse.trim() : "";
@@ -82,7 +76,6 @@ export const submitAssignment = async (req, res) => {
     const hasFile = Boolean(req.file);
     const hasText = Boolean(textResponse);
     const hasLink = Boolean(link);
-
     if (submissionType === "file" && !hasFile)
       return res.status(400).json({ message: "File is required" });
     if (submissionType === "text" && !hasText)
@@ -91,7 +84,6 @@ export const submitAssignment = async (req, res) => {
       return res.status(400).json({ message: "Link is required" });
     if (submissionType === "both" && (!hasFile || !hasText))
       return res.status(400).json({ message: "File and text response are required" });
-
     if (hasLink) {
       try {
         const parsed = new URL(link);
@@ -102,7 +94,6 @@ export const submitAssignment = async (req, res) => {
         return res.status(400).json({ message: "Invalid link" });
       }
     }
-
     const baseUrl = `${req.protocol}://${req.get("host")}`;
     const submission = {
       student: req.user.id,
@@ -119,8 +110,8 @@ export const submitAssignment = async (req, res) => {
             filename: req.file.filename,
           }
         : undefined,
-    };
 
+    };
     assignment.submissions.push(submission);
     await assignment.save();
     
@@ -136,7 +127,7 @@ export const submitAssignment = async (req, res) => {
     if (error.status === 403) return res.status(403).json({ message: error.message });
     res.status(500).json({ message: "Submission failed" });
   }
-};
+}; 
 
 export const evaluateAssignment = async (req, res) => {
   try {

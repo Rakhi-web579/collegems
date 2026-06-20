@@ -45,10 +45,10 @@ const assignmentSchema = new mongoose.Schema(
         },
         submittedAt: Date,
         status: {
-          type: String,
-          enum: ["submitted", "graded"],
-          default: "submitted"
-        },
+        type: String,
+        enum: ['draft', 'submitted', 'graded'],
+         default: 'submitted'
+},
         textResponse: String,
         link: String,
         file: {
