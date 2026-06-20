@@ -90,3 +90,13 @@ Server exits immediately if `MONGO_URI`, `JWT_SECRET`, or `JWT_REFRESH_SECRET` a
 - PRs target `master` branch.
 - UI changes should be tested across all three roles (Student, Teacher, HOD) and on mobile — Tailwind is mobile-first.
 - The `patch_teacher_assignments.js` at the root is a one-off code-mod script, not part of the build.
+
+## Available skills (`.agents/skills/`)
+
+| Skill | What it does in this repo |
+|-------|--------------------------|
+| `conventional-commit` | Generates commit messages following the `feat(scope):` / `fix(scope):` format enforced by commitlint + husky |
+| `mongodb-query-optimizer` | Reviews slow Mongoose queries in `collegems-server`, suggests indexes for MongoDB collections |
+| `python-anti-patterns` | Checks `collegems-ml-service` FastAPI/scikit-learn code for common Python mistakes before merge |
+| `seo-audit` | Audits the React client pages for meta tags, Core Web Vitals, and indexing issues |
+| `wcag-audit-patterns` | Audits React components against WCAG 2.2 — covers all three role UIs (Student, Teacher, HOD) |
