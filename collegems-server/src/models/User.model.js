@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import timelinePlugin from "../plugins/timelinePlugin.js";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -72,5 +73,9 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 userSchema.index({ name: "text", email: "text", studentId: "text", teacherId: "text" });
+
+userSchema.plugin(timelinePlugin, {
+  trackedFields: ["course", "semester", "phone", "email"]
+});
 
 export default mongoose.model("User", userSchema);

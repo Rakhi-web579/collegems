@@ -241,15 +241,6 @@ export default function App() {
           }
         />
 
-        {/* Parent Routes */}
-        <Route
-          path="/parent/dashboard"
-          element={
-            <RoleRoute role="parent">
-              <ParentDashboard />
-            </RoleRoute>
-          }
-        />
         <Route
           path="/parent/dashboard"
           element={

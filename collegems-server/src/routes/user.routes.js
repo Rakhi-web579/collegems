@@ -8,7 +8,6 @@ import {
   updatePassword,
   getPreferences,
   updatePreferences,
-  getStudentProfile,
   getStudents,
   uploadResumeFile,
   getCleanupSuggestions,
@@ -60,6 +59,13 @@ router.get(
   protect,
   authorize("teacher", "hod"),
   getStudentProfile
+);
+
+router.get(
+  "/students/:id/timeline",
+  protect,
+  authorize("teacher", "hod", "student"),
+  getStudentTimeline
 );
 
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
