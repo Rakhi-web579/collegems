@@ -29,6 +29,7 @@ interface Student {
   course?: string;
   semester?: number;
   phone?: string;
+  tags?: string[];
   joinedAt?: string;
   lastUpdated?: string;
 }
@@ -180,8 +181,8 @@ const Students: React.FC = () => {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`inline-flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${Object.keys(tableState.filters).length > 0
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  ? "border-blue-500 text-blue-600 bg-blue-50"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}
               >
                 <Filter className="w-4 h-4" />
@@ -314,6 +315,15 @@ const Students: React.FC = () => {
                             <Mail className="w-3 h-3" />
                             {student.email}
                           </p>
+                          {student.tags && student.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {student.tags.map((tag) => (
+                                <span key={tag} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 rounded text-[10px] font-medium border border-indigo-100 dark:border-indigo-800">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <button className="p-1 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
