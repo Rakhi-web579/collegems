@@ -1,11 +1,11 @@
 // FILE: collegems-client/src/teacher-components/AnnouncementForm.tsx
-
 import { useState } from "react";
 import {
   Bell, Send, Tag, Calendar, Users, AlertCircle,
   CheckCircle, Loader2, FileText, Megaphone,
 } from "lucide-react";
 import api from "../api/axios";
+import { scrollToFirstError } from "../utils/formHelpers";
 
 //  Constants 
 
@@ -13,17 +13,17 @@ const COURSES = ["BCA", "MCA", "BBA", "MBA"];
 const SEMESTERS = ["1", "2", "3", "4", "5", "6"];
 
 const ROLES = [
-  { value: "all",     label: "Everyone"       },
-  { value: "student", label: "Students only"  },
-  { value: "teacher", label: "Teachers only"  },
-  { value: "hod",     label: "HOD only"       },
-  { value: "parent",  label: "Parents only"   },
+  { value: "all", label: "Everyone" },
+  { value: "student", label: "Students only" },
+  { value: "teacher", label: "Teachers only" },
+  { value: "hod", label: "HOD only" },
+  { value: "parent", label: "Parents only" },
 ];
 
 const PRIORITIES = [
-  { value: "low",    label: "Low"    },
+  { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
-  { value: "high",   label: "High"   },
+  { value: "high", label: "High" },
   { value: "urgent", label: "Urgent" },
 ];
 
@@ -118,15 +118,15 @@ interface Props {
 
 export default function AnnouncementForm({ onSuccess }: Props) {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
-  const [errors, setErrors]     = useState<FormErrors>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess]       = useState(false);
-  const [apiError, setApiError]         = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const inputBase =
     "w-full px-3 py-2.5 border rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors";
   const inputNormal = `${inputBase} border-gray-300`;
-  const inputErr    = `${inputBase} border-red-400 bg-red-50`;
+  const inputErr = `${inputBase} border-red-400 bg-red-50`;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -148,6 +148,7 @@ export default function AnnouncementForm({ onSuccess }: Props) {
     const validationErrors = validate(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      scrollToFirstError(validationErrors);
       return;
     }
 
@@ -155,9 +156,9 @@ export default function AnnouncementForm({ onSuccess }: Props) {
     try {
       await api.post("/announcements", {
         ...formData,
-        targetCourse:   formData.targetCourse   || null,
+        targetCourse: formData.targetCourse || null,
         targetSemester: formData.targetSemester || null,
-        expiresAt:      formData.expiresAt      || null,
+        expiresAt: formData.expiresAt || null,
       });
       setIsSuccess(true);
       setFormData(EMPTY_FORM);
@@ -190,7 +191,7 @@ export default function AnnouncementForm({ onSuccess }: Props) {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                 Announcement
+                Announcement
               </h1>
               <p className="text-gray-500 mt-0.5">
                 Send a targeted notice to specific groups
@@ -256,11 +257,10 @@ export default function AnnouncementForm({ onSuccess }: Props) {
                 {PRIORITIES.map((p) => (
                   <label
                     key={p.value}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-colors text-sm ${
-                      formData.priority === p.value
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-colors text-sm ${formData.priority === p.value
                         ? "bg-blue-50 border-blue-400 text-blue-700 font-medium"
                         : "border-gray-200 text-gray-600 hover:border-blue-200 hover:bg-blue-50"
-                    }`}
+                      }`}
                   >
                     <input
                       type="radio"
@@ -378,7 +378,7 @@ export default function AnnouncementForm({ onSuccess }: Props) {
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                     Post Announcement
+                    Post Announcement
                   </>
                 )}
               </button>
