@@ -5,7 +5,7 @@ import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
   Wallet, DollarSign, Calendar, Menu, X, RefreshCw, ChevronRight,
   Bell, Search, UserCircle, LogOut, Settings, CalendarDays,
-  Moon, Sun, Award, Bus, MessageSquare
+  Moon, Sun, Award, Bus, MessageSquare, Activity
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -37,6 +37,7 @@ import RiskDashboard from "./RiskDashboard";
 // For now, assuming it's in pages based on the previous error logs.
 // import SystemLogsDashboard from "./SystemLogsDashboard";
 import AttendanceAlertsWidget from "../teacher-components/AttendanceAlertsWidget";
+import SystemHealthDashboard from "../hod-components/SystemHealthDashboard";
 
 type TabType =
   | "overview"
@@ -67,6 +68,7 @@ type TabType =
   | "manage-resources"
   | "risk-dashboard"
   | "system-logs"
+  | "system-health"
   | "freeze-semesters";
 
 interface Data {
@@ -138,6 +140,7 @@ export default function HODDashboard() {
     { id: "hall-allocation" as TabType, label: "Hall Allocation", icon: Users },
     { id: "audit-logs" as TabType, label: "Audit Logs", icon: FileText },
     { id: "system-logs" as TabType, label: "System Traces", icon: FileText },
+    { id: "system-health" as TabType, label: "System Health", icon: Activity },
     { id: "manage-bookings" as TabType, label: "Manage Bookings", icon: Calendar },
     { id: "manage-resources" as TabType, label: "Manage Resources", icon: Building2 },
     { id: "freeze-semesters" as TabType, label: "Freeze Semesters", icon: BookOpen },
@@ -417,6 +420,7 @@ export default function HODDashboard() {
         {activeTab === "hall-allocation" && <HallAllocation />}
         {activeTab === "audit-logs" && <AuditLogs />}
         {/* {activeTab === "system-logs" && <SystemLogsDashboard />} */}
+        {activeTab === "system-health" && <SystemHealthDashboard />}
         {activeTab === "manage-bookings" && <BookingManagement />}
         {activeTab === "manage-resources" && <ResourceManagement />}
         {activeTab === "freeze-semesters" && <SemesterManagement />}
