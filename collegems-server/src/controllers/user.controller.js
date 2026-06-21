@@ -241,8 +241,8 @@ export const getStudentSummary = async (req, res) => {
     if (results.length > 0) {
       const numericResults = results.filter(r => r.marks && !isNaN(parseFloat(r.marks)));
       if (numericResults.length > 0) {
-          const totalMarks = numericResults.reduce((acc, curr) => acc + parseFloat(curr.marks), 0);
-          averageMarks = Math.round(totalMarks / numericResults.length);
+        const totalMarks = numericResults.reduce((acc, curr) => acc + parseFloat(curr.marks), 0);
+        averageMarks = Math.round(totalMarks / numericResults.length);
       }
     }
 
@@ -255,5 +255,58 @@ export const getStudentSummary = async (req, res) => {
   } catch (error) {
     console.error("Error fetching student summary:", error);
     res.status(500).json({ message: "Server error fetching summary" });
+  }
+};
+
+export const bulkAssignTags = async (req, res) => {
+  try {
+    const { userIds, tags } = req.body;
+
+    if (!userIds || !Array.isArray(userIds) || !tags || !Array.isArray(tags)) {
+      return res.status(400).json({ message: "userIds and tags must be arrays" });
+    }
+
+    if (userIds.length === 0) {
+      return res.status(400).json({ message: "userIds array cannot be empty" });
+    }
+
+    // Process tags: type check, trim, remove empty, check length
+    const processedTags = [];
+    for (const t of tags) {
+      if (typeof t !== "string") {
+        return res.status(400).json({ message: "All tags must be strings" });
+      }
+      const trimmed = t.trim();
+      if (!trimmed) continue;
+      if (trimmed.length > 50) {
+        return res.status(400).json({ message: `Tag "${trimmed.substring(0, 20)}..." exceeds the 50 character limit` });
+      }
+      processedTags.push(trimmed);
+    }
+
+    // Deduplicate
+    const uniqueTags = [...new Set(processedTags)];
+
+    if (uniqueTags.length === 0) {
+      return res.status(400).json({ message: "No valid tags provided" });
+    }
+
+    const result = await User.updateMany(
+      { _id: { $in: userIds }, role: "student" },
+      { $addToSet: { tags: { $each: uniqueTags } } }
+    );
+
+    // Audit logging
+    await logAction(req.user.id, "BULK_ASSIGN_TAGS", "User", null, { userIds, tags: uniqueTags });
+
+    res.json({ 
+      success: true,
+      message: "Tags assigned successfully", 
+      matchedCount: result.matchedCount, 
+      modifiedCount: result.modifiedCount 
+    });
+  } catch (error) {
+    console.error("Error in bulkAssignTags:", error);
+    res.status(500).json({ message: "Server error assigning tags" });
   }
 };

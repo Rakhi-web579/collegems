@@ -12,6 +12,7 @@ import {
   uploadResumeFile,
   getStudentSummary,
   getStudentProfile,
+  bulkAssignTags,
 } from "../controllers/user.controller.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
@@ -67,6 +68,13 @@ router.get(
   protect,
   authorize("teacher", "hod", "admin"),
   getStudentSummary
+);
+
+router.put(
+  "/students/bulk-tags",
+  protect,
+  authorize("teacher", "hod", "admin"),
+  bulkAssignTags
 );
 
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
