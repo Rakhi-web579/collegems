@@ -58,8 +58,9 @@ app.use((req, res, next) => {
 // Static Files
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// Tenant Resolver
-app.use(tenantResolver);
+// TODO: Multi-tenancy is not yet supported by the frontend or seeder
+// import tenantResolver from "./middlewares/tenantResolver.js";
+// app.use(tenantResolver);
 
 // ========================================
 // MOUNT ALL ROUTES UNDER /api
