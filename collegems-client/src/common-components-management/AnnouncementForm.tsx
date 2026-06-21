@@ -1,5 +1,5 @@
 // FILE: collegems-client/src/teacher-components/AnnouncementForm.tsx
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Bell, Send, Tag, Calendar, Users, AlertCircle,
   CheckCircle, Loader2, FileText, Megaphone,
@@ -112,13 +112,48 @@ function FieldWrapper({
 
 //  Main Component ─
 
+export interface AnnouncementData {
+  _id: string;
+  title: string;
+  message: string;
+  targetRole: string;
+  targetCourse: string | null;
+  targetSemester: string | null;
+  expiresAt: string | null;
+  priority: string;
+  status?: "draft" | "published";
+}
+
 interface Props {
+  mode?: "create" | "edit";
+  initialAnnouncement?: AnnouncementData;
   onSuccess?: () => void;
 }
 
-export default function AnnouncementForm({ onSuccess }: Props) {
+export default function AnnouncementForm({ mode = "create", initialAnnouncement, onSuccess }: Props) {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
+  useEffect(() => {
+    if (initialAnnouncement) {
+      setFormData({
+        title: initialAnnouncement.title || "",
+        message: initialAnnouncement.message || "",
+        targetRole: initialAnnouncement.targetRole || "all",
+        targetCourse: initialAnnouncement.targetCourse || "",
+        targetSemester: initialAnnouncement.targetSemester || "",
+        expiresAt: initialAnnouncement.expiresAt ? new Date(initialAnnouncement.expiresAt).toISOString().slice(0, 16) : "",
+        priority: initialAnnouncement.priority || "medium",
+      });
+      if (initialAnnouncement.status) {
+         submitActionRef.current = initialAnnouncement.status;
+      }
+    } else {
+      setFormData(EMPTY_FORM);
+      submitActionRef.current = "published";
+    }
+  }, [initialAnnouncement]);
+  const [submitStatus, setSubmitStatus] = useState<"draft" | "published">("published");
+  const submitActionRef = useRef<"draft" | "published">("published");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [apiError, setApiError] = useState("");
@@ -154,15 +189,27 @@ export default function AnnouncementForm({ onSuccess }: Props) {
 
     setIsSubmitting(true);
     try {
-      await api.post("/announcements", {
+      const payload = {
         ...formData,
         targetCourse: formData.targetCourse || null,
         targetSemester: formData.targetSemester || null,
         expiresAt: formData.expiresAt || null,
-      });
+        status: submitActionRef.current,
+      };
+
+      if (mode === "edit" && initialAnnouncement?._id) {
+        await api.put(`/announcements/${initialAnnouncement._id}`, payload);
+      } else {
+        await api.post("/announcements", payload);
+      }
       setIsSuccess(true);
       setFormData(EMPTY_FORM);
       setErrors({});
+      
+      // Reset action back to default "Publish" mode for the next interaction
+      submitActionRef.current = "published";
+      setSubmitStatus("published");
+      
       setTimeout(() => setIsSuccess(false), 4000);
       onSuccess?.();
     } catch (err: any) {
@@ -177,6 +224,8 @@ export default function AnnouncementForm({ onSuccess }: Props) {
     setErrors({});
     setApiError("");
     setIsSuccess(false);
+    submitActionRef.current = "published";
+    setSubmitStatus("published");
   };
 
   return (
@@ -202,16 +251,23 @@ export default function AnnouncementForm({ onSuccess }: Props) {
 
         {/*  Success banner  */}
         {isSuccess && (
-          <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium text-green-800">
-                Announcement posted successfully!
-              </p>
-              <p className="text-sm text-green-700 mt-0.5">
-                It is now visible to the intended audience.
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between animate-fade-in">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <p className="text-sm font-medium text-green-800">
+                {mode === "edit" 
+                  ? "Announcement updated successfully." 
+                  : (submitActionRef.current === "draft" 
+                      ? "Draft saved successfully." 
+                      : "Announcement published successfully.")}
               </p>
             </div>
+            <button
+              onClick={() => setIsSuccess(false)}
+              className="text-green-600 hover:text-green-800 transition-colors p-1"
+            >
+              ×
+            </button>
           </div>
         )}
 
@@ -367,18 +423,33 @@ export default function AnnouncementForm({ onSuccess }: Props) {
               </button>
               <button
                 type="submit"
+                onClick={() => {
+                  submitActionRef.current = "draft";
+                  setSubmitStatus("draft");
+                }}
+                disabled={isSubmitting}
+                className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting && submitStatus === "draft" ? "Saving..." : "Save as Draft"}
+              </button>
+              <button
+                type="submit"
+                onClick={() => {
+                  submitActionRef.current = "published";
+                  setSubmitStatus("published");
+                }}
                 disabled={isSubmitting}
                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? (
+                {isSubmitting && submitStatus === "published" ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Posting...
+                    Publishing...
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    Post Announcement
+                    Publish
                   </>
                 )}
               </button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState ,useRef} from "react";
 import {
   FileText,
   Clock,
@@ -15,7 +15,9 @@ import {
   FolderOpen,
   FileCheck,
   MessageSquare,
-  X
+  X,
+  UploadCloud,
+  Trash2
 } from "lucide-react";
 import api from "../api/axios";
 import { extractArray } from "../utils/apiHelpers";
@@ -34,8 +36,9 @@ export default function Assignment() {
   const [submitting, setSubmitting] = useState<"draft" | "final" | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeSubmission, setActiveSubmission] = useState<any | null>(null);
-  const [viewingComments, setViewingComments] = useState<any | null>(null); 
-  
+const [viewingComments, setViewingComments] = useState<any | null>(null); 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [submissionForm, setSubmissionForm] = useState({
     textResponse: "",
     link: "",
@@ -90,17 +93,10 @@ export default function Assignment() {
     setSubmitError(null);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    
-    if (!selectedFile) {
-      setSubmissionForm((prev) => ({ ...prev, file: null }));
-      return;
-    }
-
+const processFile = (selectedFile: File) => {
     if (selectedFile.size > 5 * 1024 * 1024) {
       setSubmitError("File is too large! Maximum allowed size is 5MB.");
-      e.target.value = ""; 
+      if (fileInputRef.current) fileInputRef.current.value = ""; 
       setSubmissionForm((prev) => ({ ...prev, file: null }));
       return;
     }
@@ -113,13 +109,57 @@ export default function Assignment() {
     
     if (!allowedTypes.includes(selectedFile.type)) {
       setSubmitError("Invalid file type! Please upload a .pdf, .doc, or .docx file.");
-      e.target.value = ""; 
+      if (fileInputRef.current) fileInputRef.current.value = ""; 
       setSubmissionForm((prev) => ({ ...prev, file: null }));
       return;
     }
 
     setSubmitError(null);
     setSubmissionForm((prev) => ({ ...prev, file: selectedFile }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) {
+      setSubmissionForm((prev) => ({ ...prev, file: null }));
+      return;
+    }
+    processFile(selectedFile);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (droppedFile) {
+      processFile(droppedFile);
+    }
+  };
+
+  const removeFile = () => {
+    setSubmissionForm((prev) => ({ ...prev, file: null }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const getFileIcon = (filename: string) => {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') {
+      return <div className="p-2.5 bg-red-100 text-red-600 rounded-lg"><FileText className="w-6 h-6" /></div>;
+    }
+    if (ext === 'doc' || ext === 'docx') {
+      return <div className="p-2.5 bg-blue-100 text-blue-600 rounded-lg"><FileText className="w-6 h-6" /></div>;
+    }
+    return <div className="p-2.5 bg-gray-100 text-gray-600 rounded-lg"><FileText className="w-6 h-6" /></div>;
   };
 
   const submitAssignment = async () => {
@@ -694,27 +734,65 @@ export default function Assignment() {
               {(activeSubmissionType === "file" ||
                 activeSubmissionType === "both") && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Upload File (Max 5MB)
                     <span className="text-red-500"> *</span>
                   </label>
                   
                   {activeSubmission.submissions?.find((s:any) => s.student.toString() === getUserId())?.file && !submissionForm.file && (
-                     <div className="mb-2 p-2 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center justify-between">
-                       <span>Draft file attached: {activeSubmission.submissions.find((s:any) => s.student.toString() === getUserId()).file.originalName}</span>
+                     <div className="mb-3 p-3 bg-blue-50 text-blue-700 text-sm rounded-xl border border-blue-100 flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                         {getFileIcon(activeSubmission.submissions.find((s:any) => s.student.toString() === getUserId()).file.originalName || "")}
+                         <span className="font-medium">Previously uploaded: {activeSubmission.submissions.find((s:any) => s.student.toString() === getUserId()).file.originalName}</span>
+                       </div>
                      </div>
                   )}
 
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    onChange={handleFileChange}
-                  />
-                  {submissionForm.file && (
-                    <p className="mt-2 text-xs text-gray-500 font-medium">
-                      Selected: {submissionForm.file.name}
-                    </p>
+                  {submissionForm.file ? (
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl bg-gray-50 shadow-sm animate-in fade-in">
+                      <div className="flex items-center gap-4">
+                        {getFileIcon(submissionForm.file.name)}
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 line-clamp-1">{submissionForm.file.name}</p>
+                          <p className="text-xs text-gray-500 font-medium mt-0.5">{(submissionForm.file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={removeFile} 
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove file"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`relative flex flex-col items-center justify-center w-full py-8 px-4 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                        isDragging 
+                          ? "border-blue-500 bg-blue-50 scale-[1.02]" 
+                          : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+                      }`}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        className="hidden"
+                        onChange={handleFileChange}
+                      />
+                      <div className={`p-4 rounded-full mb-3 ${isDragging ? "bg-blue-100" : "bg-white border border-gray-200 shadow-sm"}`}>
+                        <UploadCloud className={`w-8 h-8 ${isDragging ? "text-blue-600" : "text-gray-500"}`} />
+                      </div>
+                      <p className="text-sm font-medium text-gray-700 text-center">
+                        <span className="text-blue-600 hover:underline">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1.5 font-medium">PDF, DOC, DOCX (Max 5MB)</p>
+                    </div>
                   )}
                 </div>
               )}
@@ -773,6 +851,8 @@ export default function Assignment() {
           </div>
         </div>
       )}
+      
     </div>
+    
   );
 }
