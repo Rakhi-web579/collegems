@@ -17,7 +17,8 @@ import {
 import api from "../api/axios";
 import { useServerDataTable } from "../hooks/useServerDataTable";
 import AdvancedExportButton from "./AdvancedExportButton";
-import CompareStudentsModal from "./CompareStudentsModal";
+import CompareStudentsModal, { type Student as CompareStudent } from "./CompareStudentsModal";
+import StudentTimeline from "./StudentTimeline";
 
 interface Student {
   _id?: string;
@@ -577,7 +578,7 @@ const Students: React.FC = () => {
       )}
 
       {showCompareModal && (
-        <CompareStudentsModal students={selectedForCompare} onClose={() => setShowCompareModal(false)} />
+        <CompareStudentsModal students={selectedForCompare as CompareStudent[]} onClose={() => setShowCompareModal(false)} />
       )}
     </div>
   );

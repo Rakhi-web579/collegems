@@ -11,7 +11,9 @@ import {
   getStudents,
   uploadResumeFile,
   getStudentSummary,
+  getStudentProfile,
 } from "../controllers/user.controller.js";
+import { getCleanupSuggestions } from "../services/userCleanup.service.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
