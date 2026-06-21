@@ -171,3 +171,52 @@ export const getStudentProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+export const bulkFieldReset = async (req, res) => {
+  try {
+    const { userIds, field } = req.body;
+
+    // Validate input
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ message: "No users selected" });
+    }
+
+    if (!field) {
+      return res.status(400).json({ message: "No field specified" });
+    }
+
+    // Allowed fields to reset (security: whitelist)
+    const allowedFields = ["phone", "department", "tags", "teacherId"];
+    if (!allowedFields.includes(field)) {
+      return res.status(400).json({ message: "Field not allowed to be reset" });
+    }
+
+    // Preview mode - just return affected users without resetting
+    if (req.query.preview === "true") {
+      const users = await User.find({ _id: { $in: userIds } }).select(
+        `name email ${field}`
+      );
+      return res.json({ affectedUsers: users, field });
+    }
+
+    // Perform the reset
+    const resetValue = null;
+    await User.updateMany(
+      { _id: { $in: userIds } },
+      { $set: { [field]: resetValue } }
+    );
+
+    // Log the action
+    await logAction(req.user.id, "BULK_FIELD_RESET", "User", null, {
+      userIds,
+      field,
+    });
+
+    res.json({
+      message: `Field "${field}" reset successfully for ${userIds.length} users`,
+      affectedCount: userIds.length,
+    });
+  } catch (error) {
+    console.error("Error in bulk field reset:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

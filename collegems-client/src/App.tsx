@@ -3,9 +3,10 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
-import StudentDashboard from "./pages/StudentDashboard";
+// import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
@@ -60,14 +61,14 @@ export default function App() {
 
         </Route>
 
-        <Route
+        {/* <Route
           path="/student/dashboard"
           element={
             <RoleRoute role="student">
               <StudentDashboard />
             </RoleRoute>
           }
-        />
+        /> */}
         <Route
           path="/student/exam-form"
           element={
@@ -172,7 +173,16 @@ export default function App() {
             </RoleRoute>
           }
         />
-      </Routes>
+    
+      <Route
+  path="/hod/bulk-reset"
+  element={
+    <RoleRoute role="hod">
+      <BulkFieldReset />
+    </RoleRoute>
+  }
+/>
+     </Routes>
     </BrowserRouter>
   );
 }

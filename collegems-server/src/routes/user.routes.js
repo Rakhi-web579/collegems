@@ -9,6 +9,7 @@ import {
   getPreferences,
   updatePreferences,
   getStudentProfile,
+  bulkFieldReset,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
@@ -61,4 +62,12 @@ router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (
   res.json(teachers);
 });
 
+router.post(
+  "/bulk-reset",
+  protect,
+  authorize("hod"),
+  bulkFieldReset
+);
+
 export default router;
+
