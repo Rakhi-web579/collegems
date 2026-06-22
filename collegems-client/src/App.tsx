@@ -4,6 +4,10 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import BulkFieldReset from "./hod-components/BulkFieldReset";
+
+import TimeTable from "./user-components/TimeTable";
+ import StudentDashboard from "./pages/StudentDashboard";
 import TimeTable from "./user-components/TimeTable";
 
 import StudentDashboard from "./pages/StudentDashboard";
@@ -240,6 +244,16 @@ export default function App() {
             </RoleRoute>
           }
         />
+    
+      <Route
+  path="/hod/bulk-reset"
+  element={
+    <RoleRoute role="hod">
+      <BulkFieldReset />
+    </RoleRoute>
+  }
+/>
+     </Routes>
 
         <Route
           path="/parent/dashboard"

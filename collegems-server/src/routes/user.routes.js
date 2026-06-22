@@ -87,3 +87,4 @@ router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (
 // router.get("/cleanup-suggestions", protect, authorize("admin"), getCleanupSuggestions);
 
 export default router;
+
