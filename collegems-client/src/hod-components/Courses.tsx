@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Award,
 } from "lucide-react";
+import { RecordOwnership } from "../common-components-management/RecordOwnership";
 
 interface Course {
   _id: string;
@@ -586,6 +587,17 @@ export default function HODCourses() {
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
+              
+              {/* Record Ownership - Only show when editing an existing course */}
+              {editingCourse && (
+                <div className="mt-6">
+                  <RecordOwnership 
+                    modelName="Course" 
+                    recordId={editingCourse._id} 
+                    onTransferSuccess={fetchCourses}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Modal Footer */}
