@@ -7,7 +7,10 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
-import StudentDashboard from "./pages/StudentDashboard";
+ import StudentDashboard from "./pages/StudentDashboard";
+//import TimeTable from "./user-components/TimeTable";
+
+//import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
@@ -250,7 +253,7 @@ export default function App() {
     </RoleRoute>
   }
 />
-
+     
 
         <Route
           path="/parent/dashboard"
