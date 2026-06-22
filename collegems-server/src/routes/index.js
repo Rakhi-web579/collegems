@@ -75,6 +75,7 @@ import notificationRoutes from "./notification.routes.js";
 import plagiarismRoutes from "./plagiarism.routes.js";
 import workflowRoutes from "./workflow.routes.js";
 import dependencyRoutes from "./dependency.routes.js";
+import dataLockRoutes from "./dataLock.routes.js";
 
 // Faculty Assignment (if needed later)
 // import facultyAssignmentRoutes from "./facultyAssignment.routes.js";
@@ -185,6 +186,7 @@ router.use("/notifications", authenticate, notificationRoutes);
 router.use("/plagiarism", authenticate, plagiarismRoutes);
 router.use("/workflows", workflowRoutes);
 router.use("/dependencies", dependencyRoutes);
+router.use("/data-locks", dataLockRoutes);
 
 // ========================================
 // EXPORT ROUTER
