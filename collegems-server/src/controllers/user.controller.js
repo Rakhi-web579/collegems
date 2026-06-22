@@ -165,6 +165,8 @@ export const getStudentProfile = async (req, res) => {
   try {
     const { id } = req.params;
     const student = await User.findOne({ _id: id, role: "student" }).select("-password");
+        `name email ${field}`
+      );
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
