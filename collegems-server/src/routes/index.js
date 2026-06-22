@@ -10,6 +10,7 @@ import express from "express";
 // import authRoutes from "./auth.routes.js";
 // import dashboardRoutes from "./dashboard.routes.js";
 import userRoutes from "./user.routes.js";
+import historyRoutes from "./history.routes.js";
 
 // Academic Routes
 import attendanceRoutes from "./attendance.routes.js";
@@ -131,6 +132,7 @@ router.use("/scholarships", authenticate, scholarshipRoutes);
 // USER & ADMIN ROUTES
 // ========================================
 router.use("/users", authenticate, userRoutes);
+router.use("/history", historyRoutes);
 router.use("/leaves", authenticate, leaveRoutes);
 router.use("/teacher-attendance", teacherAttendanceRoutes);
 router.use("/office-hours", officeHoursRoutes);
