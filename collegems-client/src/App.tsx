@@ -7,9 +7,6 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
- import StudentDashboard from "./pages/StudentDashboard";
-import TimeTable from "./user-components/TimeTable";
-
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
@@ -67,22 +64,12 @@ export default function App() {
 
         {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>
-
-        
-
           {/* student/user pages */}
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
           <Route path="/events" element={<EventsStudent />} />
           {/* <Route path="/calendar" element={<AcademicCalendar />} /> */}
           <Route path="/calendar" element={<AcademicCalendar />} />
-
-          {/* Student/User Pages */}
-          <Route path="/examschedule" element={<ExamSchedule />} />
-          <Route path="/results" element={<StudentResults />} />
-          <Route path="/events" element={<EventsStudent />} />
-
-
           <Route
             path="/courses"
             element={
@@ -237,32 +224,23 @@ export default function App() {
         />
 
         <Route
-          path="/hod/manage-resources"
+          path="/hod/bulk-reset"
           element={
             <RoleRoute role="hod">
-              <ResourceManagement />
+              <BulkFieldReset />
             </RoleRoute>
           }
         />
-    
-      <Route
-  path="/hod/bulk-reset"
-  element={
-    <RoleRoute role="hod">
-      <BulkFieldReset />
-    </RoleRoute>
-  }
-/>
-     </Routes>
 
-        <Route
-          path="/parent/dashboard"
-          element={
-            <RoleRoute role="parent">
-              <ParentDashboard />
-            </RoleRoute>
-          }
-        />
+      <Route
+        path="/parent/dashboard"
+        element={
+          <RoleRoute role="parent">
+            <ParentDashboard />
+          </RoleRoute>
+        }
+      />
+
       </Routes>
     </BrowserRouter>
   );
