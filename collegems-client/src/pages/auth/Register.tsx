@@ -191,7 +191,7 @@ export default function Register() {
               <label htmlFor="name" className={labelClass}>Full Name *</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><User className="h-4 w-4 text-gray-400" /></div>
-                <input id="name" name="name" type="text" value={form.name || ""} onChange={handleChange} className={inputClass} placeholder="John Doe" />
+                <input id="name" name="name" type="text" value={form.name || ""} onChange={handleChange} disabled={loading} className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`} placeholder="John Doe" />
               </div>
             </div>
 
@@ -199,37 +199,23 @@ export default function Register() {
               <label htmlFor="email" className={labelClass}>Email Address *</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Mail className="h-4 w-4 text-gray-400" /></div>
-                <input id="email" name="email" type="email" value={form.email || ""} onChange={handleChange} className={inputClass} placeholder="you@example.com" />
+                <input id="email" name="email" type="email" value={form.email || ""} onChange={handleChange} disabled={loading} className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`} placeholder="you@example.com" />
               </div>
             </div>
 
             
             <div>
-              <label htmlFor="password" className={labelClass}>Password *</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={form.password || ""}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setPasswordStrength(getPasswordStrength(e.target.value));
-                  }}
-                  disabled={loading}
-                  className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`}
-                  placeholder="••••••••"
-                />
+            <label htmlFor="password" className={labelClass}>Password *</label>
+             <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Lock className="h-4 w-4 text-gray-400" /></div>
+              <input id="password" name="password" type={showPassword ? "text" : "password"} value={form.password || ""} onChange={handleChange} disabled={loading} className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`} placeholder="••••••••" />
                 <button
-                  type="button"
-                  onClick={handleTogglePassword}
-                  disabled={loading}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {showPassword ? <AiOutlineEyeInvisible size={18} /> : <AiOutlineEye size={18} />}
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                 {showPassword ? <AiOutlineEyeInvisible size={18} /> : <AiOutlineEye size={18} />}
                 </button>
               </div>
                 
