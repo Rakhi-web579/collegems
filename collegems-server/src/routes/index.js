@@ -78,7 +78,7 @@ import dependencyRoutes from "./dependency.routes.js";
 
 // Faculty Assignment (if needed later)
 // import facultyAssignmentRoutes from "./facultyAssignment.routes.js";
-// import searchRoutes from './search.routes.js';
+import searchRoutes from './search.routes.js';
 
 // ========================================
 // MIDDLEWARES
@@ -95,7 +95,7 @@ const router = express.Router();
 // CORE ROUTES (Commented out for now)
 // ========================================
 // router.use("/auth", authRoutes);
-// router.use("/search", searchRoutes);
+router.use("/search", searchRoutes);
 // router.use("/dashboard", dashboardRoutes);
 // router.use("/faculty-assignments", facultyAssignmentRoutes);
 

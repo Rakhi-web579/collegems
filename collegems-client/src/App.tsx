@@ -253,7 +253,7 @@ export default function App() {
     </RoleRoute>
   }
 />
-     </Routes>
+
 
         <Route
           path="/parent/dashboard"
