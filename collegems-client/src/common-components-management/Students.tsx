@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useServerDataTable } from "../hooks/useServerDataTable";
 import AdvancedExportButton from "./AdvancedExportButton";
 import CompareStudentsModal from "./CompareStudentsModal";
-import EmptyState from "../components/EmptyState";
+import BulkTagModal from "./BulkTagModal";
 
 interface Student {
   _id?: string;
@@ -30,6 +30,7 @@ interface Student {
   course?: string;
   semester?: number;
   phone?: string;
+  tags?: string[];
   joinedAt?: string;
   lastUpdated?: string;
 }
@@ -65,17 +66,17 @@ const Students: React.FC = () => {
 
   const [selectedForCompare, setSelectedForCompare] = useState<Student[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showTagModal, setShowTagModal] = useState(false);
 
   const handleCompareToggle = (student: Student, e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     if (e.target.checked) {
-      if (selectedForCompare.length < 2) {
-        setSelectedForCompare([...selectedForCompare, student]);
-      } else {
-        alert("You can only compare 2 students at a time.");
-      }
+      setSelectedForCompare((prev) => {
+        if (prev.some((s) => s._id === student._id)) return prev;
+        return [...prev, student];
+      });
     } else {
-      setSelectedForCompare(selectedForCompare.filter((s) => s._id !== student._id));
+      setSelectedForCompare((prev) => prev.filter((s) => s._id !== student._id));
     }
   };
 
@@ -183,11 +184,10 @@ const Students: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`inline-flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
-                  Object.keys(tableState.filters).length > 0
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`inline-flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${Object.keys(tableState.filters).length > 0
+                  ? "border-blue-500 text-blue-600 bg-blue-50"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  }`}
               >
                 <Filter className="w-4 h-4" />
                 Filters
@@ -199,7 +199,7 @@ const Students: React.FC = () => {
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </button>
-              <AdvancedExportButton 
+              <AdvancedExportButton
                 data={students}
                 filename="Students_Export"
                 pdfTitle="Students Report"
@@ -330,6 +330,15 @@ const Students: React.FC = () => {
                             <Mail className="w-3 h-3" />
                             {student.email}
                           </p>
+                          {student.tags && student.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {student.tags.map((tag) => (
+                                <span key={tag} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 rounded text-[10px] font-medium border border-indigo-100 dark:border-indigo-800">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <button className="p-1 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
@@ -503,7 +512,7 @@ const Students: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   {fullProfile && (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-3 bg-gray-50 rounded-lg">
@@ -543,7 +552,7 @@ const Students: React.FC = () => {
               )}
 
               <div className="mt-6 flex justify-end gap-3">
-                 <button
+                <button
                   onClick={() => { setSelectedStudent(null); setFullProfile(null); setProfileError(""); }}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
@@ -567,12 +576,12 @@ const Students: React.FC = () => {
       {selectedForCompare.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] p-4 z-40 flex items-center justify-between px-8 ml-0 md:ml-64 transition-all">
           <div className="flex items-center gap-4">
-            <span className="font-medium text-gray-700 dark:text-gray-300">Comparing {selectedForCompare.length}/2</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300 pl-4">Selected: {selectedForCompare.length}</span>
             <div className="flex gap-2">
               {selectedForCompare.map(s => (
                 <span key={s._id} className="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-sm px-3 py-1 rounded-full flex items-center gap-2">
                   {s.name}
-                  <button onClick={() => setSelectedForCompare(selectedForCompare.filter(st => st._id !== s._id))} className="hover:text-blue-900 dark:hover:text-blue-100">
+                  <button onClick={() => setSelectedForCompare(prev => prev.filter(st => st._id !== s._id))} className="hover:text-blue-900 dark:hover:text-blue-100">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -580,20 +589,37 @@ const Students: React.FC = () => {
             </div>
           </div>
           <div className="flex gap-3">
-             <button onClick={() => setSelectedForCompare([])} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">Clear</button>
-             <button 
-               disabled={selectedForCompare.length !== 2}
-               onClick={() => setShowCompareModal(true)}
-               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-             >
-               Compare
-             </button>
+            <button onClick={() => setSelectedForCompare([])} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">Clear</button>
+            <button
+              onClick={() => setShowTagModal(true)}
+              className="px-6 py-2 border border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm"
+            >
+              Manage Tags
+            </button>
+            <button
+              disabled={selectedForCompare.length !== 2}
+              onClick={() => setShowCompareModal(true)}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            >
+              Compare
+            </button>
           </div>
         </div>
       )}
 
       {showCompareModal && (
         <CompareStudentsModal students={selectedForCompare} onClose={() => setShowCompareModal(false)} />
+      )}
+
+      {showTagModal && (
+        <BulkTagModal
+          students={selectedForCompare}
+          onClose={() => setShowTagModal(false)}
+          onSuccess={() => {
+            setSelectedForCompare([]);
+            refetch();
+          }}
+        />
       )}
     </div>
   );
