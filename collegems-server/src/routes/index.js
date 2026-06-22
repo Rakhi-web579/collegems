@@ -80,6 +80,7 @@ import snapshotRoutes from "./snapshot.routes.js";
 import sequenceRoutes from "./sequence.routes.js";
 import ownershipRoutes from "./ownership.routes.js";
 import savedFilterRoutes from "./savedFilter.routes.js";
+import abandonmentRoutes from "./abandonment.routes.js";
 
 // Faculty Assignment (if needed later)
 // import facultyAssignmentRoutes from "./facultyAssignment.routes.js";
@@ -195,6 +196,7 @@ router.use("/snapshots", snapshotRoutes);
 router.use("/sequences", sequenceRoutes);
 router.use("/ownership", ownershipRoutes);
 router.use("/saved-filters", savedFilterRoutes);
+router.use("/abandonment", abandonmentRoutes);
 
 // ========================================
 // EXPORT ROUTER

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import api from "../../api/axios";
+import api from "../api/axios";
 import { UserCircle, Shuffle, ShieldCheck } from "lucide-react";
-import { extractArray } from "../../utils/apiHelpers";
+import { extractArray } from "../utils/apiHelpers";
 
 interface Owner {
   _id: string;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bookmark, Save, Trash2, ChevronDown, Check } from "lucide-react";
-import api from "../../api/axios";
+import api from "../api/axios";
 
 interface SavedFilter {
   _id: string;
