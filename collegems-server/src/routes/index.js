@@ -7,8 +7,8 @@ import express from "express";
 // ========================================
 
 // Auth & Core
-// import authRoutes from "./auth.routes.js";
-// import dashboardRoutes from "./dashboard.routes.js";
+import authRoutes from "./auth.routes.js";
+import dashboardRoutes from "./dashboard.routes.js";
 import userRoutes from "./user.routes.js";
 
 // Academic Routes
@@ -77,8 +77,8 @@ import workflowRoutes from "./workflow.routes.js";
 import dependencyRoutes from "./dependency.routes.js";
 
 // Faculty Assignment (if needed later)
-// import facultyAssignmentRoutes from "./facultyAssignment.routes.js";
-// import searchRoutes from './search.routes.js';
+import facultyAssignmentRoutes from "./facultyAssignment.routes.js";
+import searchRoutes from './search.routes.js';
 
 // ========================================
 // MIDDLEWARES
@@ -94,10 +94,10 @@ const router = express.Router();
 // ========================================
 // CORE ROUTES (Commented out for now)
 // ========================================
-// router.use("/auth", authRoutes);
-// router.use("/search", searchRoutes);
-// router.use("/dashboard", dashboardRoutes);
-// router.use("/faculty-assignments", facultyAssignmentRoutes);
+router.use("/auth", authRoutes);
+router.use("/search", searchRoutes);
+router.use("/dashboard", dashboardRoutes);
+router.use("/faculty-assignments", facultyAssignmentRoutes);
 
 // ========================================
 // ACADEMIC ROUTES
