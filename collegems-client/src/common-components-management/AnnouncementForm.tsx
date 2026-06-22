@@ -1,11 +1,11 @@
 // FILE: collegems-client/src/teacher-components/AnnouncementForm.tsx
-
 import { useState, useRef, useEffect } from "react";
 import {
   Bell, Send, Tag, Calendar, Users, AlertCircle,
   CheckCircle, Loader2, FileText, Megaphone,
 } from "lucide-react";
 import api from "../api/axios";
+import { scrollToFirstError } from "../utils/formHelpers";
 
 //  Constants 
 
@@ -133,7 +133,6 @@ interface Props {
 export default function AnnouncementForm({ mode = "create", initialAnnouncement, onSuccess }: Props) {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
-
   useEffect(() => {
     if (initialAnnouncement) {
       setFormData({
@@ -184,6 +183,7 @@ export default function AnnouncementForm({ mode = "create", initialAnnouncement,
     const validationErrors = validate(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      scrollToFirstError(validationErrors);
       return;
     }
 

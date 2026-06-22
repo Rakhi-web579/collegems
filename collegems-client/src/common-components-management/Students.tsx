@@ -18,8 +18,8 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { useServerDataTable } from "../hooks/useServerDataTable";
 import AdvancedExportButton from "./AdvancedExportButton";
-import CompareStudentsModal from "./CompareStudentsModal";
-import BulkTagModal from "./BulkTagModal";
+import CompareStudentsModal, { type Student as CompareStudent } from "./CompareStudentsModal";
+import StudentTimeline from "./StudentTimeline";
 
 interface Student {
   _id?: string;
@@ -608,7 +608,7 @@ const Students: React.FC = () => {
       )}
 
       {showCompareModal && (
-        <CompareStudentsModal students={selectedForCompare} onClose={() => setShowCompareModal(false)} />
+        <CompareStudentsModal students={selectedForCompare as CompareStudent[]} onClose={() => setShowCompareModal(false)} />
       )}
 
       {showTagModal && (
