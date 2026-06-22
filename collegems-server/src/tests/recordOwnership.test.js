@@ -78,6 +78,8 @@ describe("Record Ownership Transfer Tests", () => {
       password: "password123",
       role: "student",
       department: "Computer Science",
+      course: "BTech",
+      semester: "3",
     });
   });
 
@@ -96,6 +98,7 @@ describe("Record Ownership Transfer Tests", () => {
       code: "CS301",
       department: "Computer Science",
       semester: 3,
+      teacher: teacher1._id,
       createdBy: teacher1._id, // ownershipPlugin should auto-set ownerId to this
     });
   });

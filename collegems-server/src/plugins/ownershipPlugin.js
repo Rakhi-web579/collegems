@@ -7,6 +7,11 @@ import mongoose from "mongoose";
 export default function ownershipPlugin(schema, options = {}) {
   // Add ownership fields to the schema
   schema.add({
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

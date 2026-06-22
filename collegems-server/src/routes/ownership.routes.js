@@ -1,6 +1,6 @@
 import express from "express";
 import { getOwnershipInfo, transferOwnership } from "../controllers/ownership.controller.js";
-import { authenticate } from "../middleware/auth.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
