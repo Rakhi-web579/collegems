@@ -8,6 +8,9 @@ import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
+//import TimeTable from "./user-components/TimeTable";
+
+//import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
@@ -42,10 +45,13 @@ import AnnouncementManage from "./common-components-management/AnnouncementManag
 
 import { PwaManager } from "./components/PwaManager";
 
+import BackToTop from "./components/BackToTop";
+
 export default function App() {
   return (
     <BrowserRouter>
       <PwaManager />
+      <BackToTop />
       <Routes>
         {/* Public Routes */}
         <Route
@@ -240,7 +246,13 @@ export default function App() {
           </RoleRoute>
         }
       />
-
+  path="/hod/bulk-reset"
+  element={
+    <RoleRoute role="hod">
+      <BulkFieldReset />
+    </RoleRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );
