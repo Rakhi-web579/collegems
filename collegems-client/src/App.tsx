@@ -7,7 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
- import StudentDashboard from "./pages/StudentDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 //import TimeTable from "./user-components/TimeTable";
 
 //import StudentDashboard from "./pages/StudentDashboard";
@@ -45,10 +45,13 @@ import AnnouncementManage from "./common-components-management/AnnouncementManag
 
 import { PwaManager } from "./components/PwaManager";
 
+import BackToTop from "./components/BackToTop";
+
 export default function App() {
   return (
     <BrowserRouter>
       <PwaManager />
+      <BackToTop />
       <Routes>
         {/* Public Routes */}
         <Route
