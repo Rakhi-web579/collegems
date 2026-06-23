@@ -53,3 +53,12 @@ export const getMyAttendance = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getLowAttendance = async (req, res) => {
+  try {
+    // Return empty array for now to prevent route crash
+    res.json({ success: true, data: [] });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -9,16 +9,15 @@ import path from "path";
 import multer from "multer";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.js";
-import { getTeacherAssignments } from '../controllers/assignment.controller.js';
-import { protect, restrictTo } from '../middlewares/auth.middleware.js';
-import { uploadAssignment } from '../middlewares/upload.middleware.js';
-import { getAssignmentSubmissions } from '../controllers/assignment.controller.js';
+import { protect } from '../middlewares/auth.middleware.js';
 import log from "../utils/logger.js";
 import {
   createAssignment,
   submitAssignment,
   evaluateAssignment,
   downloadAssignmentFile,
+  getUpcomingAssignments,
+  getTeacherAssignments,
 } from "../controllers/assignment.controller.js";
 import Assignment from "../models/Assignment.model.js";
 import { verifyFileSignature, scanFileForMalware } from "../utils/malwareScanner.js";
@@ -129,7 +128,6 @@ router.post(
   validateUploadedFile,
   submitAssignment,
 );
-router.post("/submit/:id", protect, restrictTo("student"), uploadAssignment.single("file"), submitAssignment);
 
 router.get("/download/:filename", protect, downloadAssignmentFile);
 
@@ -139,7 +137,7 @@ router.post(
   allowRoles("teacher"),
   asyncHandler(evaluateAssignment)
 );
-router.get("/teacher", protect, restrictTo("teacher", "hod"), getTeacherAssignments);
+router.get("/teacher", protect, allowRoles("teacher", "hod"), getTeacherAssignments);
 
 // get assignments for a course
 // Student assignments (course-wise)
@@ -149,8 +147,10 @@ router.get("/student", protect, allowRoles("student","teacher","parent"), async 
       .populate("course", "name code")
       .populate("teacher", "name");
     res.json({ success: true, data: assignments });
-  })
-);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 router.get(
   "/teacher/submissions/:assignmentId",
@@ -163,7 +163,6 @@ router.get(
     if (!assignmentId) {
       throw new AppError("Assignment ID is required", 400, "MISSING_ID");
     }
-    router.get("/teacher/submissions/:id", protect, restrictTo("teacher", "hod"), getAssignmentSubmissions);
 
     const assignment = await Assignment.findById(assignmentId)
       .populate(

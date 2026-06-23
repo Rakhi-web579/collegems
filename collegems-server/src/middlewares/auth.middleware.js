@@ -25,3 +25,6 @@ export const authenticate = (req, res, next) => {
 
 export const protect = authenticate;
 
+import { allowRoles } from "./role.middleware.js";
+export const restrictTo = allowRoles;
+
