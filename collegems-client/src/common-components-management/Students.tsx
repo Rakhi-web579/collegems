@@ -22,8 +22,7 @@ import EmptyState from "../components/EmptyState";
 import BulkTagModal from "./BulkTagModal";
 import CompareStudentsModal, { type Student as CompareStudent } from "./CompareStudentsModal";
 import StudentTimeline from "./StudentTimeline";
-import EmptyState from "../components/EmptyState";
-import BulkTagModal from "./BulkTagModal";
+
 
 interface Student {
   _id?: string;
