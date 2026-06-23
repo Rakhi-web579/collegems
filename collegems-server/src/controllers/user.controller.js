@@ -55,6 +55,18 @@ export const updateMe = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+   if (
+     user.academicRecordLocked &&
+     (
+       req.body.studentId !== undefined ||
+       req.body.semester !== undefined ||
+       req.body.course !== undefined
+    )
+  ) {
+    return res.status(403).json({
+      message: "Academic record is locked after result publication",
+    });
+  }
 
     if (email && email !== user.email) {
       const existing = await User.findOne({ email });
@@ -69,6 +81,7 @@ export const updateMe = async (req, res) => {
     if (department !== undefined) user.department = department;
     if (teacherId !== undefined) user.teacherId = teacherId;
 
+    user._updatedBy = req.user.id;
     await user.save();
 
     const safeUser = user.toObject();
@@ -104,6 +117,7 @@ export const updatePassword = async (req, res) => {
     }
 
     user.password = await hashPassword(newPassword, 8);
+    user._updatedBy = req.user.id;
     await user.save();
 
     res.json({ message: "Password updated successfully" });
@@ -152,6 +166,7 @@ export const updatePreferences = async (req, res) => {
       },
     };
 
+    user._updatedBy = req.user.id;
     await user.save();
 
     res.json(user.settings);
@@ -165,8 +180,6 @@ export const getStudentProfile = async (req, res) => {
   try {
     const { id } = req.params;
     const student = await User.findOne({ _id: id, role: "student" }).select("-password");
-        `name email ${field}`
-      );
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
@@ -210,6 +223,7 @@ export const uploadResumeFile = async (req, res) => {
     // Save relative path
     const resumePath = `/uploads/resumes/${req.file.filename}`;
     user.resumeUrl = resumePath;
+    user._updatedBy = req.user.id;
     await user.save();
 
     res.json({
@@ -310,5 +324,31 @@ export const bulkAssignTags = async (req, res) => {
   } catch (error) {
     console.error("Error in bulkAssignTags:", error);
     res.status(500).json({ message: "Server error assigning tags" });
+  }
+};
+
+export const unlockAcademicRecord = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { academicRecordLocked: false },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      message: "Academic record unlocked successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Unlock academic record error:", error);
+    res.status(500).json({
+      message: "Failed to unlock academic record",
+    });
   }
 };

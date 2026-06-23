@@ -3,7 +3,13 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import BulkFieldReset from "./hod-components/BulkFieldReset";
+
+import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
+//import TimeTable from "./user-components/TimeTable";
+
+//import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
@@ -20,9 +26,32 @@ import SemesterRegistration from "./user-components/SemesterRegistration";
 import TimeTable from "./user-components/TimeTable";
 import DashboardLayout from "./layouts/DashboardLayout";
 
+import LostFoundPortal from "./pages/LostFoundPortal";
+import VerifyStudent from "./pages/VerifyStudent";
+import RiskDashboard from "./pages/RiskDashboard";
+
+
+import Library from "./common-components-management/Library";
+import ExamHalls from "./hod-components/ExamHalls";
+import HallAllocation from "./hod-components/HallAllocation";
+import StudentSeatView from "./user-components/StudentSeatView";
+import AuditLogs from "./hod-components/AuditLogs";
+import ResourceBooking from "./user-components/ResourceBooking";
+import BookingManagement from "./hod-components/BookingManagement";
+import ResourceManagement from "./hod-components/ResourceManagement";
+import AnnouncementForm from "./common-components-management/AnnouncementForm";
+import AnnouncementManage from "./common-components-management/AnnouncementManage";
+
+import { PwaManager } from "./components/PwaManager";
+import BackToTop from "./components/BackToTop";
+import SessionTimeoutWarning from "./components/SessionTimeoutWarning";
+
 export default function App() {
   return (
     <BrowserRouter>
+      <PwaManager />
+      <BackToTop />
+      <SessionTimeoutWarning timeoutMinutes={30} warningMinutes={5} />
       <Routes>
         <Route path="/" element={<MainDashboard />} />
         <Route path="/login" element={<Login />} />
@@ -38,11 +67,155 @@ export default function App() {
           <Route path="/quickaccess" element={<QuickAccessAll />} />
           <Route path="/timetable" element={ <TimeTable /> } />
         </Route>
-        <Route path="/student/dashboard" element={<RoleRoute role="student"><StudentDashboard /></RoleRoute>} />
-        <Route path="/student/exam-form" element={<RoleRoute role="student"><ExaminationFormPage /></RoleRoute>} />
-        <Route path="/teacher/dashboard" element={<RoleRoute role="teacher"><TeacherDashboard /></RoleRoute>} />
-        <Route path="/hod/dashboard" element={<RoleRoute role="hod"><HodDashboard /></RoleRoute>} />
-        <Route path="/hod/reports" element={<RoleRoute role="hod"><ReportGenerator /></RoleRoute>} />
+
+        {/* Student Routes */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <RoleRoute role="student">
+              <StudentDashboard />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/student/exam-form"
+          element={
+            <RoleRoute role="student">
+              <ExaminationFormPage />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/student/my-seat"
+          element={
+            <RoleRoute role="student">
+              <StudentSeatView />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/student/book-resources"
+          element={
+            <RoleRoute role="student">
+              <ResourceBooking />
+            </RoleRoute>
+          }
+        />
+
+        {/* Teacher Routes */}
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <RoleRoute role="teacher">
+              <TeacherDashboard />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/teacher/announcements"
+          element={
+            <RoleRoute role="teacher">
+              <TeacherDashboard initialTab="announcements" />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/teacher/book-resources"
+          element={
+            <RoleRoute role="teacher">
+              <ResourceBooking />
+            </RoleRoute>
+          }
+        />
+
+        {/* HOD Routes */}
+        <Route
+          path="/hod/dashboard"
+          element={
+            <RoleRoute role="hod">
+              <HodDashboard />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/reports"
+          element={
+            <RoleRoute role="hod">
+              <ReportGenerator />
+            </RoleRoute>
+          }
+        />
+
+
+
+        <Route
+          path="/hod/exam-halls"
+          element={
+            <RoleRoute role="hod">
+              <ExamHalls />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/hall-allocation"
+          element={
+            <RoleRoute role="hod">
+              <HallAllocation />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/audit-logs"
+          element={
+            <RoleRoute role="hod">
+              <AuditLogs />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/manage-bookings"
+          element={
+            <RoleRoute role="hod">
+              <BookingManagement />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/hod/manage-resources"
+          element={
+            <RoleRoute role="hod">
+              <ResourceManagement />
+            </RoleRoute>
+          }
+        />
+    
+      <Route
+  path="/hod/bulk-reset"
+  element={
+    <RoleRoute role="hod">
+      <BulkFieldReset />
+    </RoleRoute>
+  }
+/>
+     
+
+        <Route
+          path="/parent/dashboard"
+          element={
+            <RoleRoute role="parent">
+              <ParentDashboard />
+            </RoleRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
