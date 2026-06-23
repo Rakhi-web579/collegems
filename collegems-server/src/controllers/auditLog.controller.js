@@ -55,7 +55,7 @@ export const getAuditLogs = async (req, res) => {
 
 export const exportAuditLogs = async (req, res) => {
   try {
-    const { user, module, action, startDate, endDate } = req.query;
+    const { user, module, action, startDate, endDate, fields } = req.query;
 
     const query = {};
 
@@ -92,7 +92,15 @@ export const exportAuditLogs = async (req, res) => {
     // Since json2csv is not in package.json, we can either install it, or generate CSV manually.
     // Let's generate it manually to avoid adding unapproved dependencies unless necessary.
     // The user didn't explicitly approve new dependencies.
-    const headers = ["Timestamp", "User Name", "User Email", "User Role", "Action", "Module", "Target", "Details"];
+    const allHeaders = ["Timestamp", "User Name", "User Email", "User Role", "Action", "Module", "Target", "Details"];
+    const headers = fields ? fields.split(",") : allHeaders;
+    
+    // Filter to ensure only valid headers are used
+    const validHeaders = headers.filter(h => allHeaders.includes(h.trim())).map(h => h.trim());
+    if (validHeaders.length === 0) {
+      return res.status(400).json({ message: "No valid fields selected for export." });
+    }
+
     const escapeCsvCell = (value) => {
       if (value === null || value === undefined) return '""';
       const stringValue = String(value);
@@ -102,10 +110,10 @@ export const exportAuditLogs = async (req, res) => {
       return stringValue;
     };
 
-    let csvContent = headers.map(escapeCsvCell).join(',') + '\\n';
+    let csvContent = validHeaders.map(escapeCsvCell).join(',') + '\\n';
     
     for (const log of formattedLogs) {
-      const row = headers.map(header => escapeCsvCell(log[header]));
+      const row = validHeaders.map(header => escapeCsvCell(log[header]));
       csvContent += row.join(',') + '\\n';
     }
 
@@ -116,5 +124,38 @@ export const exportAuditLogs = async (req, res) => {
   } catch (error) {
     console.error("Error exporting audit logs:", error);
     res.status(500).json({ message: "Error exporting audit logs." });
+  }
+};
+
+import SystemLog from "../models/SystemLog.model.js";
+
+export const getSystemLogs = async (req, res) => {
+  try {
+    const { level, correlationId, service, page = 1, limit = 50 } = req.query;
+
+    const query = {};
+    if (level) query.level = level;
+    if (correlationId) query.correlationId = correlationId;
+    if (service) query.service = service;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const logs = await SystemLog.find(query)
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const totalLogs = await SystemLog.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      logs,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(totalLogs / parseInt(limit)),
+      totalLogs,
+    });
+  } catch (error) {
+    console.error("Error fetching system logs:", error);
+    res.status(500).json({ success: false, message: "Error fetching system logs." });
   }
 };

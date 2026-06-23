@@ -5,6 +5,8 @@ import {
   UserCircle, GraduationCap, BookOpen, ChevronRight, Filter, Clock, MapPin, Wifi,
 } from "lucide-react";
 import api from "../api/axios";
+import { extractArray } from "../utils/apiHelpers";
+import { SavedFiltersMenu } from "../common-components-management/SavedFiltersMenu";
 
 interface Teacher {
   _id?: string;
@@ -27,7 +29,7 @@ interface OfficeHourSlot {
 }
 
 const Teachers: React.FC = () => {
-  useTheme();
+  const { darkMode } = useTheme();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,14 +44,19 @@ const Teachers: React.FC = () => {
   useEffect(() => { fetchTeachers(); }, []);
 
   useEffect(() => {
-    const filtered = teachers.filter(
+    let filtered = teachers.filter(
       (t) =>
         t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.teacherId.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.email.toLowerCase().includes(searchTerm.toLowerCase()),
     );
+    
+    if (filterDepartment !== "all") {
+      filtered = filtered.filter((t) => t.department === filterDepartment);
+    }
+    
     setFilteredTeachers(filtered);
-  }, [searchTerm, teachers]);
+  }, [searchTerm, teachers, filterDepartment]);
 
   useEffect(() => {
     if (!selectedTeacher?._id) {
@@ -75,8 +82,8 @@ const Teachers: React.FC = () => {
       setLoading(true);
       setError("");
       const response = await api.get("/users/teachers");
-      setTeachers(response.data);
-      setFilteredTeachers(response.data);
+      setTeachers(extractArray(response.data));
+      setFilteredTeachers(extractArray(response.data));
     } catch (error) {
       console.error("Error fetching teachers:", error);
       setError("Failed to load teachers data");
@@ -109,6 +116,11 @@ const Teachers: React.FC = () => {
 
   const inputCls = "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
   const selectCls = "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+  const handleApplySavedFilter = (savedFilters: any) => {
+    if (savedFilters.searchTerm !== undefined) setSearchTerm(savedFilters.searchTerm);
+    if (savedFilters.filterDepartment !== undefined) setFilterDepartment(savedFilters.filterDepartment);
+  };
 
   return (
     <div className="space-y-6 p-10 bg-gray-50 dark:bg-gray-950 min-h-screen">
@@ -169,6 +181,11 @@ const Teachers: React.FC = () => {
             >
               <Filter className="w-4 h-4" /> Filters
             </button>
+            <SavedFiltersMenu 
+              dashboardName="HODTeachers" 
+              currentFilters={{ searchTerm, filterDepartment }} 
+              onApplyFilter={handleApplySavedFilter} 
+            />
             <button
               onClick={fetchTeachers}
               className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -197,11 +214,13 @@ const Teachers: React.FC = () => {
           </div>
         )}
       </div>
+      
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
+      
       {/* Teachers Grid */}
       {loading ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
@@ -213,7 +232,7 @@ const Teachers: React.FC = () => {
           <Users className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No teachers found</h3>
           <p className="text-gray-500 dark:text-gray-400">
-            {searchTerm ? "Try adjusting your search or filters" : "No teachers registered yet"}
+            {searchTerm || filterDepartment !== "all" ? "Try adjusting your search or filters" : "No teachers registered yet"}
           </p>
         </div>
       ) : (
@@ -263,7 +282,7 @@ const Teachers: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <Calendar className="w-4 h-4" />
-                    Joined 2024
+                    Joined {teacher.joinDate?.split("-")[0] || "2024"}
                   </div>
                   <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium inline-flex items-center gap-1">
                     View Profile <ChevronRight className="w-4 h-4" />
@@ -278,7 +297,7 @@ const Teachers: React.FC = () => {
       {!loading && filteredTeachers.length > 0 && (
         <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
           Showing {filteredTeachers.length} of {teachers.length} teachers
-          {searchTerm && ` matching "${searchTerm}"`}
+          {(searchTerm || filterDepartment !== "all") && ` matching criteria`}
         </div>
       )}
 

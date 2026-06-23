@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { Check, X, Clock } from "lucide-react";
 
 interface Booking {
@@ -25,9 +25,7 @@ const BookingManagement: React.FC = () => {
 
   const fetchBookings = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/bookings", {
-        withCredentials: true,
-      });
+      const { data } = await api.get("/bookings");
       setBookings(data);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -41,10 +39,9 @@ const BookingManagement: React.FC = () => {
     if (remarks === null) return; // cancelled prompt
 
     try {
-      await axios.put(
-        `http://localhost:5000/api/bookings/${id}/status`,
-        { status, remarks },
-        { withCredentials: true }
+      await api.put(
+        `/bookings/${id}/status`,
+        { status, remarks }
       );
       fetchBookings();
     } catch (error: any) {
@@ -94,11 +91,11 @@ const BookingManagement: React.FC = () => {
                 <tr key={b._id}>
                   <td className="px-6 py-4">
                     <div className="text-sm font-bold text-gray-900">{b.resource?.name}</div>
-                    <div className="text-sm text-gray-900 mt-1">{new Date(b.startTime).toLocaleDateString()}</div>
+                    <div className="text-sm text-gray-900 mt-1">{new Date(b.startTime).toLocaleDateString('en-US', { timeZone: 'UTC' })}</div>
                     <div className="text-xs text-gray-500 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {new Date(b.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
-                      {new Date(b.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {new Date(b.startTime).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', timeZone: 'UTC'})} - 
+                      {new Date(b.endTime).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', timeZone: 'UTC'})}
                     </div>
                   </td>
                   <td className="px-6 py-4">

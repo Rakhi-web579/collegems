@@ -8,8 +8,15 @@ import {
   updatePassword,
   getPreferences,
   updatePreferences,
+  getStudents,
+  uploadResumeFile,
+  getStudentSummary,
   getStudentProfile,
+  bulkAssignTags,
+  unlockAcademicRecord,
 } from "../controllers/user.controller.js";
+import { getCleanupSuggestions } from "../services/userCleanup.service.js";
+import { uploadResume } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -34,18 +41,21 @@ router.put(
   updatePreferences,
 );
 
-// Teacher fetches all students
+// Resume Upload
+router.post(
+  "/me/resume",
+  protect,
+  authorize("student", "alumni"),
+  uploadResume.single("resume"),
+  uploadResumeFile
+);
+
+// Teacher fetches all students (Paginated)
 router.get(
   "/students",
   protect,
   authorize("teacher", "hod"),
-  async (req, res) => {
-    const students = await User.find({ role: "student" }).select(
-      "name email role studentId course semester",
-    );
-
-    res.json(students);
-  },
+  getStudents
 );
 
 router.get(
@@ -55,10 +65,34 @@ router.get(
   getStudentProfile
 );
 
+router.get(
+  "/students/:id/summary",
+  protect,
+  authorize("teacher", "hod", "admin"),
+  getStudentSummary
+);
+
+router.put(
+  "/students/bulk-tags",
+  protect,
+  authorize("teacher", "hod", "admin"),
+  bulkAssignTags
+);
+
 router.get("/teachers", protect, authorize("hod", "teacher", "student"), async (req, res) => {
   const teachers = await User.find({ role: "teacher" }).select("name email role teacherId department phone");
 
   res.json(teachers);
 });
 
+// TODO: getCleanupSuggestions is not implemented yet
+// router.get("/cleanup-suggestions", protect, authorize("admin"), getCleanupSuggestions);
+router.put(
+  "/students/:id/unlock",
+  protect,
+  authorize("admin"),
+  unlockAcademicRecord
+);
+
 export default router;
+
