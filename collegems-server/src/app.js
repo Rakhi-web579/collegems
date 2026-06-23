@@ -57,6 +57,7 @@ import searchRoutes from './routes/search.routes.js';
 import timetableRoutes from './routes/timetable.routes.js'
 import plagiarismRoutes from "./routes/plagiarism.routes.js";
 import log from "./utils/logger.js";
+import { allowedOrigins } from "./config/cors.js";
 
 import httpContext from "express-http-context";
 import { v4 as uuidv4 } from "uuid";
@@ -64,10 +65,6 @@ import { v4 as uuidv4 } from "uuid";
 const app = express();
 
 // Middlewares
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:5173"];
-
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {

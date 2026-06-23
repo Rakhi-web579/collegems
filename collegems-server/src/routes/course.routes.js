@@ -97,12 +97,11 @@ router.delete(
   })
 );
 
-// View all courses
 router.get(
   "/all",
   protect,
   allowRoles("hod", "admin", "teacher", "student", "parent"),
-  async (req, res) => {
+  asyncHandler(async (req, res) => {
     const courses = await Course.find().populate("teacher", "name email");
     res.json(courses);
   })
