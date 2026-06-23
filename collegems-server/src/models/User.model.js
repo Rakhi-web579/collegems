@@ -32,6 +32,8 @@ const userSchema = new mongoose.Schema({
   },
 
   // Teacher-specific
+  branch: { type: String },
+  section: { type: String },
   teacherId: { type: String },
   department: {
     type: String,
@@ -55,6 +57,16 @@ const userSchema = new mongoose.Schema({
       inApp: { type: Boolean, default: true },
     },
   },
+
+  transferHistory: [
+  {
+    field: { type: String }, // which field changed
+    previousValue: { type: String },
+    newValue: { type: String },
+    changedAt: { type: Date, default: Date.now },
+    changedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  }
+],
 });
 
 export default mongoose.model("User", userSchema);

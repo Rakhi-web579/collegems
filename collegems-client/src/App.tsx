@@ -6,6 +6,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
+import StudentTransferHistory from "./hod-components/StudentTransferHistory";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
 import MainDashboard from "./pages/MainDashboard";
@@ -172,6 +173,14 @@ export default function App() {
             </RoleRoute>
           }
         />
+        <Route
+  path="/hod/student-transfer/:studentId"
+  element={
+    <RoleRoute role="hod">
+      <StudentTransferHistory />
+    </RoleRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );

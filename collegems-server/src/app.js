@@ -41,6 +41,7 @@ import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
 import auditLogRoutes from "./routes/auditLog.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
+import transferRoutes from "./routes/transfer.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
 
 const app = express();
@@ -77,6 +78,9 @@ app.use("/api/fee",    authenticate, feeRoutes);
 app.use("/api/salary", authenticate, salaryRoutes);
 
 app.use("/api/users", authenticate, userRoutes);
+import mentorshipRoutes from "./routes/mentorship.routes.js";
+import complaintRoutes from "./routes/complaint.routes.js";
+app.use("/api/transfer", authenticate, transferRoutes);
 app.use("/api/leaves", authenticate, leaveRoutes);
 app.use("/api/scholarships", authenticate, scholarshipRoutes);
 app.use("/api/examschedule", authenticate, examScheduleRoutes);

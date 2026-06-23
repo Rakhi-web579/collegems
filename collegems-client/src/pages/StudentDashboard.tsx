@@ -25,7 +25,7 @@ import {
   Wallet,
   X,
   AlertCircle,
-  TrendingUp,
+
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
