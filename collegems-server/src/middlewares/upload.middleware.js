@@ -10,15 +10,6 @@ const assignmentStorage = multer.diskStorage({
   },
 });
 
-// 2. Storage Configuration for Resumes
-const resumeStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/resumes/"); 
-  },
-  filename: (req, file, cb) => {
-    cb(null, `resume-${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`); 
-  },
-});
 
 // Shared File Type Filter (PDFs and Word Docs only)
 const documentFilter = (req, file, cb) => {
