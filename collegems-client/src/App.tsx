@@ -1,4 +1,3 @@
-import AcademicCalendar from "./common-components-management/AcademicCalendar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -15,10 +14,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 //import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
-import ParentDashboard from "./pages/ParentDashboard";
 import MainDashboard from "./pages/MainDashboard";
-import DashboardLayout from "./layouts/DashboardLayout";
-
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
 import Teachers from "./hod-components/Teachers";
@@ -28,6 +24,9 @@ import QuickAccessAll from "./pages/QuickAccessAll";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
+import SemesterRegistration from "./user-components/SemesterRegistration";
+import TimeTable from "./user-components/TimeTable";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 import LostFoundPortal from "./pages/LostFoundPortal";
 import VerifyStudent from "./pages/VerifyStudent";
@@ -85,62 +84,22 @@ export default function App() {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }} />
       <Routes>
-        {/* Public Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainDashboard />
-            </ProtectedRoute>
-          }
-        />
-
+        <Route path="/" element={<MainDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
-        <Route path="/access-denied" element={<AccessDenied />} />
-
-        {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>
-          {/* student/user pages */}
           <Route path="/examschedule" element={<ExamSchedule />} />
           <Route path="/results" element={<StudentResults />} />
           <Route path="/events" element={<EventsStudent />} />
-          {/* <Route path="/calendar" element={<AcademicCalendar />} /> */}
-          <Route path="/calendar" element={<AcademicCalendar />} />
-          <Route
-            path="/courses"
-            element={
-              <ProtectedRoute>
-                <Courses />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/faculty"
-            element={
-              <ProtectedRoute>
-                <Teachers />
-              </ProtectedRoute>
-            }
-          />
-
+          <Route path="/semester-registration" element={<SemesterRegistration />} />
+          <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+          <Route path="/faculty" element={<Teachers />} />
           <Route path="/quickaccess" element={<QuickAccessAll />} />
-
-           <Route path="/timetable" element={ <TimeTable /> } /> 
-
-
-          {/* Your Added Feature */}
-          <Route path="/lost-found" element={<LostFoundPortal />} />
-
-
-          {/* Existing Project Features */}
-          <Route path="/library" element={<Library />} />
+          <Route path="/timetable" element={ <TimeTable /> } />
         </Route>
 
         {/* Student Routes */}
