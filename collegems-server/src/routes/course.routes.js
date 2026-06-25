@@ -5,6 +5,7 @@ import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.j
 import log from "../utils/logger.js";
 import Course from "../models/Course.model.js";
 import { cacheResponse, invalidateCache } from "../middlewares/cache.middleware.js";
+import { auditAction } from "../middlewares/audit.middleware.js";
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.post(
   "/add",
   protect,
   allowRoles("hod", "admin", "teacher"),
+  auditAction("CREATE_COURSE", "Course"),
   asyncHandler(async (req, res) => {
     const { name, code, department, semester, credits, description, maxStudents } = req.body;
     const teacher = req.body.teacher || req.user.id;
@@ -50,6 +52,7 @@ router.put(
   "/update/:id",
   protect,
   allowRoles("hod", "admin", "teacher"),
+  auditAction("UPDATE_COURSE", "Course"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { name, code, department, semester, teacher, credits, description, maxStudents } = req.body;
@@ -81,6 +84,7 @@ router.delete(
   "/delete/:id",
   protect,
   allowRoles("hod", "admin", "teacher"),
+  auditAction("DELETE_COURSE", "Course"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
 
