@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import MyAssignments from "../teacher-components/MyAssignments";
 import api from "../api/axios";
@@ -10,6 +10,7 @@ import {
   Percent, Moon, Sun, ClipboardCheck, Trophy,
   Briefcase,
   ShieldCheck,
+  User,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
@@ -40,6 +41,7 @@ import { useNotifications } from "../hooks/useNotifications";
 import RiskDashboard from "./RiskDashboard";
 import AttendanceAlertsWidget from "../teacher-components/AttendanceAlertsWidget";
 import UserWorkflows from "../user-components/UserWorkflows";
+import TeacherProfile from "../teacher-components/TeacherProfile";
 
 interface TeacherDashboardProps {
   initialTab?: string;
@@ -102,6 +104,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
 
   const navigationItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "profile", label: "My Profile", icon: User },
     { id: "announcements", label: "Announcements", icon: Bell },
     { id: "myattendance", label: "My Attendance", icon: ClipboardList },
     { id: "officehours", label: "Office Hours", icon: Clock },
@@ -381,6 +384,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
             </div>
           )}
 
+          {activeTab === "profile" && <TeacherProfile />}
           {activeTab === "myattendance" && <MyAttendance />}
           {activeTab === "officehours" && <OfficeHours />}
           {activeTab === "courses" && <HodCourses />}
