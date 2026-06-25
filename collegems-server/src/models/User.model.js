@@ -69,6 +69,8 @@ const userSchema = new mongoose.Schema({
       return this.role === "teacher";
     },
   },
+  bio: { type: String },
+  officeHours: { type: String },
   unavailableTimeSlots: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "TimeSlot"

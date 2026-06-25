@@ -49,7 +49,7 @@ export const getMe = async (req, res) => {
 
 export const updateMe = async (req, res) => {
   try {
-    const { name, email, phone, department, teacherId } = req.body;
+    const { name, email, phone, department, teacherId, bio, officeHours } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -78,8 +78,14 @@ export const updateMe = async (req, res) => {
 
     if (name) user.name = name;
     if (phone !== undefined) user.phone = phone;
-    if (department !== undefined) user.department = department;
-    if (teacherId !== undefined) user.teacherId = teacherId;
+    
+    // Teacher specific profile updates
+    if (user.role === 'teacher') {
+      if (department !== undefined) user.department = department;
+      if (teacherId !== undefined) user.teacherId = teacherId;
+      if (bio !== undefined) user.bio = bio;
+      if (officeHours !== undefined) user.officeHours = officeHours;
+    }
 
     user._updatedBy = req.user.id;
     await user.save();
