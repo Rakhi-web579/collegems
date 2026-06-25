@@ -20,18 +20,23 @@ import {
   Trash2
 } from "lucide-react";
 import api from "../api/axios";
-import { extractArray } from "../utils/apiHelpers";
 import AssignmentComments from "../common-components-management/AssignmentComments";
 import { useAutoSave } from "../hooks/useAutoSave";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  fetchStudentAssignments,
+  submitAssignment as submitAssignmentAction,
+  clearError
+} from "../store/slices/assignmentSlice";
 
 export default function Assignment() {
+  const dispatch = useAppDispatch();
+  const { studentAssignments: assignments, loadingStudent: loading, loadingAction } = useAppSelector((state) => state.assignments);
   const getUserId = () => {
     const role = localStorage.getItem("role");
     return role === "parent" ? localStorage.getItem("childStudentId") : localStorage.getItem("userId");
   };
 
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [submitting, setSubmitting] = useState<"draft" | "final" | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -51,20 +56,8 @@ const [viewingComments, setViewingComments] = useState<any | null>(null);
   const requiresTextResponse = activeSubmissionType === "text" || activeSubmissionType === "both";
 
   useEffect(() => {
-    fetchAssignments();
-  }, []);
-
-  const fetchAssignments = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get("/assignment/student");
-      setAssignments(extractArray(res.data));
-    } catch (err: any) {
-      console.error("Assignment fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    dispatch(fetchStudentAssignments());
+  }, [dispatch]);
 
   const userId = getUserId();
   const draftKey = activeSubmission && !submitting ? `draft_${activeSubmission._id}_${userId}` : "";
@@ -162,8 +155,8 @@ const processFile = (selectedFile: File) => {
     return <div className="p-2.5 bg-gray-100 text-gray-600 rounded-lg"><FileText className="w-6 h-6" /></div>;
   };
 
-  const submitAssignment = async () => {
-    if (!activeSubmission || submitting) return;
+  const handleSubmitAssignment = async () => {
+    if (!activeSubmission || loadingAction) return;
 
     const textResponse = submissionForm.textResponse.trim();
     const link = submissionForm.link.trim();
@@ -177,8 +170,8 @@ const processFile = (selectedFile: File) => {
     if (activeSubmissionType === "link" && !link) return setSubmitError("Please provide a link.");
     if (activeSubmissionType === "both" && (!hasFile || !textResponse)) return setSubmitError("Please attach a file and enter your response.");
 
-    setSubmitting("final");
     setSubmitError(null);
+    dispatch(clearError());
 
     try {
       const formData = new FormData();
@@ -186,18 +179,16 @@ const processFile = (selectedFile: File) => {
       if (textResponse) formData.append("textResponse", textResponse);
       if (link) formData.append("link", link);
 
-      await api.post(`/assignment/submit/${activeSubmission._id}`, formData);
+      await dispatch(submitAssignmentAction({ assignmentId: activeSubmission._id, formData })).unwrap();
 
       localStorage.removeItem(`draft_${activeSubmission._id}_${currentUserId}`);
       setSubmitSuccess("Assignment submitted successfully.");
       closeSubmission();
-      await fetchAssignments();
+      await dispatch(fetchStudentAssignments());
       setTimeout(() => setSubmitSuccess(null), 3000);
     } catch (err: any) {
-      setSubmitError(err?.response?.data?.message || "Submission failed.");
+      setSubmitError(err || "Submission failed.");
       console.error("Submission failed:", err);
-    } finally {
-      setSubmitting(null);
     }
   };
 
@@ -618,14 +609,14 @@ const processFile = (selectedFile: File) => {
                   {!isSubmitted ? (
                     <button
                       onClick={() => openSubmission(assignment)}
-                      disabled={Boolean(submitting) && submitting === assignment._id}
+                      disabled={loadingAction}
                       className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        Boolean(submitting) && submitting === assignment._id
+                        loadingAction
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-blue-600 text-white hover:bg-blue-700"
                       } ml-auto`}
                     >
-                      {Boolean(submitting) && submitting === assignment._id ? (
+                      {loadingAction ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                           Loading...
@@ -670,7 +661,7 @@ const processFile = (selectedFile: File) => {
                 </div>
                 <button
                   onClick={closeSubmission}
-                  disabled={Boolean(submitting)}
+                  disabled={loadingAction}
                   className="p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
                 >
                   <XCircle className="w-5 h-5 text-gray-500" />
@@ -801,18 +792,18 @@ const processFile = (selectedFile: File) => {
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
               <button 
                 onClick={closeSubmission} 
-                disabled={Boolean(submitting)} 
+                disabled={loadingAction} 
                 className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 disabled:opacity-50"
               >
                 Cancel
               </button>
               
               <button
-                onClick={submitAssignment}
-                disabled={Boolean(submitting)}
+                onClick={handleSubmitAssignment}
+                disabled={loadingAction}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:bg-gray-400"
               >
-                {submitting === "final" ? "Submitting..." : <><Upload className="w-4 h-4"/> Submit</>}
+                {loadingAction ? "Submitting..." : <><Upload className="w-4 h-4"/> Submit</>}
               </button>
             </div>
           </div>
