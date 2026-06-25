@@ -274,6 +274,18 @@ export default function Register() {
                     </select>
                   </div>
                   <div>
+                    <label htmlFor="department" className={labelClass}>Department</label>
+                    <select id="department" name="department" value={form.department || ""} onChange={handleChange} className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      <option value="">Select department (Optional)</option>
+                      <option value="Computer Science">Computer Science</option>
+                      <option value="Business">Business</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Engineering">Engineering</option>
+                      <option value="Arts">Arts</option>
+                    </select>
+                  </div>
+                  <div>
                     <label htmlFor="semester" className={labelClass}>Semester *</label>
                     <select id="semester" name="semester" value={form.semester || ""} onChange={handleChange} className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       <option value="">Select</option>

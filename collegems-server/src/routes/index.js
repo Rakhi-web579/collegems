@@ -67,6 +67,7 @@ import reportRoutes from "./report.routes.js";
 import analyticsRoutes from "./analytics.routes.js";
 import auditLogRoutes from "./auditLog.routes.js";
 import systemHealthRoutes from "./systemHealth.routes.js";
+import restoreRoutes from "./restore.routes.js";
 
 
 // Miscellaneous
@@ -82,6 +83,7 @@ import sequenceRoutes from "./sequence.routes.js";
 import ownershipRoutes from "./ownership.routes.js";
 import savedFilterRoutes from "./savedFilter.routes.js";
 import abandonmentRoutes from "./abandonment.routes.js";
+import temporaryLinkRoutes from "./temporaryLink.routes.js";
 
 // Faculty Assignment (if needed later)
 import facultyAssignmentRoutes from "./facultyAssignment.routes.js";
@@ -188,6 +190,7 @@ router.use("/reports", reportRoutes);
 router.use("/analytics", authenticate, analyticsRoutes);
 router.use("/audit-logs", authenticate, auditLogRoutes);
 router.use("/system-health", authenticate, systemHealthRoutes);
+router.use("/restore", restoreRoutes);
 
 
 // ========================================
@@ -205,6 +208,7 @@ router.use("/sequences", sequenceRoutes);
 router.use("/ownership", ownershipRoutes);
 router.use("/saved-filters", savedFilterRoutes);
 router.use("/abandonment", abandonmentRoutes);
+router.use("/temporary-links", temporaryLinkRoutes);
 
 // ========================================
 // EXPORT ROUTER

@@ -84,6 +84,9 @@ export const register = async (req, res) => {
       }
 
       userData = { ...userData, studentId, semester, course};
+      if (department) {
+        userData.department = department;
+      }
     }
 
     if (role === "teacher") {

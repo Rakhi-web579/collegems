@@ -46,6 +46,7 @@ import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
 
 import { PwaManager } from "./components/PwaManager";
+import ToastTest from "./pages/ToastTest";
 
 // New Route Guard imports
 import withRoleGuard from "./hocs/withRoleGuard";
@@ -84,7 +85,17 @@ export default function App() {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }} />
       <Routes>
-        <Route path="/" element={<MainDashboard />} />
+<Route path="/test-toasts" element={<ToastTest />} />
+
+{/* Public Routes */}
+<Route
+  path="/"
+  element={
+    <ProtectedRoute>
+      <MainDashboard />
+    </ProtectedRoute>
+  }
+/>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />

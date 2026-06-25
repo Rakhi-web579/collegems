@@ -207,7 +207,7 @@ export const getStudents = async (req, res) => {
     const result = await getPaginatedData(User, req.query, {
       baseFilter: { role: "student" },
       searchFields: ["name", "email", "studentId"],
-      select: "name email role studentId course semester tags joinedAt lastUpdated",
+      select: "name email role studentId course semester department tags joinedAt lastUpdated",
       defaultSort: { name: 1 },
       defaultLimit: 20,
       useTextSearch: true,

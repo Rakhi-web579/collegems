@@ -31,8 +31,12 @@ export const getPaginatedData = async (Model, query, options = {}) => {
     Object.keys(query.filter).forEach((key) => {
       // Ignore 'all' or empty strings
       if (query.filter[key] !== "all" && query.filter[key] !== "") {
-        // Simple exact match, could be expanded to support $in, etc.
-        filterQuery[key] = query.filter[key];
+        if (query.filter[key] === "unassigned") {
+          filterQuery[key] = { $in: [null, ""] };
+        } else {
+          // Simple exact match, could be expanded to support $in, etc.
+          filterQuery[key] = query.filter[key];
+        }
       }
     });
   }
