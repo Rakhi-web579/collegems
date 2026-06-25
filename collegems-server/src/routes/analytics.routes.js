@@ -2,6 +2,7 @@ import express from "express";
 import StudentAnalytics from "../models/StudentAnalytics.model.js";
 import { generateAnalyticsForStudent, batchGenerateAnalytics } from "../services/analytics.service.js";
 import { restrictTo } from "../middlewares/auth.middleware.js";
+import { getStudentGradeTrend } from "../controllers/studentAnalytics.controller.js";
 import { getHodDashboardMetrics } from "../controllers/hodAnalytics.controller.js";
 
 const router = express.Router();
@@ -13,6 +14,10 @@ router.get("/department/hod-dashboard", restrictTo("hod"), getHodDashboardMetric
 // GET /api/analytics/department/at-risk
 // Retrieves a list of high-risk students
 router.get("/department/at-risk", restrictTo("hod", "teacher", "admin"), async (req, res) => {
+
+// GET /api/analytics/student/:studentId/grade-trend
+router.get("/student/:studentId/grade-trend", restrictTo("student", "hod", "teacher"), getStudentGradeTrend);
+
     try {
         // Optional: Filter by departmentCode if using req.user
         const atRiskStudents = await StudentAnalytics.find({ riskLevel: "high" })

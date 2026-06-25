@@ -92,7 +92,8 @@ type TabType =
   | "subject-faculty"
   | "semester-comparison"
   | "user-workflows"
-  | "settings";
+  | "settings"
+  | "grade-trend";
 
 
 // Consolidated and cleaned navigation items
@@ -125,6 +126,7 @@ const navigationItems: {
   { id: "bus-routes", label: "Bus Tracking", icon: Bus },
   { id: "book-resources", label: "Book Resources", icon: CalendarDays },
   { id: "user-workflows", label: "My Workflows", icon: FileText },
+  { id: "grade-trend", label: "Grade Trend", icon: ChartBarIcon },
 ];
 
 export default function StudentDashboard() {
