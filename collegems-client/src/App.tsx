@@ -46,6 +46,7 @@ import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
 
 import { PwaManager } from "./components/PwaManager";
+import ToastTest from "./pages/ToastTest";
 
 export default function App() {
   return (
@@ -58,6 +59,7 @@ export default function App() {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }} />
       <Routes>
+        <Route path="/test-toasts" element={<ToastTest />} />
         {/* Public Routes */}
         <Route
           path="/"
