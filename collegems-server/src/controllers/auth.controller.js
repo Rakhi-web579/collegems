@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { logAction } from "../utils/auditService.js";
 import { checkPotentialDuplicates } from "../services/duplicateDetection.service.js";
 import crypto from "crypto";
-import { sendVerificationEmail } from "../utils/email.js";
+import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/email.js";
 const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || "";
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
@@ -355,3 +355,61 @@ export const resendVerificationEmail = async (req, res) => {
   }
 };
 
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user) {
+      // Don't leak whether user exists or not
+      return res.json({ message: "If an account with that email exists, we have sent a password reset link." });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetTokenExpires;
+    await user.save({ validateBeforeSave: false });
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+    await sendPasswordResetEmail(user, resetUrl);
+
+    res.json({ message: "If an account with that email exists, we have sent a password reset link." });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired password reset token" });
+    }
+
+    user.password = await hashPassword(password, 8);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    await logAction(user._id, "RESET_PASSWORD", "Auth", user._id, { email: user.email });
+
+    res.json({ message: "Password has been successfully reset" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
