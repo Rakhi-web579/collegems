@@ -200,6 +200,7 @@ export const getStudents = async (req, res) => {
       select: "name email role studentId course semester tags joinedAt lastUpdated",
       defaultSort: { name: 1 },
       defaultLimit: 20,
+      useTextSearch: true,
     });
 
     res.json(result);
