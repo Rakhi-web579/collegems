@@ -99,7 +99,7 @@ router.delete(
       throw new AppError("Course not found", 404, "NOT_FOUND");
     }
 
-log.info(`Course soft-deleted: ${course.code}`, { courseId: id });
+log.info(`Course deleted: ${course.code}`, { courseId: id });
 invalidateCache('/api/courses'); // Clear course cache
     res.json({ success: true, message: "Course deleted successfully" });
   })
