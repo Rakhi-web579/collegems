@@ -2,7 +2,6 @@ import AcademicCalendar from "./common-components-management/AcademicCalendar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import RoleRoute from "./routes/RoleRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import BulkFieldReset from "./hod-components/BulkFieldReset";
 
@@ -31,7 +30,6 @@ import LostFoundPortal from "./pages/LostFoundPortal";
 import VerifyStudent from "./pages/VerifyStudent";
 import RiskDashboard from "./pages/RiskDashboard";
 
-
 import Library from "./common-components-management/Library";
 import ExamHalls from "./hod-components/ExamHalls";
 import HallAllocation from "./hod-components/HallAllocation";
@@ -46,6 +44,32 @@ import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
 
 import { PwaManager } from "./components/PwaManager";
+
+// New Route Guard imports
+import withRoleGuard from "./hocs/withRoleGuard";
+import { UserRole } from "./constants/role.constants";
+import AccessDenied from "./pages/AccessDenied";
+
+// Define Guarded Components
+const StudentDashboardGuarded = withRoleGuard(StudentDashboard, { allowedRoles: UserRole.STUDENT });
+const ExaminationFormPageGuarded = withRoleGuard(ExaminationFormPage, { allowedRoles: UserRole.STUDENT });
+const StudentSeatViewGuarded = withRoleGuard(StudentSeatView, { allowedRoles: UserRole.STUDENT });
+const ResourceBookingStudentGuarded = withRoleGuard(ResourceBooking, { allowedRoles: UserRole.STUDENT });
+
+const TeacherDashboardGuarded = withRoleGuard(TeacherDashboard, { allowedRoles: UserRole.TEACHER });
+const TeacherAnnouncementsGuarded = withRoleGuard(() => <TeacherDashboard initialTab="announcements" />, { allowedRoles: UserRole.TEACHER });
+const ResourceBookingTeacherGuarded = withRoleGuard(ResourceBooking, { allowedRoles: UserRole.TEACHER });
+
+const HodDashboardGuarded = withRoleGuard(HodDashboard, { allowedRoles: UserRole.HOD });
+const ReportGeneratorGuarded = withRoleGuard(ReportGenerator, { allowedRoles: UserRole.HOD });
+const ExamHallsGuarded = withRoleGuard(ExamHalls, { allowedRoles: UserRole.HOD });
+const HallAllocationGuarded = withRoleGuard(HallAllocation, { allowedRoles: UserRole.HOD });
+const AuditLogsGuarded = withRoleGuard(AuditLogs, { allowedRoles: UserRole.HOD });
+const BookingManagementGuarded = withRoleGuard(BookingManagement, { allowedRoles: UserRole.HOD });
+const ResourceManagementGuarded = withRoleGuard(ResourceManagement, { allowedRoles: UserRole.HOD });
+const BulkFieldResetGuarded = withRoleGuard(BulkFieldReset, { allowedRoles: UserRole.HOD });
+
+const ParentDashboardGuarded = withRoleGuard(ParentDashboard, { allowedRoles: UserRole.PARENT });
 
 export default function App() {
   return (
@@ -72,6 +96,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/verify/student/:studentId" element={<VerifyStudent />} />
+        <Route path="/access-denied" element={<AccessDenied />} />
 
         {/* Dashboard Layout */}
         <Route element={<DashboardLayout />}>
@@ -120,150 +145,86 @@ export default function App() {
         {/* Student Routes */}
         <Route
           path="/student/dashboard"
-          element={
-            <RoleRoute role="student">
-              <StudentDashboard />
-            </RoleRoute>
-          }
+          element={<StudentDashboardGuarded />}
         />
 
         <Route
           path="/student/exam-form"
-          element={
-            <RoleRoute role="student">
-              <ExaminationFormPage />
-            </RoleRoute>
-          }
+          element={<ExaminationFormPageGuarded />}
         />
 
         <Route
           path="/student/my-seat"
-          element={
-            <RoleRoute role="student">
-              <StudentSeatView />
-            </RoleRoute>
-          }
+          element={<StudentSeatViewGuarded />}
         />
 
         <Route
           path="/student/book-resources"
-          element={
-            <RoleRoute role="student">
-              <ResourceBooking />
-            </RoleRoute>
-          }
+          element={<ResourceBookingStudentGuarded />}
         />
 
         {/* Teacher Routes */}
         <Route
           path="/teacher/dashboard"
-          element={
-            <RoleRoute role="teacher">
-              <TeacherDashboard />
-            </RoleRoute>
-          }
+          element={<TeacherDashboardGuarded />}
         />
 
         <Route
           path="/teacher/announcements"
-          element={
-            <RoleRoute role="teacher">
-              <TeacherDashboard initialTab="announcements" />
-            </RoleRoute>
-          }
+          element={<TeacherAnnouncementsGuarded />}
         />
         <Route
           path="/teacher/book-resources"
-          element={
-            <RoleRoute role="teacher">
-              <ResourceBooking />
-            </RoleRoute>
-          }
+          element={<ResourceBookingTeacherGuarded />}
         />
 
         {/* HOD Routes */}
         <Route
           path="/hod/dashboard"
-          element={
-            <RoleRoute role="hod">
-              <HodDashboard />
-            </RoleRoute>
-          }
+          element={<HodDashboardGuarded />}
         />
 
         <Route
           path="/hod/reports"
-          element={
-            <RoleRoute role="hod">
-              <ReportGenerator />
-            </RoleRoute>
-          }
+          element={<ReportGeneratorGuarded />}
         />
 
 
 
         <Route
           path="/hod/exam-halls"
-          element={
-            <RoleRoute role="hod">
-              <ExamHalls />
-            </RoleRoute>
-          }
+          element={<ExamHallsGuarded />}
         />
 
         <Route
           path="/hod/hall-allocation"
-          element={
-            <RoleRoute role="hod">
-              <HallAllocation />
-            </RoleRoute>
-          }
+          element={<HallAllocationGuarded />}
         />
 
         <Route
           path="/hod/audit-logs"
-          element={
-            <RoleRoute role="hod">
-              <AuditLogs />
-            </RoleRoute>
-          }
+          element={<AuditLogsGuarded />}
         />
 
         <Route
           path="/hod/manage-bookings"
-          element={
-            <RoleRoute role="hod">
-              <BookingManagement />
-            </RoleRoute>
-          }
+          element={<BookingManagementGuarded />}
         />
 
         <Route
           path="/hod/manage-resources"
-          element={
-            <RoleRoute role="hod">
-              <ResourceManagement />
-            </RoleRoute>
-          }
+          element={<ResourceManagementGuarded />}
         />
     
-      <Route
-  path="/hod/bulk-reset"
-  element={
-    <RoleRoute role="hod">
-      <BulkFieldReset />
-    </RoleRoute>
-  }
-/>
+        <Route
+          path="/hod/bulk-reset"
+          element={<BulkFieldResetGuarded />}
+        />
      
 
         <Route
           path="/parent/dashboard"
-          element={
-            <RoleRoute role="parent">
-              <ParentDashboard />
-            </RoleRoute>
-          }
+          element={<ParentDashboardGuarded />}
         />
       </Routes>
     </BrowserRouter>
