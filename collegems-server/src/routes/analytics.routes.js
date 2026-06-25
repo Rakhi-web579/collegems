@@ -2,8 +2,13 @@ import express from "express";
 import StudentAnalytics from "../models/StudentAnalytics.model.js";
 import { generateAnalyticsForStudent, batchGenerateAnalytics } from "../services/analytics.service.js";
 import { restrictTo } from "../middlewares/auth.middleware.js";
+import { getHodDashboardMetrics } from "../controllers/hodAnalytics.controller.js";
 
 const router = express.Router();
+
+// GET /api/analytics/department/hod-dashboard
+// Retrieves high-level analytics specifically for the HOD dashboard
+router.get("/department/hod-dashboard", restrictTo("hod"), getHodDashboardMetrics);
 
 // GET /api/analytics/department/at-risk
 // Retrieves a list of high-risk students
