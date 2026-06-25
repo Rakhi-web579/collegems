@@ -4,6 +4,7 @@ import { allowRoles } from "../middlewares/role.middleware.js";
 import { asyncHandler, AppError } from "../middlewares/errorHandler.middleware.js";
 import log from "../utils/logger.js";
 import Course from "../models/Course.model.js";
+import { cacheResponse, invalidateCache } from "../middlewares/cache.middleware.js";
 
 const router = express.Router();
 
@@ -39,6 +40,7 @@ router.post(
     });
 
     log.info(`Course created: ${code}`, { courseId: course._id, teacher });
+    invalidateCache('/api/courses'); // Clear course cache
     res.status(201).json({ success: true, data: course });
   })
 );
@@ -69,6 +71,7 @@ router.put(
     }
 
     log.info(`Course updated: ${code}`, { courseId: id });
+    invalidateCache('/api/courses'); // Clear course cache
     res.json({ success: true, data: course });
   })
 );
@@ -93,6 +96,7 @@ router.delete(
     }
 
     log.info(`Course deleted: ${course.code}`, { courseId: id });
+    invalidateCache('/api/courses'); // Clear course cache
     res.json({ success: true, message: "Course deleted successfully" });
   })
 );
@@ -102,6 +106,7 @@ router.get(
   "/all",
   protect,
   allowRoles("hod", "admin", "teacher", "student", "parent"),
+  cacheResponse(300), // Cache for 5 minutes
   async (req, res) => {
     const courses = await Course.find().populate("teacher", "name email");
     res.json(courses);

@@ -15,9 +15,9 @@ export const getStudentGradeTrend = async (req, res) => {
       return res.status(400).json({ message: "Student ID is required" });
     }
 
-    const match: any = { studentId };
+    const match = { studentId };
     if (semester) match.semester = semester;
-    if (subject) match["courseId"] = subject; // expecting subject to be courseId
+    if (subject) match.courseId = subject; // expecting subject to be courseId
 
     // Fetch results and populate course name for labeling
     const results = await Results.find(match)

@@ -4,6 +4,7 @@ import { generateAnalyticsForStudent, batchGenerateAnalytics } from "../services
 import { restrictTo } from "../middlewares/auth.middleware.js";
 import { getStudentGradeTrend } from "../controllers/studentAnalytics.controller.js";
 import { getHodDashboardMetrics } from "../controllers/hodAnalytics.controller.js";
+import { cache } from "../utils/cache.js";
 
 const router = express.Router();
 
@@ -17,6 +18,20 @@ router.get("/department/at-risk", restrictTo("hod", "teacher", "admin"), async (
 
 // GET /api/analytics/student/:studentId/grade-trend
 router.get("/student/:studentId/grade-trend", restrictTo("student", "hod", "teacher"), getStudentGradeTrend);
+
+// GET /api/analytics/cache/stats
+// Retrieves current cache performance metrics (Admin only)
+router.get("/cache/stats", restrictTo("admin"), (req, res) => {
+    res.json({ success: true, data: cache.getStats() });
+});
+
+// POST /api/analytics/cache/clear
+// Manually purges the entire cache (Admin only)
+router.post("/cache/clear", restrictTo("admin"), (req, res) => {
+    cache.clear();
+    res.json({ success: true, message: "Cache successfully cleared" });
+});
+
 
     try {
         // Optional: Filter by departmentCode if using req.user
