@@ -225,7 +225,7 @@ export default function HODDashboard() {
   const fetchSearchData = async () => {
     try {
       const [studentsRes, teachersRes, coursesRes] = await Promise.all([
-        api.get("/users/students?limit=200"),
+        api.get("/users/students?limit=0"),
         api.get("/users/teachers"),
         api.get("/courses/all"),
       ]);
