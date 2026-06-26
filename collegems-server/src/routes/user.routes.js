@@ -18,15 +18,17 @@ import {
 } from "../controllers/user.controller.js";
 import { getCleanupSuggestions } from "../services/userCleanup.service.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
+import { auditAction } from "../middlewares/audit.middleware.js";
 
 const router = express.Router();
 
 router.get("/me", protect, getMe);
-router.put("/me", protect, authorize("teacher", "hod"), updateMe);
+router.put("/me", protect, authorize("teacher", "hod"), auditAction("UPDATE_PROFILE", "User"), updateMe);
 router.put(
   "/me/password",
   protect,
   authorize("teacher", "hod"),
+  auditAction("UPDATE_PASSWORD", "User"),
   updatePassword,
 );
 router.get(
@@ -77,6 +79,7 @@ router.put(
   "/students/bulk-tags",
   protect,
   authorize("teacher", "hod", "admin"),
+  auditAction("BULK_ASSIGN_TAGS", "User"),
   bulkAssignTags
 );
 
@@ -97,6 +100,7 @@ router.put(
   "/students/:id/unlock",
   protect,
   authorize("admin"),
+  auditAction("UNLOCK_ACADEMIC_RECORD", "User"),
   unlockAcademicRecord
 );
 
