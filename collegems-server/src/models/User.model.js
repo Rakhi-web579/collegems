@@ -14,6 +14,15 @@ const userSchema = new mongoose.Schema({
   loginCount: { type: Number, default: 0 },
   accountStatus: { type: String, enum: ["active", "archived", "suspended"], default: "active" },
 
+  // Email Verification
+  isEmailVerified: { type: Boolean, default: false },
+  verificationToken: { type: String },
+  verificationTokenExpires: { type: Date },
+
+  // Password Reset
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+
   // Tags
   tags: {
     type: [String],
@@ -53,6 +62,8 @@ const userSchema = new mongoose.Schema({
 
 
   // Teacher-specific
+  branch: { type: String },
+  section: { type: String },
   teacherId: { type: String },
   department: {
     type: String,
@@ -60,6 +71,8 @@ const userSchema = new mongoose.Schema({
       return this.role === "teacher";
     },
   },
+  bio: { type: String },
+  officeHours: { type: String },
   unavailableTimeSlots: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "TimeSlot"
@@ -81,6 +94,16 @@ const userSchema = new mongoose.Schema({
       inApp: { type: Boolean, default: true },
     },
   },
+
+  transferHistory: [
+  {
+    field: { type: String }, // which field changed
+    previousValue: { type: String },
+    newValue: { type: String },
+    changedAt: { type: Date, default: Date.now },
+    changedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  }
+],
 }, { timestamps: true });
 
 userSchema.index({ name: "text", email: "text", studentId: "text", teacherId: "text" });
