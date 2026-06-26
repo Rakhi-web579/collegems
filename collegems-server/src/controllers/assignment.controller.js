@@ -1,10 +1,12 @@
 // ─── FILE: collegems-server/src/controllers/assignment.controller.js ──────────
 
 import Assignment from "../models/Assignment.model.js";
+import Course from "../models/Course.model.js";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
 import { publishEvent } from "../utils/rabbitmq.js";
+import { checkSemesterFrozen } from "../services/semesterService.js";
 
 export const createAssignment = async (req, res) => {
   try {
