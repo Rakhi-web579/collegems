@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import api from "../api/axios";
+import { trackView } from "../utils/trackView";
 
 // Common Components
 import AcademicCalendar from "../common-components-management/AcademicCalendar";
@@ -150,6 +151,7 @@ export default function StudentDashboard() {
       try {
         const res = await api.get("/users/me");
         setProfileData(res.data);
+        if (res.data?._id) trackView("Student", res.data._id);
       } catch (err) {
         console.error("Profile fetch error:", err);
       }
