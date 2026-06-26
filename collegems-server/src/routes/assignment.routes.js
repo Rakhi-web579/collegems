@@ -19,7 +19,6 @@ import {
   downloadAssignmentFile,
   getUpcomingAssignments,
   getTeacherAssignments,
-  addAssignmentComment,
 } from "../controllers/assignment.controller.js";
 
 const router = express.Router();
