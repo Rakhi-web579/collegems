@@ -7,7 +7,7 @@ import express from "express";
 // ========================================
 
 // Auth & Core
-// import authRoutes from "./auth.routes.js";
+import authRoutes from "./auth.routes.js";
 // import dashboardRoutes from "./dashboard.routes.js";
 import userRoutes from "./user.routes.js";
 import historyRoutes from "./history.routes.js";
@@ -101,7 +101,7 @@ const router = express.Router();
 // ========================================
 // CORE ROUTES (Commented out for now)
 // ========================================
-// router.use("/auth", authRoutes);
+router.use("/auth", authRoutes);
 router.use("/search", searchRoutes);
 // router.use("/dashboard", dashboardRoutes);
 // router.use("/faculty-assignments", facultyAssignmentRoutes);
