@@ -58,8 +58,29 @@ export const uploadAssignment = multer({
   fileFilter: documentFilter,
 });
 
+// Resume Upload Middleware Configuration
+const resumeStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/resumes/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`); 
+  },
+});
+
+const resumeFilter = (req, file, cb) => {
+  const allowedMimeTypes = ["application/pdf"];
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only PDF documents are allowed."), false);
+  }
+};
+
 export const uploadResume = multer({
   storage: resumeStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
-  fileFilter: documentFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: resumeFilter,
 });

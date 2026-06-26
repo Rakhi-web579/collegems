@@ -10,6 +10,7 @@ import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import { execSync } from "child_process";
 import { initializeStudyGroupSockets } from "./src/socket/studyGroupSocket.js";
+import { allowedOrigins } from "./src/config/cors.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -50,7 +51,13 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: (origin, callback) => { callback(null, true); },
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   },

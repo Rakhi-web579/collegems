@@ -55,19 +55,12 @@ import apiRouter from "./routes/index.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import tenantResolver from "./middlewares/tenantResolver.js";
 import log from "./utils/logger.js";
+import { allowedOrigins } from "./config/cors.js";
 
 const app = express();
 app.set("query parser", "extended");
 
-// ========================================
-// MIDDLEWARES
-// ========================================
-
-// CORS Configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:5173"];
-
+// Middlewares
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {

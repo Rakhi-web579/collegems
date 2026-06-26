@@ -105,13 +105,11 @@ invalidateCache('/api/courses'); // Clear course cache
   })
 );
 
-// View all courses
 router.get(
   "/all",
   protect,
   allowRoles("hod", "admin", "teacher", "student", "parent"),
-  cacheResponse(300), // Cache for 5 minutes
-  async (req, res) => {
+  asyncHandler(async (req, res) => {
     const courses = await Course.find().populate("teacher", "name email");
     res.json(courses);
   }
