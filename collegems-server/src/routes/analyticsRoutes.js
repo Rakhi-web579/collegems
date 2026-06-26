@@ -4,7 +4,8 @@ import {
     getPageVisitMetrics,
     getVisitsByRole
 } from '../controllers/analyticsController.js';
-import { protect, authorize } from '../middlewares/authMiddleware.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
+
 
 const router = express.Router();
 
@@ -12,9 +13,9 @@ const router = express.Router();
 router.post('/track-visit', protect, trackPageVisit);
 
 // Get page visit metrics (admin only)
-router.get('/page-visits', protect, authorize('admin'), getPageVisitMetrics);
+router.get('/page-visits', protect, restrictTo('admin'), getPageVisitMetrics);
 
 // Get visits by role (admin only)
-router.get('/visits-by-role', protect, authorize('admin'), getVisitsByRole);
+router.get('/visits-by-role', protect, restrictTo('admin'), getVisitsByRole);
 
 export default router;
