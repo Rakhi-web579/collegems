@@ -9,11 +9,13 @@ import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
+import StudentTransferHistory from "./hod-components/StudentTransferHistory";
 //import TimeTable from "./user-components/TimeTable";
 
 //import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import HodDashboard from "./pages/HODDashboard";
+import ParentDashboard from "./pages/ParentDashboard";
 import MainDashboard from "./pages/MainDashboard";
 import ExamSchedule from "./user-components/ExamSchedule";
 import Courses from "./user-components/Courses";
@@ -25,7 +27,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ReportGenerator from "./pages/ReportGenerator";
 import ExaminationFormPage from "./pages/ExaminationFormPage";
 import SemesterRegistration from "./user-components/SemesterRegistration";
-import TimeTable from "./user-components/TimeTable";
+//import TimeTable from "./user-components/TimeTable";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 import LostFoundPortal from "./pages/LostFoundPortal";
@@ -186,6 +188,14 @@ export default function App() {
           path="/hod/manage-resources"
           element={<ResourceManagementGuarded />}
         />
+        <Route
+  path="/hod/student-transfer/:studentId"
+  element={
+    <RoleRoute role="hod">
+      <StudentTransferHistory />
+    </RoleRoute>
+  }
+/>
     
         <Route
           path="/hod/bulk-reset"

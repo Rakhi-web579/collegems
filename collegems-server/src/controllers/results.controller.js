@@ -55,9 +55,7 @@ export const createResult = async (req, res) => {
             status,
         } = req.body;
 
-        // ✅ find using Mongo _id
         const student = await Student.findById(studentId);
-
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
         }
@@ -68,8 +66,25 @@ export const createResult = async (req, res) => {
 
         const course = await Course.findById(courseId);
 
+        const course = await Course.findById(courseId);
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
+        }
+
+        // Verify course ownership if user is a teacher
+        if (req.user.role === "teacher" && course.teacher.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Not authorized to manage results for this course",
+            });
+        }
+
+        // Verify student eligibility for the course
+        const matchesSem = student.semester && course.semester === Number(student.semester);
+        const matchesDept = student.course && course.department.toLowerCase() === student.course.toLowerCase();
+        if (!matchesSem && !matchesDept) {
+            return res.status(403).json({
+                message: "Not authorized to grade this student (student is not in the course's department or semester)",
+            });
         }
 
         // Verify course ownership if user is a teacher
