@@ -151,7 +151,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const examSchedule = await ExamSchedule.find({});
     res.json({ success: true, data: examSchedule });
-  }
+  })
 );
 
 export default router;
