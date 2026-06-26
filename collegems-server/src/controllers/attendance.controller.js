@@ -74,36 +74,3 @@ export const getLowAttendance = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-export const getAttendanceAlerts = async (req, res) => {
-  try {
-    const alerts = await AttendanceAlert.find({ status: "active" })
-      .populate("student", "name email studentId")
-      .populate("course", "name code")
-      .sort({ severity: 1, lastDetectedAt: -1 })
-      .lean();
-
-    res.json({ success: true, data: alerts });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch attendance alerts" });
-  }
-};
-
-export const resolveAttendanceAlert = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const alert = await AttendanceAlert.findByIdAndUpdate(
-      id,
-      { status: "resolved" },
-      { new: true }
-    );
-    
-    if (!alert) {
-      return res.status(404).json({ message: "Alert not found" });
-    }
-
-    res.json({ success: true, data: alert });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to resolve alert" });
-  }
-};
