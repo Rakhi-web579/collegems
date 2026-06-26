@@ -9,6 +9,7 @@ import BulkFieldReset from "./hod-components/BulkFieldReset";
 
 import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
+import StudentTransferHistory from "./hod-components/StudentTransferHistory";
 //import TimeTable from "./user-components/TimeTable";
 
 //import StudentDashboard from "./pages/StudentDashboard";
@@ -187,6 +188,14 @@ export default function App() {
           path="/hod/manage-resources"
           element={<ResourceManagementGuarded />}
         />
+        <Route
+  path="/hod/student-transfer/:studentId"
+  element={
+    <RoleRoute role="hod">
+      <StudentTransferHistory />
+    </RoleRoute>
+  }
+/>
     
         <Route
           path="/hod/bulk-reset"
