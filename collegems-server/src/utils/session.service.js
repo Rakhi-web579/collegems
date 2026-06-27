@@ -1,9 +1,15 @@
 import RefreshToken from "../models/RefreshToken.model.js";
 
 /**
- * Creates a new session in the database.
+ * Creates a new refresh token session.
  */
-export const createSession = async ({ userId, tokenHash, deviceInfo, ipAddress, expiresAt }) => {
+export const createSession = async ({
+  userId,
+  tokenHash,
+  deviceInfo,
+  ipAddress,
+  expiresAt,
+}) => {
   return await RefreshToken.create({
     user: userId,
     token: tokenHash,
@@ -14,39 +20,105 @@ export const createSession = async ({ userId, tokenHash, deviceInfo, ipAddress, 
 };
 
 /**
- * Revokes a single session by setting isRevoked = true.
+ * Revokes a single session.
  */
 export const revokeSession = async (tokenHash) => {
   return await RefreshToken.findOneAndUpdate(
-    { token: tokenHash },
-    { isRevoked: true },
-    { new: true }
+    {
+      token: tokenHash,
+      isRevoked: false,
+    },
+    {
+      $set: {
+        isRevoked: true,
+      },
+    },
+    {
+      new: true,
+    }
   );
 };
 
 /**
- * Revokes all sessions for a specific user by deleting their documents.
+ * Revokes all sessions for a user.
+ *
+ * NOTE:
+ * Do NOT delete sessions.
+ * Keep them until TTL removes them so
+ * token reuse detection still works.
  */
 export const revokeAllSessions = async (userId) => {
-  return await RefreshToken.deleteMany({ user: userId });
+  return await RefreshToken.updateMany(
+    {
+      user: userId,
+      isRevoked: false,
+    },
+    {
+      $set: {
+        isRevoked: true,
+      },
+    }
+  );
 };
 
 /**
- * Finds an active or inactive session by its hashed token.
+ * Finds a session by hashed refresh token.
+ *
+ * We intentionally do NOT filter revoked sessions here
+ * because auth.controller.js uses them for
+ * Token Reuse Detection.
  */
 export const findSession = async (tokenHash) => {
-  return await RefreshToken.findOne({ token: tokenHash });
+  return await RefreshToken.findOne({
+    token: tokenHash,
+    expiresAt: {
+      $gt: new Date(),
+    },
+  });
 };
 
 /**
- * Rotates a session: creates a new one and marks the old one as revoked.
- * Marking as revoked (instead of deleting) is critical for Token Reuse Detection.
+ * Updates session activity timestamp.
+ *
+ * Call this after every successful refresh.
  */
-export const rotateSession = async ({ oldTokenHash, newTokenHash, newExpiresAt, deviceInfo, ipAddress }) => {
-  const oldSession = await RefreshToken.findOne({ token: oldTokenHash });
-  if (!oldSession) return null;
+export const updateSessionUsage = async (tokenHash) => {
+  return await RefreshToken.findOneAndUpdate(
+    {
+      token: tokenHash,
+    },
+    {
+      $set: {
+        lastUsedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+    }
+  );
+};
 
-  // Create new session
+/**
+ * Rotates refresh token session.
+ *
+ * Creates a new session and revokes
+ * the previous session.
+ */
+export const rotateSession = async ({
+  oldTokenHash,
+  newTokenHash,
+  newExpiresAt,
+  deviceInfo,
+  ipAddress,
+}) => {
+  const oldSession = await RefreshToken.findOne({
+    token: oldTokenHash,
+  });
+
+  if (!oldSession) {
+    return null;
+  }
+
   const newSession = await RefreshToken.create({
     user: oldSession.user,
     token: newTokenHash,
@@ -55,7 +127,6 @@ export const rotateSession = async ({ oldTokenHash, newTokenHash, newExpiresAt, 
     expiresAt: newExpiresAt,
   });
 
-  // Mark old session as revoked
   oldSession.isRevoked = true;
   await oldSession.save();
 
