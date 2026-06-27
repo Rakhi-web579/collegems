@@ -2,7 +2,7 @@ import Results from "../models/Results.model.js";
 import Student from "../models/User.model.js";
 import Course from "../models/Course.model.js";
 import { logAction } from "../utils/auditService.js";
-import { publishEvent } from "../utils/rabbitmq.js";
+
 export const getResults = async (req, res) => {
     try {
         if (!req.user) {
@@ -30,7 +30,7 @@ export const getResults = async (req, res) => {
             status: "published",
         })
             .populate("courseId", "name code")
-            .select("marks grade status semester");
+            .select("internalMarks externalMarks practicalMarks totalMarks grade status semester createdAt");
 
         res.json(results);
     } catch (error) {
@@ -43,33 +43,98 @@ export const getResults = async (req, res) => {
 
 export const createResult = async (req, res) => {
     try {
-        const { studentId, courseId, marks, grade } = req.body;
+        const {
+            studentId,
+            courseId,
+            semester,
+            internalMarks,
+            externalMarks,
+            practicalMarks,
+            totalMarks,
+            grade,
+            status,
+        } = req.body;
 
-        // ✅ find using Mongo _id
         const student = await Student.findById(studentId);
-
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
         }
 
+        if (student.role !== "student") {
+            return res.status(400).json({ message: "Specified user is not a student" });
+        }
+
         const course = await Course.findById(courseId);
 
+        const course = await Course.findById(courseId);
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
 
-        await checkSemesterFrozen(course.semester);
+        // Verify course ownership if user is a teacher
+        if (req.user.role === "teacher" && course.teacher.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Not authorized to manage results for this course",
+            });
+        }
+
+        // Verify student eligibility for the course
+        const matchesSem = student.semester && course.semester === Number(student.semester);
+        const matchesDept = student.course && course.department.toLowerCase() === student.course.toLowerCase();
+        if (!matchesSem && !matchesDept) {
+            return res.status(403).json({
+                message: "Not authorized to grade this student (student is not in the course's department or semester)",
+            });
+        }
+
+        // Verify course ownership if user is a teacher
+        if (req.user.role === "teacher" && course.teacher.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Not authorized to manage results for this course",
+            });
+        }
+
+        // Verify student eligibility for the course
+        const matchesSem = student.semester && course.semester === Number(student.semester);
+        const matchesDept = student.course && course.department.toLowerCase() === student.course.toLowerCase();
+        if (!matchesSem && !matchesDept) {
+            return res.status(403).json({
+                message: "Not authorized to grade this student (student is not in the course's department or semester)",
+            });
+        }
 
         const result = await Results.create({
             studentId,
             courseId,
-            marks,
+            semester: semester || student.semester,
+            internalMarks,
+            externalMarks,
+            practicalMarks,
+            totalMarks,
             grade,
+            status: status || "draft",
+            createdBy: req.user.id,
         });
+
         res.status(201).json(result);
 
-        // Log result creation
-        await logAction(req.user.id, "CREATE_RESULT", "Result", result._id, { studentId, courseId, marks, grade });
+        // Log result creation with rich audit details
+        await logAction(req.user.id, "CREATE_RESULT", "Result", result._id, {
+            userRole: req.user.role,
+            studentId,
+            previousValue: null,
+            newValue: {
+                studentId,
+                courseId,
+                semester: semester || student.semester,
+                internalMarks,
+                externalMarks,
+                practicalMarks,
+                totalMarks,
+                grade,
+                status: result.status,
+            },
+        });
     } catch (err) {
         console.log("Create Result Error:", err);
         if (err.status === 403) return res.status(403).json({ message: err.message });
@@ -79,34 +144,26 @@ export const createResult = async (req, res) => {
 
 export const publishResult = async (req, res) => {
     try {
-        const existingResult = await Results.findById(req.params.id).populate("courseId");
-        if (!existingResult) return res.status(404).json({ message: "Result not found" });
-        
-        await checkSemesterFrozen(existingResult.courseId?.semester || existingResult.semester);
+        const result = await Results.findById(req.params.id);
+        if (!result) {
+            return res.status(404).json({ message: "Result record not found" });
+        }
 
-        const result = await Results.findByIdAndUpdate(
-            req.params.id,
-            { status: "published" },
-            { new: true, editorId: req.user.id }
-        );
+        const previousValue = { status: result.status };
+        result.status = "published";
+        await result.save();
+
         res.json(result);
 
-        // Log result publish
-        await logAction(req.user.id, "PUBLISH_RESULT", "Result", result._id, { studentId: result.studentId });
-        
-        // Publish Domain Event
-        publishEvent("academics", "result.published", {
+        // Log result publish with rich audit details
+        await logAction(req.user.id, "PUBLISH_RESULT", "Result", result._id, {
+            userRole: req.user.role,
             studentId: result.studentId,
-            courseId: result.courseId,
-            resultId: result._id,
-            timestamp: new Date()
+            previousValue,
+            newValue: { status: "published" },
         });
-        await Student.findByIdAndUpdate(
-          result.studentId,
-          { academicRecordLocked: true }
-        );
     } catch (error) {
-        if (error.status === 403) return res.status(403).json({ message: error.message });
+        console.error("Publish Result Error:", error);
         res.status(500).json({ message: "Publish failed" });
     }
 };

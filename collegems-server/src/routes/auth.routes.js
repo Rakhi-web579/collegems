@@ -7,6 +7,10 @@ import {
   getSessions,
   logoutAll,
   deleteSession,
+  verifyEmail,
+  resendVerificationEmail,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 import { validateRegister } from "../middlewares/validation.middleware.js";
 import { loginLimiter, registerLimiter } from "../middlewares/rateLimit.middleware.js";
@@ -19,6 +23,10 @@ router.post("/register", registerLimiter, detectDevice, validateRegister, regist
 router.post("/login", loginLimiter, detectDevice, login);
 router.post("/refresh", detectDevice, refresh);
 router.post("/logout", logout);
+router.post("/verify-email", verifyEmail);
+router.post("/resend-verification", resendVerificationEmail);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 router.get("/sessions", authenticate, getSessions);
 router.post("/logout-all", authenticate, logoutAll);

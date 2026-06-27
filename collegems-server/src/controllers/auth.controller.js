@@ -5,38 +5,25 @@ import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import { logAction } from "../utils/auditService.js";
 
 import { checkPotentialDuplicates } from "../services/duplicateDetection.service.js";
-
 import {
-
   generateAccessToken,
-
   generateRefreshToken,
-
   hashRefreshToken,
-
   verifyRefreshToken
-
 } from "../utils/token.service.js";
 
 import {
-
   createSession,
-
   revokeSession,
-
   revokeAllSessions,
-
   findSession,
-
   rotateSession,
-
   updateSessionUsage,
-
 } from "../utils/session.service.js";
 
 import RefreshToken from "../models/RefreshToken.model.js";
-
-
+import crypto from "crypto";
+import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/email.js";
 
 const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const REFRESH_TOKEN_COOKIE_OPTIONS = {
@@ -46,7 +33,6 @@ const REFRESH_TOKEN_COOKIE_OPTIONS = {
   maxAge: REFRESH_TOKEN_MAX_AGE,
   path: "/",
 };
-
 const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || "";
 
 
@@ -134,29 +120,20 @@ export const register = async (req, res) => {
       }
 
       if (!semester || !course) {
-
         return res
-
           .status(400)
-
           .json({ message: "Semester and course required for student" });
-
       }
-
       if (!course) {
-
         return res
-
           .status(400)
-
           .json({ message: "Course required for student" });
-
       }
-
-
 
       userData = { ...userData, studentId, semester, course };
-
+      if (department) {
+        userData.department = department;
+      }
     }
 
 
@@ -283,48 +260,22 @@ export const register = async (req, res) => {
 
     const user = await User.create(userData);
 
+    // Generate Verification Token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpires = verificationTokenExpires;
+    await user.save({ validateBeforeSave: false });
 
+    // Send Verification Email
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    await sendVerificationEmail(user, verificationUrl);
 
-    const accessToken = generateAccessToken(user);
-
-    const refreshToken = generateRefreshToken(user);
-
-
-
-    // Save session in database
-
-    const tokenHash = hashRefreshToken(refreshToken);
-
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    await createSession({
-
-      userId: user._id,
-
-      tokenHash,
-
-      deviceInfo: req.deviceInfo,
-
-      ipAddress: req.ipAddress,
-
-      expiresAt,
-
-    });
-
-
-
-    res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-
-
-
+    // Note: Not generating access tokens here because user must verify email first.
     res.status(201).json({
-
-      message: "Registered successfully",
-
-      accessToken,
-
+      message: "Registered successfully. Please check your email to verify your account.",
       user: { id: user._id, name: user.name, role: user.role },
-
     });
 
 
@@ -387,7 +338,13 @@ export const login = async (req, res) => {
 
     }
 
-
+    if (!user.isEmailVerified) {
+      return res.status(403).json({ 
+        message: "Please verify your email address to login.",
+        isEmailVerified: false,
+        email: user.email
+      });
+    }
 
     if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
 
@@ -651,8 +608,6 @@ export const logout = async (req, res) => {
 
 };
 
-
-
 export const getSessions = async (req, res) => {
 
   try {
@@ -785,4 +740,122 @@ export const deleteSession = async (req, res) => {
 
 };
 
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ message: "Token is required" });
 
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired verification token" });
+    }
+
+    user.isEmailVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    // Log verification
+    await logAction(user._id, "VERIFY_EMAIL", "Auth", user._id, { email: user.email });
+
+    res.json({ message: "Email verified successfully. You can now log in." });
+  } catch (err) {
+    console.error("Verify email error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ message: "Email is already verified" });
+    }
+
+    // Generate new token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpires = verificationTokenExpires;
+    await user.save({ validateBeforeSave: false });
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    await sendVerificationEmail(user, verificationUrl);
+
+    res.json({ message: "Verification email sent successfully" });
+  } catch (err) {
+    console.error("Resend verification email error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user) {
+      // Don't leak whether user exists or not
+      return res.json({ message: "If an account with that email exists, we have sent a password reset link." });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetTokenExpires;
+    await user.save({ validateBeforeSave: false });
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+    await sendPasswordResetEmail(user, resetUrl);
+
+    res.json({ message: "If an account with that email exists, we have sent a password reset link." });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired password reset token" });
+    }
+
+    user.password = await hashPassword(password, 8);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    await logAction(user._id, "RESET_PASSWORD", "Auth", user._id, { email: user.email });
+
+    res.json({ message: "Password has been successfully reset" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
