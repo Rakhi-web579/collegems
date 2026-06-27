@@ -28,13 +28,24 @@ import {
 
   findSession,
 
-  rotateSession
+  rotateSession,
+
+  updateSessionUsage,
 
 } from "../utils/session.service.js";
 
 import RefreshToken from "../models/RefreshToken.model.js";
 
 
+
+const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: REFRESH_TOKEN_MAX_AGE,
+  path: "/",
+};
 
 const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || "";
 
@@ -302,17 +313,7 @@ export const register = async (req, res) => {
 
 
 
-    res.cookie("refreshToken", refreshToken, {
-
-      httpOnly: true,
-
-      secure: process.env.NODE_ENV === "production",
-
-      sameSite: "strict",
-
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-
-    });
+    res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
 
 
@@ -426,17 +427,7 @@ export const login = async (req, res) => {
 
 
 
-    res.cookie("refreshToken", refreshToken, {
-
-      httpOnly: true,
-
-      secure: process.env.NODE_ENV === "production",
-
-      sameSite: "strict",
-
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-
-    });
+    res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
 
 
@@ -552,15 +543,7 @@ export const refresh = async (req, res) => {
 
       await revokeAllSessions(session.user);
 
-      res.clearCookie("refreshToken", {
-
-        httpOnly: true,
-
-        secure: process.env.NODE_ENV === "production",
-
-        sameSite: "strict",
-
-      });
+      res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
       return res.status(401).json({ message: "Token has been revoked/reused" });
 
@@ -620,17 +603,7 @@ export const refresh = async (req, res) => {
 
 
 
-    res.cookie("refreshToken", newRefreshToken, {
-
-      httpOnly: true,
-
-      secure: process.env.NODE_ENV === "production",
-
-      sameSite: "strict",
-
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-
-    });
+    res.cookie("refreshToken", newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
 
 
@@ -664,15 +637,7 @@ export const logout = async (req, res) => {
 
 
 
-    res.clearCookie("refreshToken", {
-
-      httpOnly: true,
-
-      secure: process.env.NODE_ENV === "production",
-
-      sameSite: "strict",
-
-    });
+    res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
     res.json({ message: "Logged out successfully" });
 
@@ -750,15 +715,7 @@ export const logoutAll = async (req, res) => {
 
     await revokeAllSessions(req.user.id);
 
-    res.clearCookie("refreshToken", {
-
-      httpOnly: true,
-
-      secure: process.env.NODE_ENV === "production",
-
-      sameSite: "strict",
-
-    });
+    res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
     res.json({ message: "Logged out from all sessions successfully" });
 
@@ -808,15 +765,7 @@ export const deleteSession = async (req, res) => {
 
       if (session.token === tokenHash) {
 
-        res.clearCookie("refreshToken", {
-
-          httpOnly: true,
-
-          secure: process.env.NODE_ENV === "production",
-
-          sameSite: "strict",
-
-        });
+        res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
       }
 
