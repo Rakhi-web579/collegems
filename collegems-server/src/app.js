@@ -18,8 +18,11 @@ import apiRouter from "./routes/index.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import tenantResolver from "./middlewares/tenantResolver.js";
 import log from "./utils/logger.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
+
+app.use(cookieParser());
 
 // ========================================
 // MIDDLEWARES
