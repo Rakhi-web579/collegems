@@ -54,6 +54,7 @@ import ToastTest from "./pages/ToastTest";
 import withRoleGuard from "./hocs/withRoleGuard";
 import { UserRole } from "./constants/role.constants";
 import AccessDenied from "./pages/AccessDenied";
+import RoleRoute from "./routes/RoleRoute";
 
 // Define Guarded Components
 const StudentDashboardGuarded = withRoleGuard(StudentDashboard, { allowedRoles: UserRole.STUDENT });
@@ -199,7 +200,7 @@ export default function App() {
     
         <Route
           path="/hod/bulk-reset"
-          element={<BulkFieldResetGuarded />}
+          element={<BulkFieldResetGuarded />} 
         />
      
 
