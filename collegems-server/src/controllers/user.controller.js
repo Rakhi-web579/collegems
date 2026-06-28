@@ -6,7 +6,8 @@ import { getPaginatedData } from "../utils/pagination.util.js";
 import calculateProfileCompletion from "../utils/profileCompletion.js";
 import Attendance from "../models/Attendance.model.js";
 import Results from "../models/Results.model.js";
-
+import crypto from "crypto";
+import { checkPotentialDuplicates } from "../services/duplicateDetection.service.js";
 const normalizeSettings = (settings) => {
   const safeSettings = settings || {};
   return {
@@ -49,7 +50,7 @@ export const getMe = async (req, res) => {
 
 export const updateMe = async (req, res) => {
   try {
-    const { name, email, phone, department, teacherId } = req.body;
+    const { name, email, phone, department, teacherId, bio, officeHours } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -78,8 +79,14 @@ export const updateMe = async (req, res) => {
 
     if (name) user.name = name;
     if (phone !== undefined) user.phone = phone;
-    if (department !== undefined) user.department = department;
-    if (teacherId !== undefined) user.teacherId = teacherId;
+    
+    // Teacher specific profile updates
+    if (user.role === 'teacher') {
+      if (department !== undefined) user.department = department;
+      if (teacherId !== undefined) user.teacherId = teacherId;
+      if (bio !== undefined) user.bio = bio;
+      if (officeHours !== undefined) user.officeHours = officeHours;
+    }
 
     user._updatedBy = req.user.id;
     await user.save();
@@ -179,13 +186,17 @@ export const updatePreferences = async (req, res) => {
 export const getStudentProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const student = await User.findOne({ _id: id, role: "student" }).select("-password");
+
+    const student = await User.findOne({
+      _id: id,
+      role: "student",
+    }).select("-password");
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    res.json(student);
+    res.status(200).json(student);
   } catch (error) {
     console.error("Error fetching student profile:", error);
     res.status(500).json({ message: "Server error" });
@@ -197,9 +208,10 @@ export const getStudents = async (req, res) => {
     const result = await getPaginatedData(User, req.query, {
       baseFilter: { role: "student" },
       searchFields: ["name", "email", "studentId"],
-      select: "name email role studentId course semester tags joinedAt lastUpdated",
+      select: "name email role studentId course semester department tags joinedAt lastUpdated",
       defaultSort: { name: 1 },
       defaultLimit: 20,
+      useTextSearch: true,
     });
 
     res.json(result);
@@ -349,6 +361,87 @@ export const unlockAcademicRecord = async (req, res) => {
     console.error("Unlock academic record error:", error);
     res.status(500).json({
       message: "Failed to unlock academic record",
+    });
+  }
+};
+export const createTeacher = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      teacherId,
+      department,
+      phone,
+      dob,
+      overrideDuplicates,
+    } = req.body || {};
+
+    if (!name || !email || !password || !teacherId || !department) {
+      return res.status(400).json({
+        message:
+          "Name, email, password, teacher ID and department are required",
+      });
+    }
+
+    const existing = await User.findOne({
+      email: email.trim().toLowerCase(),
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        message: "User already exists with this email",
+      });
+    }
+
+    let duplicates = [];
+
+if (!overrideDuplicates) {
+  duplicates = await checkPotentialDuplicates({
+    name,
+    email,
+    teacherId,
+    department,
+    phone,
+    dob,
+    role: "teacher",
+  });
+
+  if (duplicates.length > 0) {
+    return res.status(409).json({
+      isDuplicateWarning: true,
+      matches: duplicates,
+    });
+  }
+}
+
+    const teacher = await User.create({
+      name,
+      email: email.trim().toLowerCase(),
+      password: await hashPassword(password, 8),
+      role: "teacher",
+      teacherId,
+      department,
+      phone,
+      dob,
+    });
+
+    await logAction(
+      req.user.id,
+      "CREATE_TEACHER",
+      "User",
+      teacher._id,
+      {}
+    );
+
+    res.status(201).json({
+      message: "Teacher created successfully",
+      teacher,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({  
+      message: "Server error",
     });
   }
 };

@@ -144,15 +144,14 @@ router.delete(
   })
 );
 
-// Get all exam schedules
 router.get(
   "/all",
   protect,
   allowRoles("student", "teacher", "admin", "hod", "parent"),
-  async (req, res) => {
+  asyncHandler(async (req, res) => {
     const examSchedule = await ExamSchedule.find({});
     res.json({ success: true, data: examSchedule });
-  }
+  })
 );
 
 export default router;
