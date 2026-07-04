@@ -14,6 +14,9 @@ import StudentTransferHistory from "./hod-components/StudentTransferHistory";
 
 //import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import QuizTaker from "./user-components/QuizTaker";
 import HodDashboard from "./pages/HODDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import MainDashboard from "./pages/MainDashboard";
@@ -130,6 +133,11 @@ export default function App() {
         <Route
           path="/student/my-seat"
           element={<StudentSeatViewGuarded />}
+        />
+
+        <Route
+          path="/quiz/take/:id"
+          element={<ProtectedRoute><QuizTaker /></ProtectedRoute>}
         />
 
         <Route
