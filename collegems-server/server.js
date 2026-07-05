@@ -9,9 +9,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import { execSync } from "child_process";
-import { initializeStudyGroupSockets } from "./src/socket/studyGroupSocket.js";
 import { allowedOrigins } from "./src/config/cors.js";
-
+import configureSocketIO from "./src/socket/socket.js";
 const PORT = process.env.PORT || 5000;
 
 const freePort = () => {
@@ -49,49 +48,8 @@ startAttendanceCronJobs();
 
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
-  },
-});
 
-app.set("io", io);
-
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token || socket.handshake.query.token;
-  if (!token) {
-    return next(new Error("Authentication error"));
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    socket.user = decoded;
-    next();
-  } catch (err) {
-    next(new Error("Authentication error"));
-  }
-});
-
-io.on("connection", (socket) => {
-  const userId = socket.user?.id || socket.user?._id;
-  if (userId) {
-    socket.join(`user_${userId}`);
-    console.log(`User connected to socket: ${userId}`);
-  }
-
-  socket.on("disconnect", () => {
-    if (userId) console.log(`User disconnected from socket: ${userId}`);
-  });
-});
-
-initializeStudyGroupSockets(io);
+const io = configureSocketIO(httpServer, app);
 
 freePort();
 
