@@ -14,12 +14,14 @@ import {
   getStudentProfile,
   bulkAssignTags,
   unlockAcademicRecord,
+  createUser,
 } from "../controllers/user.controller.js";
 import { getCleanupSuggestions } from "../services/userCleanup.service.js";
 import { uploadResume } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
+router.post("/", protect, authorize("admin"), createUser);
 router.get("/me", protect, getMe);
 router.put("/me", protect, authorize("teacher", "hod"), updateMe);
 router.put(
