@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import {
   LayoutGrid, Users, GraduationCap, BookOpen, Building2, FileText,
@@ -42,6 +42,7 @@ import RiskDashboard from "./RiskDashboard";
 // For now, assuming it's in pages based on the previous error logs.
 // import SystemLogsDashboard from "./SystemLogsDashboard";
 import AttendanceAlertsWidget from "../teacher-components/AttendanceAlertsWidget";
+import TrackingWidget from "../hod-components/TrackingWidget";
 import SystemHealthDashboard from "../hod-components/SystemHealthDashboard";
 
 type TabType =
@@ -225,7 +226,7 @@ export default function HODDashboard() {
   const fetchSearchData = async () => {
     try {
       const [studentsRes, teachersRes, coursesRes] = await Promise.all([
-        api.get("/users/students?limit=200"),
+        api.get("/users/students?limit=0"),
         api.get("/users/teachers"),
         api.get("/courses/all"),
       ]);
@@ -392,6 +393,7 @@ export default function HODDashboard() {
 
             <div className="space-y-6">
               <AttendanceAlertsWidget />
+              <TrackingWidget />
             </div>
           </div>
         </div>

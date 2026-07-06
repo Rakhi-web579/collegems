@@ -193,11 +193,4 @@ router.get(
 // The new StackOverflow-style Comments Route!
 router.post("/:id/comments", protect, asyncHandler(addAssignmentComment));
 
-router.get(
-  "/reminders",
-  protect,
-  allowRoles("student"),
-  asyncHandler(getUpcomingAssignments)
-);
-
 export default router;

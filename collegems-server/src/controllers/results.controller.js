@@ -2,8 +2,7 @@ import Results from "../models/Results.model.js";
 import Student from "../models/User.model.js";
 import Course from "../models/Course.model.js";
 import { logAction } from "../utils/auditService.js";
-import { publishEvent } from "../utils/rabbitmq.js";
-import { checkSemesterFrozen } from "../services/semesterService.js";
+
 export const getResults = async (req, res) => {
     try {
         if (!req.user) {
@@ -56,9 +55,7 @@ export const createResult = async (req, res) => {
             status,
         } = req.body;
 
-        // ✅ find using Mongo _id
         const student = await Student.findById(studentId);
-
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
         }
@@ -68,11 +65,9 @@ export const createResult = async (req, res) => {
         }
 
         const course = await Course.findById(courseId);
-
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
-        await checkSemesterFrozen(course.semester);
 
         // Verify course ownership if user is a teacher
         if (req.user.role === "teacher" && course.teacher.toString() !== req.user.id) {
@@ -131,18 +126,15 @@ export const createResult = async (req, res) => {
 
 export const publishResult = async (req, res) => {
     try {
-        const existingResult = await Results.findById(req.params.id).populate("courseId");
-        if (!existingResult) return res.status(404).json({ message: "Result not found" });
-        
-        await checkSemesterFrozen(existingResult.courseId?.semester || existingResult.semester);
+        const result = await Results.findById(req.params.id);
+        if (!result) {
+            return res.status(404).json({ message: "Result record not found" });
+        }
 
-        const previousValue = { status: existingResult.status };
+        const previousValue = { status: result.status };
+        result.status = "published";
+        await result.save();
 
-        const result = await Results.findByIdAndUpdate(
-            req.params.id,
-            { status: "published" },
-            { new: true, editorId: req.user.id }
-        );
         res.json(result);
 
         // Log result publish with rich audit details
@@ -152,22 +144,70 @@ export const publishResult = async (req, res) => {
             previousValue,
             newValue: { status: "published" },
         });
-        
-        // Publish Domain Event
-        publishEvent("academics", "result.published", {
-            studentId: result.studentId,
-            courseId: result.courseId,
-            resultId: result._id,
-            timestamp: new Date()
-        });
-        
-        await Student.findByIdAndUpdate(
-          result.studentId,
-          { academicRecordLocked: true }
-        );
     } catch (error) {
         console.error("Publish Result Error:", error);
-        if (error.status === 403) return res.status(403).json({ message: error.message });
         res.status(500).json({ message: "Publish failed" });
+    }
+};
+
+// Preview which draft results would be published for a given course/semester,
+// without changing anything. Lets a HOD review before committing to publishAll.
+export const publishPreview = async (req, res) => {
+    try {
+        const { courseId, semester } = req.query;
+
+        const filter = { status: "draft" };
+        if (courseId) filter.courseId = courseId;
+        if (semester) filter.semester = semester;
+
+        const drafts = await Results.find(filter)
+            .populate("studentId", "name email studentId")
+            .populate("courseId", "name code");
+
+        res.json({
+            success: true,
+            count: drafts.length,
+            data: drafts,
+        });
+    } catch (error) {
+        console.error("Publish Preview Error:", error);
+        res.status(500).json({ message: "Failed to load publish preview" });
+    }
+};
+
+// Bulk-publishes every draft result matching the given course/semester filter.
+// Mirrors publishResult's single-record behaviour, but for many records at once.
+export const publishAll = async (req, res) => {
+    try {
+        const { courseId, semester } = req.body;
+
+        const filter = { status: "draft" };
+        if (courseId) filter.courseId = courseId;
+        if (semester) filter.semester = semester;
+
+        const drafts = await Results.find(filter);
+
+        if (drafts.length === 0) {
+            return res.json({ success: true, message: "No draft results to publish", count: 0 });
+        }
+
+        await Results.updateMany(filter, { $set: { status: "published" } });
+
+        res.json({
+            success: true,
+            message: `Published ${drafts.length} result(s)`,
+            count: drafts.length,
+        });
+
+        // Log bulk publish with rich audit details
+        await logAction(req.user.id, "PUBLISH_ALL_RESULTS", "Result", null, {
+            userRole: req.user.role,
+            filter: { courseId: courseId || null, semester: semester || null },
+            publishedCount: drafts.length,
+            resultIds: drafts.map((r) => r._id),
+        });
+    } catch (error) {
+        console.error("Publish All Error:", error);
+        res.status(500).json({ message: "Bulk publish failed" });
     }
 };
