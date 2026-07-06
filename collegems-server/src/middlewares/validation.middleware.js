@@ -16,8 +16,8 @@ export const validateRegister = [
     .withMessage("Name must be between 2 and 100 characters")
     .escape(),
   body("role")
-    .isIn(["student", "teacher", "parent", "hod"])
-    .withMessage("Role must be one of: student, teacher, parent, hod"),
+    .isIn(["student", "teacher", "parent"])
+    .withMessage("Role must be one of: student, teacher, parent"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
