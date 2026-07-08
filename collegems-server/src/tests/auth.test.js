@@ -74,7 +74,7 @@ test("Authentication and Registration Flow Tests", async (t) => {
       });
 
     assert.strictEqual(res.status, 201);
-    assert.strictEqual(res.body.message, "Registered successfully");
+    assert.strictEqual(res.body.message, "Registered successfully. Please check your email to verify your account.");
     assert.strictEqual(res.body.user.role, "student");
   });
 
@@ -91,7 +91,7 @@ test("Authentication and Registration Flow Tests", async (t) => {
       });
 
     assert.strictEqual(res.status, 201);
-    assert.strictEqual(res.body.message, "Registered successfully");
+    assert.strictEqual(res.body.message, "Registered successfully. Please check your email to verify your account.");
     assert.strictEqual(res.body.user.role, "teacher");
   });
 
@@ -109,7 +109,7 @@ test("Authentication and Registration Flow Tests", async (t) => {
       });
 
     assert.strictEqual(res.status, 201);
-    assert.strictEqual(res.body.message, "Registered successfully");
+    assert.strictEqual(res.body.message, "Registered successfully. Please check your email to verify your account.");
     assert.strictEqual(res.body.user.role, "parent");
   });
 
