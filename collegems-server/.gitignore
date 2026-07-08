@@ -31,4 +31,3 @@ uploads/**
 secure-uploads/**
 !secure-uploads/**/
 !secure-uploads/**/.gitkeep
-

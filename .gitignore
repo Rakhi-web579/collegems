@@ -10,4 +10,3 @@ collegems-server/uploads/**
 collegems-server/secure-uploads/**
 !collegems-server/secure-uploads/**/
 !collegems-server/secure-uploads/**/.gitkeep
-
