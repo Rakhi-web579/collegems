@@ -54,6 +54,7 @@ import RiskDashboard from "./RiskDashboard";
 import AttendanceAlertsWidget from "../teacher-components/AttendanceAlertsWidget";
 import TrackingWidget from "../hod-components/TrackingWidget";
 import SystemHealthDashboard from "../hod-components/SystemHealthDashboard";
+import HodAnalyticsWidget from "../components/AnalyticsWidgets/HodAnalyticsWidget";
 
 type TabType =
   | "overview"
@@ -89,6 +90,7 @@ type TabType =
   | "data-locks"
   | "sequence-repair"
   | "form-insights"
+  | "department-analytics"
   | "workflow-admin"
   | "workflow-approvals";
 
@@ -174,6 +176,7 @@ export default function HODDashboard() {
     { id: "risk-dashboard" as TabType, label: "Predictive Analytics", icon: LayoutGrid },
     { id: "workflow-admin" as TabType, label: "Workflow Builder", icon: Settings },
     { id: "workflow-approvals" as TabType, label: "Pending Approvals", icon: Activity },
+    { id: "department-analytics" as TabType, label: "Department Analytics", icon: LayoutGrid },
   ];
 
   // Fetch data on mount
@@ -575,6 +578,7 @@ export default function HODDashboard() {
         { activeTab === "risk-dashboard" && <RiskDashboard /> }
         { activeTab === "workflow-admin" && <WorkflowAdmin /> }
         { activeTab === "workflow-approvals" && <WorkflowApprovals /> }
+        { activeTab === "department-analytics" && <HodAnalyticsWidget /> }
       </>
     );
   };
