@@ -11,6 +11,7 @@ import {
   Briefcase,
   ShieldCheck,
   User,
+  MessageSquare,
 } from "lucide-react";
 import HodCourses from "../teacher-components/Courses";
 import TeacherAssignments from "../teacher-components/Assignment";
@@ -43,7 +44,7 @@ import AttendanceAlertsWidget from "../teacher-components/AttendanceAlertsWidget
 import UserWorkflows from "../user-components/UserWorkflows";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import TeacherProfile from "../teacher-components/TeacherProfile";
-
+import TeacherFeedback from "../teacher-components/TeacherFeedback";
 interface TeacherDashboardProps {
   initialTab?: string;
 }
@@ -132,6 +133,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
     { id: "plagiarism-checker", label: "Plagiarism Checker", icon: ShieldCheck },
     { id: "risk-dashboard", label: "Predictive Analytics", icon: LayoutDashboard },
     { id: "user-workflows", label: "My Workflows", icon: FileText },
+    { id: "feedback", label: "Student Feedback", icon: MessageSquare },
   ];
 
   const activeTabLabel = activeTab === "settings" ? "Settings"
@@ -410,6 +412,7 @@ export default function TeacherDashboard({ initialTab }: TeacherDashboardProps) 
           {activeTab === "plagiarism-checker" && <PlagiarismChecker />}
           {activeTab === "risk-dashboard" && <RiskDashboard />}
           {activeTab === "user-workflows" && <UserWorkflows />}
+          {activeTab === "feedback" && <TeacherFeedback />} 
           {activeTab === "announcements" && (
             <div className="space-y-8">
               <AnnouncementForm onSuccess={() => setRefreshAnnouncements((k) => k + 1)} />
