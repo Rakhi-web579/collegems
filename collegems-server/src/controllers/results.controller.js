@@ -2,6 +2,7 @@ import Results from "../models/Results.model.js";
 import Student from "../models/User.model.js";
 import Course from "../models/Course.model.js";
 import { logAction } from "../utils/auditService.js";
+import { checkSemesterFrozen } from "../services/semesterService.js";
 
 export const getResults = async (req, res) => {
     try {
@@ -85,10 +86,13 @@ export const createResult = async (req, res) => {
             });
         }
 
+        const effectiveSemester = semester || student.semester;
+        await checkSemesterFrozen(effectiveSemester);
+
         const result = await Results.create({
             studentId,
             courseId,
-            semester: semester || student.semester,
+            semester: effectiveSemester,
             internalMarks,
             externalMarks,
             practicalMarks,
@@ -108,7 +112,7 @@ export const createResult = async (req, res) => {
             newValue: {
                 studentId,
                 courseId,
-                semester: semester || student.semester,
+                semester: effectiveSemester,
                 internalMarks,
                 externalMarks,
                 practicalMarks,
@@ -131,6 +135,8 @@ export const publishResult = async (req, res) => {
             return res.status(404).json({ message: "Result record not found" });
         }
 
+        await checkSemesterFrozen(result.semester);
+
         const previousValue = { status: result.status };
         result.status = "published";
         await result.save();
@@ -145,6 +151,7 @@ export const publishResult = async (req, res) => {
             newValue: { status: "published" },
         });
     } catch (error) {
+        if (error.status === 403) return res.status(403).json({ message: error.message });
         console.error("Publish Result Error:", error);
         res.status(500).json({ message: "Publish failed" });
     }
@@ -191,6 +198,11 @@ export const publishAll = async (req, res) => {
             return res.json({ success: true, message: "No draft results to publish", count: 0 });
         }
 
+        const affectedSemesters = [...new Set(drafts.map((r) => r.semester))];
+        for (const sem of affectedSemesters) {
+            await checkSemesterFrozen(sem);
+        }
+
         await Results.updateMany(filter, { $set: { status: "published" } });
 
         res.json({
@@ -207,6 +219,7 @@ export const publishAll = async (req, res) => {
             resultIds: drafts.map((r) => r._id),
         });
     } catch (error) {
+        if (error.status === 403) return res.status(403).json({ message: error.message });
         console.error("Publish All Error:", error);
         res.status(500).json({ message: "Bulk publish failed" });
     }
