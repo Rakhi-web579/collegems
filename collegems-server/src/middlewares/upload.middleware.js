@@ -53,7 +53,11 @@ const resumeStorage = multer.diskStorage({
     cb(null, "uploads/resumes/");
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`); 
+    // Never derive the on-disk filename from the attacker-controlled
+    // originalname (e.g. "../../../server.js") - generate one and rely on
+    // resumeFilter below to guarantee the upload is a PDF.
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${uniqueSuffix}.pdf`);
   },
 });
 
