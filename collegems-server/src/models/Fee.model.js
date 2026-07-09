@@ -11,6 +11,9 @@ const installmentSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    idempotencyKey: {
+      type: String,
+    },
   },
   { _id: false },
 );

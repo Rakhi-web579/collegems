@@ -46,11 +46,21 @@ router.post(
   })
 );
 
+const computeFeeStatus = (paid, total, dueDate) => {
+  if (paid >= total) return "Paid";
+  if (new Date(dueDate) < new Date()) return "Overdue";
+  if (paid > 0) return "Partial";
+  return "Pending";
+};
+
 // installment pay
 router.post("/pay", protect, allowRoles("student", "parent"), asyncHandler(async (req, res) => {
-  const { amount } = req.body;
+  const { amount, idempotencyKey } = req.body;
   if (!amount || amount <= 0) {
     throw new AppError("Valid amount is required", 400, "INVALID_AMOUNT");
+  }
+  if (!idempotencyKey || typeof idempotencyKey !== "string") {
+    throw new AppError("idempotencyKey is required", 400, "MISSING_IDEMPOTENCY_KEY");
   }
 
   let studentId = req.user.id;
@@ -66,14 +76,46 @@ router.post("/pay", protect, allowRoles("student", "parent"), asyncHandler(async
     studentId = studentUser._id;
   }
 
-  const fee = await Fee.findOne({ student: studentId });
+  // Atomically apply the payment: only matches (and increments) if this exact
+  // idempotency key hasn't already been applied, and the payment won't overpay.
+  let fee = await Fee.findOneAndUpdate(
+    {
+      student: studentId,
+      "installments.idempotencyKey": { $ne: idempotencyKey },
+      $expr: { $lte: [{ $add: ["$paid", amount] }, "$total"] },
+    },
+    {
+      $inc: { paid: amount },
+      $push: { installments: { amount, idempotencyKey, paidOn: new Date() } },
+    },
+    { new: true },
+  );
+
   if (!fee) {
-    throw new AppError("Fee record not found", 404, "NOT_FOUND");
+    const existing = await Fee.findOne({ student: studentId });
+    if (!existing) {
+      throw new AppError("Fee record not found", 404, "NOT_FOUND");
+    }
+    const alreadyApplied = existing.installments.some((i) => i.idempotencyKey === idempotencyKey);
+    if (alreadyApplied) {
+      log.info(`Duplicate payment submission ignored: ${idempotencyKey}`, { studentId, feeId: existing._id });
+      return res.json({
+        success: true,
+        message: "Payment already processed",
+        data: existing,
+      });
+    }
+    throw new AppError(
+      `Amount exceeds outstanding balance of ${existing.total - existing.paid}`,
+      400,
+      "OVERPAYMENT",
+    );
   }
 
-  fee.installments.push({ amount });
-  fee.paid += amount;
-  await fee.save();
+  const status = computeFeeStatus(fee.paid, fee.total, fee.dueDate);
+  if (fee.status !== status) {
+    fee = await Fee.findByIdAndUpdate(fee._id, { $set: { status } }, { new: true });
+  }
 
   log.info(`Payment made: ${amount}`, { studentId, feeId: fee._id });
   res.json({
