@@ -26,7 +26,7 @@ const freePort = () => {
   }
 };
 
-if (!process.env.MONGO_URI) {
+if (process.env.USE_MEMORY_DB !== "true" && !process.env.MONGO_URI) {
   console.error(
     "Missing MONGO_URI in .env. Please set MONGO_URI to your MongoDB connection string.",
   );
