@@ -1,10 +1,21 @@
 // index.js or server.js
 
 import dotenv from "dotenv";
-import { initializeApp } from "./src/bootstrap/index.js";
-import compression from "compression";
+dotenv.config();
 
-if (process.env.USE_MEMORY_DB !== "true" && !process.env.MONGO_URI) {
+import app from "./src/app.js";
+import { connectDB } from "./src/config/db.js";
+import { startFeeCronJobs, startAnalyticsCronJobs, startLibraryCronJobs, startAttendanceCronJobs } from "./src/utils/cronJobs.js";
+
+import { createServer } from "http";
+import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
+import { initializeStudyGroupSockets } from "./src/socket/studyGroupSocket.js";
+import { allowedOrigins } from "./src/config/cors.js";
+
+const PORT = process.env.PORT || 5000;
+
+if (!process.env.MONGO_URI) {
   console.error(
     "Missing MONGO_URI in .env. Please set MONGO_URI to your MongoDB connection string.",
   );
@@ -176,85 +187,15 @@ process.on('unhandledRejection', (reason, promise) => {
     }
 });
 
-// ============================================
-// SERVER INITIALIZATION
-// ============================================
-
-// Apply compression middleware BEFORE starting the app
-if (config.compression.enabled) {
-    logger.info('Compression middleware enabled', {
-        level: config.compression.level,
-        threshold: `${config.compression.threshold} bytes`
-    });
-}
-
-/**
- * Start the application with error handling
- */
-const startServer = async () => {
-    try {
-        // Initialize the application
-        const app = await initializeApp(config);
-        
-        // Apply compression middleware
-        if (config.compression.enabled) {
-            app.use(compression({
-                level: config.compression.level,
-                threshold: config.compression.threshold,
-                memLevel: config.compression.memLevel,
-                chunkSize: config.compression.chunkSize,
-                filter: config.compression.filter
-            }));
-        }
-        
-        // Start listening
-        const server = app.listen(config.port, () => {
-            logger.start(config.port);
-        });
-        
-        // Store server instance for graceful shutdown
-        global.__server = server;
-        
-        return { app, server };
-        
-    } catch (error) {
-        logger.error('Failed to start server:', error);
-        process.exit(1);
-    }
-};
-
-// ============================================
-// HEALTH CHECK ENDPOINT (Optional)
-// ============================================
-
-// If you want to add health check endpoint
-const addHealthCheck = (app) => {
-    app.get('/health', (req, res) => {
-        res.json({
-            status: 'healthy',
-            uptime: process.uptime(),
-            timestamp: new Date().toISOString(),
-            environment: config.env,
-            compression: {
-                enabled: config.compression.enabled,
-                level: config.compression.level
-            }
-        });
-    });
-    
-    app.get('/ping', (req, res) => {
-        res.status(200).send('pong');
-    });
-};
-
-// ============================================
-// EXPORT
-// ============================================
-
-// Execute the centralized bootstrap sequence
-startServer().catch(error => {
-    console.error('Fatal error during startup:', error);
-    process.exit(1);
+httpServer.once("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`Port ${PORT} is already in use. Free it or set PORT to a different value.`);
+  } else {
+    console.error(`Failed to start server on port ${PORT}:`, err.message);
+  }
+  process.exit(1);
 });
 
-export { config, logger, startServer };
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
