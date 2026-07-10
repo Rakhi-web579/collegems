@@ -43,6 +43,7 @@ import officeHoursRoutes from "./officeHours.routes.js";
 
 // Student Services
 import idCardRoutes from "./idcard.routes.js";
+import transferRoutes from "./transfer.routes.js";
 
 // Community & Engagement
 import eventRoute from "./event.routes.js";
@@ -111,7 +112,7 @@ router.use("/faculty-assignments", facultyAssignmentRoutes);
 // ACADEMIC ROUTES
 // ========================================
 router.use("/attendance", authenticate, attendanceRoutes);
-router.use("/assignment", authenticate, assignmentRoutes);
+router.use("/assignment", assignmentRoutes);
 router.use("/results", authenticate, resultsRoutes);
 router.use("/assessments", authenticate, assessmentRoutes);
 router.use("/courses", courseRoutes);
@@ -149,6 +150,7 @@ router.use("/office-hours", officeHoursRoutes);
 // ========================================
 router.use("/student/idcard", idCardRoutes);
 router.get("/verify/student/:studentId", authenticate, verifyStudent);
+router.use("/transfer", authenticate, transferRoutes);
 
 // ========================================
 // COMMUNITY & ENGAGEMENT

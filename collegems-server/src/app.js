@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import httpContext from "express-http-context";
 import { v4 as uuidv4 } from "uuid";
+
 // Add this line near your other imports at the top of app.js
 import resourceRoutes from "./routes/resource.routes.js";
 // Auth & Core
@@ -37,6 +38,14 @@ import visitorRoutes from "./routes/visitors.routes.js";
 import transferRoutes from "./routes/transfer.routes.js";
 import scholarshipRoutes from "./routes/scholarship.routes.js";
 import { authenticate } from "./middlewares/auth.middleware.js";
+import syllabusRoutes from "./routes/syllabus.route.js";
+import idCardRoutes from "./routes/idcard.routes.js";
+import { verifyStudent } from "./controllers/idcard.controller.js";
+import busRouteRoutes from "./routes/busRoute.routes.js";
+import officeHoursRoutes from "./routes/officeHours.routes.js";
+import examHallRoutes from "./routes/examHall.routes.js";
+import hallAllocationRoutes from "./routes/hallAllocation.routes.js";
+import Tenant from "./models/Tenant.model.js";
 // Apply Global Multi-Tenant Plugin
 import tenantPlugin from "./utils/tenantPlugin.js";
 mongoose.plugin(tenantPlugin);
@@ -91,7 +100,7 @@ app.use("/api/auth",      authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/attendance",        authenticate, attendanceRoutes);
-app.use("/api/assignment",        authenticate, assignmentRoutes);
+app.use("/api/assignment",        assignmentRoutes);
 app.use("/api/teacher-attendance", teacherAttendanceRoutes);
 app.use("/api/events",            eventRoute);
 app.use("/api/results",           authenticate, resultsRoutes);
@@ -116,12 +125,20 @@ app.use("/api/scholarships", authenticate, scholarshipRoutes);
 app.use("/api/examschedule", authenticate, examScheduleRoutes);
 app.use("/api/exam-forms", examFormRoutes);
 app.use("/api/academic-calendar", academicCalendarRoutes);
-app.use("/api/reports", reportRoutes);
-app.use("/api/visitors", visitorRoutes);
+app.use("/api/syllabus", authenticate, syllabusRoutes);
+app.use("/api/reports",         reportRoutes);
+app.use("/api/feedback",        authenticate, feedbackRoutes);
+app.use("/api/student/idcard", idCardRoutes);
+app.get("/api/verify/student/:studentId", verifyStudent);
+app.use("/api/bus-routes", authenticate, busRouteRoutes);
+app.use("/api/office-hours", officeHoursRoutes);
+app.use("/api/exam-halls", authenticate, examHallRoutes);
+app.use("/api/hall-allocations", authenticate, hallAllocationRoutes);
+app.use("/api/mentorships", mentorshipRoutes);
+app.use("/api/complaints", complaintRoutes);
 
-// TODO: Multi-tenancy is not yet supported by the frontend or seeder
-// import tenantResolver from "./middlewares/tenantResolver.js";
-// app.use(tenantResolver);
+// Health check
+app.get("/", (_req, res) => res.send("SCMS Backend Running 🚀"));
 
 // ========================================
 // MOUNT ALL ROUTES UNDER /api

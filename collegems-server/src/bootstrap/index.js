@@ -13,9 +13,12 @@ import jwt from "jsonwebtoken";
 import { execSync } from "child_process";
 import { initializeStudyGroupSockets } from "../socket/studyGroupSocket.js";
 import { allowedOrigins } from "../config/cors.js";
-
-// ✅ IMPORT PROCESS ERROR HANDLERS
 import { registerProcessErrorHandlers } from "../utils/processErrorHandlers.js";
+import helmet from "helmet";
+registerProcessErrorHandlers();
+
+
+
 
 // ✅ REGISTER ERROR HANDLERS - SABSE PEHLE
 registerProcessErrorHandlers();

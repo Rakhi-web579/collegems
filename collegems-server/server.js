@@ -1,32 +1,17 @@
 // index.js or server.js
 
 import dotenv from "dotenv";
-import { initializeApp } from "./src/bootstrap/index.js";
+dotenv.config();
+
 import compression from "compression";
+import { initializeApp } from "./src/bootstrap/index.js";
+
+const PORT = process.env.PORT || 5000;
 
 // ============================================
-// ENVIRONMENT CONFIGURATION
+// ENVIRONMENT VARIABLES VALIDATION
 // ============================================
-
-// Load environment variables based on NODE_ENV
-const envFile = process.env.NODE_ENV === 'production' 
-    ? '.env.production' 
-    : process.env.NODE_ENV === 'staging' 
-        ? '.env.staging' 
-        : '.env';
-
-dotenv.config({ 
-    path: envFile,
-    debug: process.env.NODE_ENV === 'development'
-});
-
-// Validate required environment variables
-const requiredEnvVars = [
-    'PORT',
-    'NODE_ENV',
-    // Add other required env vars
-];
-
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
@@ -41,9 +26,8 @@ if (missingEnvVars.length > 0) {
 // ============================================
 // CONFIGURATION
 // ============================================
-
 const config = {
-    port: parseInt(process.env.PORT) || 3000,
+    port: parseInt(process.env.PORT) || 5000,
     env: process.env.NODE_ENV || 'development',
     isProduction: process.env.NODE_ENV === 'production',
     isDevelopment: process.env.NODE_ENV === 'development',
@@ -57,18 +41,8 @@ const config = {
         memLevel: parseInt(process.env.COMPRESSION_MEM_LEVEL) || 8,
         chunkSize: parseInt(process.env.COMPRESSION_CHUNK_SIZE) || 16384,
         filter: (req, res) => {
-            // Skip compression for specific requests
-            if (req.path === '/health' || req.path === '/ping') {
-                return false;
-            }
-            
-            // Skip compression for small responses
-            if (res.getHeader('content-length') && 
-                parseInt(res.getHeader('content-length')) < 1024) {
-                return false;
-            }
-            
-            // Default filter
+            if (req.path === '/health' || req.path === '/ping') return false;
+            if (res.getHeader('content-length') && parseInt(res.getHeader('content-length')) < 1024) return false;
             return compression.filter(req, res);
         }
     },
@@ -95,43 +69,12 @@ const config = {
         level: process.env.LOG_LEVEL || 'info',
         format: process.env.NODE_ENV === 'production' ? 'combined' : 'dev',
         silent: process.env.NODE_ENV === 'test'
-    },
-    
-    // Security
-    security: {
-        helmet: {
-            contentSecurityPolicy: {
-                directives: {
-                    defaultSrc: ["'self'"],
-                    scriptSrc: ["'self'", "'unsafe-inline'"],
-                    styleSrc: ["'self'", "'unsafe-inline'"],
-                    imgSrc: ["'self'", "data:", "https:"],
-                }
-            },
-            hsts: {
-                maxAge: 31536000,
-                includeSubDomains: true,
-                preload: true
-            }
-        },
-        session: {
-            secret: process.env.SESSION_SECRET || 'default-secret-change-me',
-            resave: false,
-            saveUninitialized: false,
-            cookie: {
-                secure: process.env.NODE_ENV === 'production',
-                httpOnly: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-                sameSite: 'lax'
-            }
-        }
     }
 };
 
 // ============================================
 // LOGGER
 // ============================================
-
 const logger = {
     info: (message, data = {}) => {
         if (config.logging.level === 'silent') return;
@@ -164,87 +107,27 @@ const logger = {
 // ============================================
 // GRACEFUL SHUTDOWN HANDLERS
 // ============================================
-
 const handleShutdown = (signal) => {
     logger.shutdown(signal);
-    
-    // In production, close database connections, etc.
-    // await db.close();
-    // await redis.quit();
-    
     process.exit(0);
 };
 
 process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 process.on('SIGINT', () => handleShutdown('SIGINT'));
 
-// Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
     logger.error('Uncaught Exception:', error);
-    if (config.isProduction) {
-        process.exit(1);
-    }
+    if (config.isProduction) process.exit(1);
 });
 
-// Handle unhandled rejections
 process.on('unhandledRejection', (reason, promise) => {
     logger.error('Unhandled Rejection at:', { reason, promise });
-    if (config.isProduction) {
-        process.exit(1);
-    }
+    if (config.isProduction) process.exit(1);
 });
 
-// ============================================
-// SERVER INITIALIZATION
-// ============================================
-
-// Apply compression middleware BEFORE starting the app
-if (config.compression.enabled) {
-    logger.info('Compression middleware enabled', {
-        level: config.compression.level,
-        threshold: `${config.compression.threshold} bytes`
-    });
-}
-
-/**
- * Start the application with error handling
- */
-const startServer = async () => {
-    try {
-        // 1. Destructure both the app and the httpServer from your function
-        const { app, httpServer } = await initializeApp(config);
-        
-        // 2. Apply compression middleware to the app
-        if (config.compression.enabled) {
-            app.use(compression({
-                level: config.compression.level,
-                threshold: config.compression.threshold,
-                memLevel: config.compression.memLevel,
-                chunkSize: config.compression.chunkSize,
-                filter: config.compression.filter
-            }));
-        }
-        
-        // 3. IMPORTANT: Call .listen() on the httpServer, NOT the app!
-        const server = httpServer.listen(config.port, () => {
-            logger.start(config.port);
-        });
-        
-        // Store server instance for graceful shutdown
-        global.__server = server;
-        
-        return { app, server };
-        
-    } catch (error) {
-        logger.error('Failed to start server:', error);
-        process.exit(1);
-    }
-};
 // ============================================
 // HEALTH CHECK ENDPOINT (Optional)
 // ============================================
-
-// If you want to add health check endpoint
 const addHealthCheck = (app) => {
     app.get('/health', (req, res) => {
         res.json({
@@ -265,7 +148,63 @@ const addHealthCheck = (app) => {
 };
 
 // ============================================
-// EXPORT
+// SERVER INITIALIZATION
+// ============================================
+
+/**
+ * Start the application with error handling
+ */
+const startServer = async () => {
+    try {
+        // 1. Destructure both the app and the httpServer from bootstrap
+        const { app, httpServer } = await initializeApp(config);
+        
+        // 2. Apply compression middleware to the app
+        if (config.compression.enabled) {
+            app.use(compression({
+                level: config.compression.level,
+                threshold: config.compression.threshold,
+                memLevel: config.compression.memLevel,
+                chunkSize: config.compression.chunkSize,
+                filter: config.compression.filter
+            }));
+            logger.info('Compression middleware enabled', {
+                level: config.compression.level,
+                threshold: `${config.compression.threshold} bytes`
+            });
+        }
+
+        // 3. Add health checks
+        addHealthCheck(app);
+
+        // 4. Handle port conflicts gracefully
+        httpServer.once("error", (err) => {
+            if (err.code === "EADDRINUSE") {
+                logger.error(`Port ${config.port} is already in use. Free it or set PORT to a different value.`);
+            } else {
+                logger.error(`Failed to start server on port ${config.port}:`, err.message);
+            }
+            process.exit(1);
+        });
+        
+        // 5. Start listening!
+        const server = httpServer.listen(config.port, () => {
+            logger.start(config.port);
+        });
+        
+        // Store server instance for graceful shutdown
+        global.__server = server;
+        
+        return { app, server };
+        
+    } catch (error) {
+        logger.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+// ============================================
+// EXPORT & EXECUTE
 // ============================================
 
 // Execute the centralized bootstrap sequence
@@ -273,5 +212,3 @@ startServer().catch(error => {
     console.error('Fatal error during startup:', error);
     process.exit(1);
 });
-
-export { config, logger, startServer };
