@@ -10,6 +10,7 @@ import {
   updatePreferences,
   getStudents,
   uploadResumeFile,
+  downloadResumeFile,
   getStudentSummary,
   getStudentProfile,
   bulkAssignTags,
@@ -18,7 +19,7 @@ import {
   createTeacher,
 } from "../controllers/user.controller.js";
 import { getCleanupSuggestions } from "../services/userCleanup.service.js";
-import { uploadResume } from "../middlewares/upload.middleware.js";
+import { uploadResume, validateResumeFile } from "../middlewares/upload.middleware.js";
 import { auditAction } from "../middlewares/audit.middleware.js";
 
 const router = express.Router();
@@ -52,7 +53,16 @@ router.post(
   protect,
   authorize("student", "alumni"),
   uploadResume.single("resume"),
+  validateResumeFile,
   uploadResumeFile
+);
+
+// Resume Download - authenticated, not served via express.static
+router.get(
+  "/me/resume",
+  protect,
+  authorize("student", "alumni"),
+  downloadResumeFile
 );
 
 // Teacher fetches all students (Paginated)
@@ -107,4 +117,3 @@ router.put(
 );
 
 export default router;
-

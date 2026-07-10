@@ -6,14 +6,15 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import BulkFieldReset from "./hod-components/BulkFieldReset";
-
-import TimeTable from "./user-components/TimeTable";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentTransferHistory from "./hod-components/StudentTransferHistory";
-//import TimeTable from "./user-components/TimeTable";
+import TimeTable from "./user-components/TimeTable";
 
 //import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import QuizTaker from "./user-components/QuizTaker";
 import HodDashboard from "./pages/HODDashboard";
 import ParentDashboard from "./pages/ParentDashboard";
 import MainDashboard from "./pages/MainDashboard";
@@ -30,6 +31,7 @@ import SemesterRegistration from "./user-components/SemesterRegistration";
 //import TimeTable from "./user-components/TimeTable";
 import DashboardLayout from "./layouts/DashboardLayout";
 
+import DashboardLayout from "./layouts/DashboardLayout";
 import LostFoundPortal from "./pages/LostFoundPortal";
 import VerifyStudent from "./pages/VerifyStudent";
 import RiskDashboard from "./pages/RiskDashboard";
@@ -44,8 +46,10 @@ import AuditLogs from "./hod-components/AuditLogs";
 import ResourceBooking from "./user-components/ResourceBooking";
 import BookingManagement from "./hod-components/BookingManagement";
 import ResourceManagement from "./hod-components/ResourceManagement";
+import FeePaymentApprovals from "./hod-components/FeePaymentApprovals";
 import AnnouncementForm from "./common-components-management/AnnouncementForm";
 import AnnouncementManage from "./common-components-management/AnnouncementManage";
+import DataTableDemo from "./pages/DataTableDemo";
 
 import { PwaManager } from "./components/PwaManager";
 import ToastTest from "./pages/ToastTest";
@@ -54,6 +58,7 @@ import ToastTest from "./pages/ToastTest";
 import withRoleGuard from "./hocs/withRoleGuard";
 import { UserRole } from "./constants/role.constants";
 import AccessDenied from "./pages/AccessDenied";
+import NotFound from "./pages/NotFound";
 import RoleRoute from "./routes/RoleRoute";
 
 // Define Guarded Components
@@ -73,6 +78,7 @@ const HallAllocationGuarded = withRoleGuard(HallAllocation, { allowedRoles: User
 const AuditLogsGuarded = withRoleGuard(AuditLogs, { allowedRoles: UserRole.HOD });
 const BookingManagementGuarded = withRoleGuard(BookingManagement, { allowedRoles: UserRole.HOD });
 const ResourceManagementGuarded = withRoleGuard(ResourceManagement, { allowedRoles: UserRole.HOD });
+const FeePaymentApprovalsGuarded = withRoleGuard(FeePaymentApprovals, { allowedRoles: UserRole.HOD });
 const BulkFieldResetGuarded = withRoleGuard(BulkFieldReset, { allowedRoles: UserRole.HOD });
 
 const ParentDashboardGuarded = withRoleGuard(ParentDashboard, { allowedRoles: UserRole.PARENT });
@@ -101,6 +107,7 @@ export default function App() {
 />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/datatable-demo" element={<DataTableDemo />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -116,12 +123,11 @@ export default function App() {
           <Route path="/timetable" element={ <TimeTable /> } />
         </Route>
 
-        {/* Student Routes */}
+        {/* Role-based dashboards */}
         <Route
           path="/student/dashboard"
           element={<StudentDashboardGuarded />}
         />
-
         <Route
           path="/student/exam-form"
           element={<ExaminationFormPageGuarded />}
@@ -130,6 +136,11 @@ export default function App() {
         <Route
           path="/student/my-seat"
           element={<StudentSeatViewGuarded />}
+        />
+
+        <Route
+          path="/quiz/take/:id"
+          element={<ProtectedRoute><QuizTaker /></ProtectedRoute>}
         />
 
         <Route
@@ -157,17 +168,15 @@ export default function App() {
           path="/hod/dashboard"
           element={<HodDashboardGuarded />}
         />
-
         <Route
           path="/hod/reports"
-          element={<ReportGeneratorGuarded />}
-        />
+      element={<ReportGeneratorGuarded />}
+    />
 
+    <Route
+      path="/hod/exam-halls"
+      element={<ExamHallsGuarded />}
 
-
-        <Route
-          path="/hod/exam-halls"
-          element={<ExamHallsGuarded />}
         />
 
         <Route
@@ -190,6 +199,10 @@ export default function App() {
           element={<ResourceManagementGuarded />}
         />
         <Route
+          path="/hod/fee-approvals"
+          element={<FeePaymentApprovalsGuarded />}
+        />
+        <Route
   path="/hod/student-transfer/:studentId"
   element={
     <RoleRoute role="hod">
@@ -208,6 +221,8 @@ export default function App() {
           path="/parent/dashboard"
           element={<ParentDashboardGuarded />}
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
