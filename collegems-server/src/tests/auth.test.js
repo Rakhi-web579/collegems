@@ -260,37 +260,39 @@ test("Authentication and Registration Flow Tests", async (t) => {
 });
 
 // Validation middleware tests
-const runValidation = async (body) => {
-  const req = { body };
+const runValidation = (body) => {
+  return new Promise((resolve, reject) => {
+    const req = { body };
+    const res = {
+      statusCode: undefined,
+      payload: undefined,
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(payload) {
+        this.payload = payload;
+        resolve({ res: this, nextCalled: false });
+        return this;
+      },
+    };
 
-  const res = {
-    statusCode: undefined,
-    payload: undefined,
-    status(code) {
-      this.statusCode = code;
-      return this;
-    },
-    json(payload) {
-      this.payload = payload;
-      return this;
-    },
-  };
+    let index = 0;
+    const next = (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      index++;
+      if (index < validateRegister.length) {
+        validateRegister[index](req, res, next);
+      } else {
+        resolve({ res, nextCalled: true });
+      }
+    };
 
-  let nextCalled = false;
-
-  const next = () => {
-    nextCalled = true;
-  };
-
-  for (const middleware of validateRegister) {
-    await middleware(req, res, next);
-
-    if (res.statusCode === 400) {
-      break;
-    }
-  }
-
-  return { res, nextCalled };
+    validateRegister[0](req, res, next);
+  });
 };
 
 test("register validation accepts a strong password", async () => {
