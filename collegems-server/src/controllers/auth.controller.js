@@ -89,7 +89,12 @@ export const register = async (req, res) => {
 
     }
 
-
+    const PUBLIC_REGISTRATION_ROLES = ["student", "teacher", "parent"];
+    if (!PUBLIC_REGISTRATION_ROLES.includes(role)) {
+      return res.status(403).json({
+        message: "This role cannot be created through public registration",
+      });
+    }
 
     // Role-specific checks
 
@@ -184,27 +189,6 @@ export const register = async (req, res) => {
       userData = { ...userData, studentId };
 
     }
-
-
-
-    if (role === "hod") {
-
-      // Relaxed COLLEGE_DOMAIN restriction to ensure easy sign-up during testing
-
-      if (!departmentCode) {
-
-        return res
-
-          .status(400)
-
-          .json({ message: "Department code required for HOD" });
-
-      }
-
-      userData = { ...userData, departmentCode };
-
-    }
-
 
 
     if (role === "parent") {
