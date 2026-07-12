@@ -3,11 +3,15 @@ import User from "../models/User.model.js";
 import StudentTimelineEvent from "../models/StudentTimelineEvent.model.js";
 import { logAction } from "../utils/auditService.js";
 import { getPaginatedData } from "../utils/pagination.util.js";
+import { revokeAllSessions } from "../utils/session.service.js";
 import calculateProfileCompletion from "../utils/profileCompletion.js";
 import Attendance from "../models/Attendance.model.js";
 import Results from "../models/Results.model.js";
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 import { checkPotentialDuplicates } from "../services/duplicateDetection.service.js";
+import { secureResumesDir } from "../middlewares/upload.middleware.js";
 const normalizeSettings = (settings) => {
   const safeSettings = settings || {};
   return {
@@ -127,6 +131,13 @@ export const updatePassword = async (req, res) => {
     user._updatedBy = req.user.id;
     await user.save();
 
+    await revokeAllSessions(req.user.id);
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
     res.json({ message: "Password updated successfully" });
 
     // Log password update
@@ -232,20 +243,39 @@ export const uploadResumeFile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Save relative path
-    const resumePath = `/uploads/resumes/${req.file.filename}`;
-    user.resumeUrl = resumePath;
+    // Resumes are stored outside the public/static file tree and are only
+    // ever retrieved through the authenticated GET /me/resume route below,
+    // so we only need to remember the on-disk filename, not a public URL.
+    user.resumeUrl = req.file.filename;
     user._updatedBy = req.user.id;
     await user.save();
 
     res.json({
       success: true,
       message: "Resume uploaded successfully",
-      resumeUrl: resumePath,
     });
   } catch (error) {
     console.error("Error uploading resume:", error);
     res.status(500).json({ message: "Server error uploading resume" });
+  }
+};
+
+export const downloadResumeFile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user || !user.resumeUrl) {
+      return res.status(404).json({ message: "No resume on file" });
+    }
+
+    const filePath = path.join(secureResumesDir, user.resumeUrl);
+    if (!filePath.startsWith(secureResumesDir) || !fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "Resume file not found" });
+    }
+
+    res.download(filePath, "resume.pdf");
+  } catch (error) {
+    console.error("Error downloading resume:", error);
+    res.status(500).json({ message: "Server error downloading resume" });
   }
 };
 
@@ -364,6 +394,124 @@ export const unlockAcademicRecord = async (req, res) => {
     });
   }
 };
+export const createUser = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      role,
+      studentId,
+      teacherId,
+      department,
+      departmentCode,
+      semester,
+      course,
+      childStudentId,
+      phone,
+      dob,
+    } = req.body || {};
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    const ALLOWED_ROLES = ["student", "teacher", "parent", "hod", "admin"];
+    if (!ALLOWED_ROLES.includes(role)) {
+      return res.status(400).json({ message: "Invalid user role" });
+    }
+
+    const COLLEGE_DOMAIN = process.env.COLLEGE_DOMAIN || "";
+    const emailNorm = email.trim().toLowerCase();
+
+    // Check institutional email domain for privileged roles
+    if (role === "hod" || role === "admin") {
+      if (COLLEGE_DOMAIN && !emailNorm.endsWith(`@${COLLEGE_DOMAIN.toLowerCase()}`)) {
+        return res.status(400).json({
+          message: `Email must belong to domain ${COLLEGE_DOMAIN}`,
+        });
+      }
+    }
+
+    // Role-specific validation
+    let userData = {
+      name,
+      email: emailNorm,
+      password: await hashPassword(password, 8),
+      role,
+      phone,
+      dob,
+    };
+
+    if (role === "student") {
+      if (!studentId) {
+        return res.status(400).json({ message: "Student ID required" });
+      }
+      if (!semester || !course) {
+        return res.status(400).json({ message: "Semester and course required for student" });
+      }
+      userData = { ...userData, studentId, semester, course };
+    }
+
+    else if (role === "teacher") {
+      if (!teacherId) {
+        return res.status(400).json({ message: "Teacher ID required" });
+      }
+      if (!department) {
+        return res.status(400).json({ message: "Department required" });
+      }
+      userData = { ...userData, teacherId, department };
+    }
+
+    else if (role === "parent") {
+      if (!childStudentId) {
+        return res.status(400).json({ message: "Child's Student ID required" });
+      }
+      const student = await User.findOne({ studentId: childStudentId, role: "student" });
+      if (!student) {
+        return res.status(404).json({ message: "Student with this ID does not exist" });
+      }
+      userData = { ...userData, childId: student._id };
+    }
+
+    else if (role === "hod") {
+      if (!departmentCode) {
+        return res.status(400).json({ message: "Department code required for HOD" });
+      }
+      const VALID_DEPARTMENT_CODES = ["CSE", "ECE", "ME", "EE", "CE", "MATH", "PHY", "BUS", "CS", "IT"];
+      if (!VALID_DEPARTMENT_CODES.includes(departmentCode.toUpperCase())) {
+        const existsInDB = await User.exists({ departmentCode: departmentCode.toUpperCase() });
+        if (!existsInDB) {
+          return res.status(400).json({ message: "Invalid or unauthorized department code" });
+        }
+      }
+      userData = { ...userData, departmentCode: departmentCode.toUpperCase() };
+    }
+
+    // Check existing user strictly by email
+    const exists = await User.findOne({ email: emailNorm });
+    if (exists) {
+      return res.status(400).json({ message: "User already exists with this email" });
+    }
+
+    const user = await User.create(userData);
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: { id: user._id, name: user.name, role: user.role, email: user.email },
+    });
+
+    // Log action
+    await logAction(req.user.id, "ADMIN_CREATE_USER", "User", user._id, {
+      role: user.role,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Server error creating user" });
+  }
+};
+
 export const createTeacher = async (req, res) => {
   try {
     const {
@@ -374,6 +522,7 @@ export const createTeacher = async (req, res) => {
       department,
       phone,
       dob,
+      bio,
       overrideDuplicates,
     } = req.body || {};
 
@@ -396,24 +545,24 @@ export const createTeacher = async (req, res) => {
 
     let duplicates = [];
 
-if (!overrideDuplicates) {
-  duplicates = await checkPotentialDuplicates({
-    name,
-    email,
-    teacherId,
-    department,
-    phone,
-    dob,
-    role: "teacher",
-  });
+    if (!overrideDuplicates) {
+      duplicates = await checkPotentialDuplicates({
+        name,
+        email,
+        teacherId,
+        department,
+        phone,
+        dob,
+        role: "teacher",
+      });
 
-  if (duplicates.length > 0) {
-    return res.status(409).json({
-      isDuplicateWarning: true,
-      matches: duplicates,
-    });
-  }
-}
+      if (duplicates.length > 0) {
+        return res.status(409).json({
+          isDuplicateWarning: true,
+          matches: duplicates,
+        });
+      }
+    }
 
     const teacher = await User.create({
       name,
@@ -424,6 +573,7 @@ if (!overrideDuplicates) {
       department,
       phone,
       dob,
+      bio,
     });
 
     await logAction(
