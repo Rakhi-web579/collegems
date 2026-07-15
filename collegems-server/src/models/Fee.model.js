@@ -14,7 +14,6 @@ const installmentSchema = new mongoose.Schema(
     idempotencyKey: {
       type: String,
     },
-  },
   paidOn: {
     type: Date,
     default: Date.now,
