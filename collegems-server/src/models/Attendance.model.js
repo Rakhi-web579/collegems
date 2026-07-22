@@ -105,6 +105,6 @@ attendanceSchema.statics.getAttendanceStats = function(courseId, startDate, endD
     ]);
 };
 
-export default mongoose.model("Attendance", attendanceSchema);
+export default mongoose.models.Attendance || mongoose.model("Attendance", attendanceSchema);
 
 export { isValidDateFormat, isValidDateRange };
